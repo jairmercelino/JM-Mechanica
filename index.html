@@ -207,19 +207,30 @@
 <!-- Slotje dashboard link -->
 <a class="dashboard-link" href="dashboard.html" title="Dashboard">&#128274;</a>
 
-<!-- AI Chat Widget -->
+<!-- FAQ Chatbot -->
 <style>
 #chat-knop {
   position: fixed; bottom: 5rem; right: 1.5rem;
   width: 52px; height: 52px; border-radius: 50%;
-  background: var(--groen); color: #fff; border: none;
+  background: #3b82f6; color: #fff; border: none;
   font-size: 22px; cursor: pointer; z-index: 998;
   box-shadow: 0 4px 16px rgba(0,0,0,0.25);
   display: flex; align-items: center; justify-content: center;
   transition: transform 0.2s, background 0.2s;
 }
-#chat-knop:hover { background: var(--groen-mid); transform: scale(1.08); }
-
+#chat-knop:hover { background: #2563eb; transform: scale(1.08); }
+#chat-badge {
+  position: absolute; top: -4px; right: -4px;
+  width: 18px; height: 18px; background: #ef4444;
+  border-radius: 50%; border: 2px solid #fff;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 11px; font-weight: 700; line-height: 1;
+  animation: badge-pulse 1.5s ease-in-out infinite;
+}
+@keyframes badge-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239,68,68,0.5); }
+  50% { transform: scale(1.2); box-shadow: 0 0 0 6px rgba(239,68,68,0); }
+}
 #chat-venster {
   position: fixed; bottom: 9rem; right: 1.5rem;
   width: 340px; max-height: 500px;
@@ -228,7 +239,9 @@
   display: none; flex-direction: column;
   z-index: 997; overflow: hidden;
   border: 1.5px solid var(--groen-border);
+  animation: chatIn 0.22s ease;
 }
+@keyframes chatIn { from { opacity:0; transform:translateY(12px) scale(0.97); } to { opacity:1; transform:none; } }
 #chat-header {
   background: var(--groen); padding: 14px 16px;
   display: flex; align-items: center; justify-content: space-between;
@@ -248,15 +261,14 @@
   font-size: 18px; cursor: pointer; padding: 2px 4px; line-height: 1;
 }
 #chat-sluit:hover { color: #fff; }
-
 #chat-berichten {
   flex: 1; overflow-y: auto; padding: 14px;
   display: flex; flex-direction: column; gap: 10px;
   min-height: 0;
 }
 .chat-bericht {
-  max-width: 82%; padding: 10px 13px;
-  border-radius: 14px; font-size: 13px; line-height: 1.5;
+  max-width: 84%; padding: 10px 13px;
+  border-radius: 14px; font-size: 13px; line-height: 1.55;
   word-wrap: break-word;
 }
 .chat-bericht.assistent {
@@ -281,13 +293,10 @@
 }
 .chat-typing span:nth-child(2) { animation-delay: 0.2s; }
 .chat-typing span:nth-child(3) { animation-delay: 0.4s; }
-@keyframes tik { 0%,60%,100% { opacity:0.3; transform:scale(0.8); } 30% { opacity:1; transform:scale(1); } }
-
+@keyframes tik { 0%,60%,100%{opacity:.3;transform:scale(.8)} 30%{opacity:1;transform:scale(1)} }
 #chat-invoer {
-  padding: 10px 12px;
-  border-top: 1.5px solid #eee;
-  display: flex; gap: 8px; align-items: flex-end;
-  flex-shrink: 0;
+  padding: 10px 12px; border-top: 1.5px solid #eee;
+  display: flex; gap: 8px; align-items: flex-end; flex-shrink: 0;
 }
 #chat-input {
   flex: 1; font-size: 13px; padding: 9px 12px;
@@ -305,32 +314,15 @@
 }
 #chat-stuur:hover { background: var(--groen-mid); }
 #chat-stuur:disabled { background: #ccc; cursor: default; }
-
-#chat-sleutel-form {
-  padding: 16px; text-align: center;
-}
-#chat-sleutel-form p {
-  font-size: 12px; color: #666; margin-bottom: 10px; line-height: 1.5;
-}
-#chat-sleutel-input {
-  width: 100%; font-size: 13px; padding: 9px 12px;
-  border: 1.5px solid #ddd; border-radius: 8px;
-  font-family: inherit; margin-bottom: 8px; outline: none;
-}
-#chat-sleutel-input:focus { border-color: var(--groen); }
-#chat-sleutel-opslaan {
-  width: 100%; background: var(--groen); color: #fff;
-  border: none; padding: 10px; border-radius: 8px;
-  font-size: 13px; font-weight: 700; cursor: pointer;
-  font-family: inherit;
-}
-
 @media (max-width: 400px) {
   #chat-venster { width: calc(100vw - 2rem); right: 1rem; }
 }
 </style>
 
-<button id="chat-knop" onclick="toggleChat()" title="Chat met ons">&#128172;</button>
+<button id="chat-knop" onclick="toggleChat()" title="Chat met ons" style="position:relative;">
+  &#128172;
+  <span id="chat-badge">1</span>
+</button>
 
 <div id="chat-venster">
   <div id="chat-header">
@@ -343,89 +335,90 @@
     </div>
     <button id="chat-sluit" onclick="toggleChat()">&#10005;</button>
   </div>
-
-  <div id="chat-sleutel-form" style="display:none;">
-    <p>Voer uw Anthropic API sleutel in.<br>Wordt alleen lokaal opgeslagen.</p>
-    <input id="chat-sleutel-input" type="password" placeholder="sk-ant-..." autocomplete="off" />
-    <button id="chat-sleutel-opslaan" onclick="slaSleutelOp()">Opslaan &amp; starten</button>
-  </div>
-
   <div id="chat-berichten"></div>
   <div id="chat-invoer">
     <textarea id="chat-input" placeholder="Stel een vraag..." rows="1"
-      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();verstuurChatBericht();}"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();verstuurChat();}"
       oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,80)+'px'"></textarea>
-    <button id="chat-stuur" onclick="verstuurChatBericht()" title="Versturen">&#10148;</button>
+    <button id="chat-stuur" onclick="verstuurChat()" title="Versturen">&#10148;</button>
   </div>
 </div>
 
 <script>
-const CHAT_SYSTEEM = `Je bent een vriendelijke assistent van JM Mechanica. Je helpt potentiële opdrachtgevers op een professionele maar toegankelijke manier. Deel informatie stap voor stap, niet alles tegelijk.
-
-Over JM Mechanica:
-- Diensten: Storing en onderhoud aan bedrijfsinstallaties, ondersteuning van technische dienst en projecten
-- Tarief: €77,50 per uur excl. btw, reisuren worden doorberekend. Bij langdurige opdrachten is overleg mogelijk
-- Werkgebied: Noord-Holland, buiten Noord-Holland in overleg voor kortere periodes
-- Beschikbaarheid: Op zoek naar losse klussen naast vaste opdracht, beschikbaar op vrije dagen en buiten roostertijden
-- KvK: 86164309, BTW: NL004201082B62
-
-Bij serieuze interesse: verwijs door naar het contactformulier of vul het voor de klant in. Stel eerst een paar vragen voordat je alle info deelt. Spreek Nederlands.`;
-
-let chatGeschiedenis = [];
 let chatOpen = false;
 let chatBezig = false;
+let serieuzeInteresse = 0;
 
-function toggleChat() {
-  chatOpen = !chatOpen;
-  const venster = document.getElementById('chat-venster');
-  venster.style.display = chatOpen ? 'flex' : 'none';
-  if (chatOpen) {
-    const key = localStorage.getItem('jm_ai_key');
-    if (!key) {
-      document.getElementById('chat-sleutel-form').style.display = 'block';
-      document.getElementById('chat-berichten').style.display = 'none';
-      document.getElementById('chat-invoer').style.display = 'none';
-    } else if (chatGeschiedenis.length === 0) {
-      voegChatToe('assistent', 'Goedendag! Ik ben de assistent van JM Mechanica. Waarmee kan ik u helpen?');
-      document.getElementById('chat-input').focus();
-    } else {
-      document.getElementById('chat-input').focus();
-    }
-  }
+const ANTWOORDEN = {
+  diensten: [
+    'JM Mechanica verzorgt storing en onderhoud aan bedrijfsinstallaties, ondersteunt uw technische dienst en is inzetbaar voor projecten. Heeft u een specifiek type klus in gedachten?',
+    'Wij bieden allround monteursdiensten: storingsoplossing, preventief onderhoud en ondersteuning van uw TD. Voor welk type installatie heeft u ondersteuning nodig?',
+    'Van storingsdiagnose tot technische projectondersteuning — JM Mechanica is breed inzetbaar in de industrie. Waar kan ik u meer over vertellen?'
+  ],
+  tarief: [
+    'Het uurtarief is €77,50 excl. btw. Reisuren worden doorberekend. Bij langdurige opdrachten is overleg mogelijk over een afwijkend tarief.',
+    'Wij hanteren €77,50 per uur excl. btw. Voor langdurige of terugkerende opdrachten kijken we graag samen naar de mogelijkheden.',
+    'Het tarief bedraagt €77,50 per uur excl. btw, inclusief reistijd. Heeft u een langdurig project? Dan is er ruimte voor overleg.'
+  ],
+  werkgebied: [
+    'JM Mechanica is actief in heel Noord-Holland. Buiten Noord-Holland is inzet mogelijk in overleg, met name voor kortere periodes.',
+    'Ons werkgebied is Noord-Holland. Voor opdrachten daarbuiten kijken we graag of inzet haalbaar is — dit gaat altijd in overleg.',
+    'Primair actief in Noord-Holland, maar ook buiten de regio inzetbaar voor kortlopende opdrachten. In welke regio heeft u de opdracht?'
+  ],
+  beschikbaar: [
+    'Jair is beschikbaar voor losse klussen naast zijn vaste opdracht — op vrije dagen en buiten roostertijden. Wanneer zou u iemand nodig hebben?',
+    'Er is beschikbaarheid op vrije dagen en buiten vaste roostertijden. Heeft u een idee van de gewenste startdatum of duur?',
+    'Losse klussen zijn welkom. De beschikbaarheid hangt af van het rooster, maar er is regelmatig ruimte. Wat is de omvang van de opdracht?'
+  ],
+  contact: [
+    'U kunt Jair bereiken via het contactformulier op deze pagina of direct bellen op +31 6 29 22 93 95. Hoe neemt u het liefst contact op?',
+    'Neem gerust contact op via het formulier hieronder, of bel direct: +31 6 29 22 93 95. Jair reageert zo snel mogelijk.',
+    'Ik kan u doorverbinden met Jair. Wilt u het contactformulier invullen of liever direct bellen op +31 6 29 22 93 95?'
+  ],
+  interesse: [
+    'Dat klinkt als een concrete opdracht! Ik kan u doorverbinden met Jair. Wilt u het contactformulier invullen of liever direct bellen op +31 6 29 22 93 95?',
+    'Goed om te horen dat u serieus interesse heeft. De snelste weg is even bellen: +31 6 29 22 93 95. Of vul het contactformulier in, dan nemen wij contact op.',
+    'Dan stel ik voor dat u direct contact opneemt met Jair — bel +31 6 29 22 93 95 of gebruik het formulier onderaan de pagina.'
+  ],
+  onbekend: [
+    'Dat is een goede vraag. Kunt u iets meer vertellen over wat u zoekt? Dan kan ik u beter helpen.',
+    'Ik begrijp uw vraag niet helemaal. Vraagt u naar onze diensten, tarieven, werkgebied of beschikbaarheid?',
+    'Daar heb ik niet direct een antwoord op. U kunt voor specifieke vragen altijd bellen: +31 6 29 22 93 95.'
+  ]
+};
+
+function pickRandom(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function slaSleutelOp() {
-  const key = document.getElementById('chat-sleutel-input').value.trim();
-  if (!key.startsWith('sk-ant-')) { alert('Ongeldige sleutel. Begint met sk-ant-'); return; }
-  localStorage.setItem('jm_ai_key', key);
-  document.getElementById('chat-sleutel-form').style.display = 'none';
-  document.getElementById('chat-berichten').style.display = 'flex';
-  document.getElementById('chat-invoer').style.display = 'flex';
-  voegChatToe('assistent', 'Goedendag! Ik ben de assistent van JM Mechanica. Waarmee kan ik u helpen?');
-  document.getElementById('chat-input').focus();
+function detecteerOnderwerp(tekst) {
+  const t = tekst.toLowerCase();
+  const isContact  = /contact|offerte|bel|mail|formulier|interesse|inschakelen|aanvragen|afspraak/.test(t);
+  const isTarief   = /tarief|prijs|kosten|uur|btw|bedrag|rekening|betalen/.test(t);
+  const isBeschik  = /beschikbaar|wanneer|vrij|planning|agenda|starten|datum|hoe snel/.test(t);
+  const isDienst   = /dienst|werk|wat doe|installat|storing|onderhoud|monteur|project|td|technisch/.test(t);
+  const isGebied   = /gebied|locatie|waar|regio|provincie|amsterdam|noord.holland|alkmaar|haarlem|zaandam/.test(t);
+
+  if (isContact) serieuzeInteresse++;
+  if (isTarief)  serieuzeInteresse++;
+  if (isBeschik) serieuzeInteresse++;
+
+  if (serieuzeInteresse >= 2) { serieuzeInteresse = 0; return 'interesse'; }
+  if (isContact)  return 'contact';
+  if (isTarief)   return 'tarief';
+  if (isBeschik)  return 'beschikbaar';
+  if (isDienst)   return 'diensten';
+  if (isGebied)   return 'werkgebied';
+  return 'onbekend';
 }
 
 function voegChatToe(rol, tekst) {
   const div = document.createElement('div');
-  div.className = `chat-bericht ${rol}`;
+  div.className = 'chat-bericht ' + rol;
   div.textContent = tekst;
   document.getElementById('chat-berichten').appendChild(div);
   scrollChatOnder();
   return div;
-}
-
-function voegTypingToe() {
-  const div = document.createElement('div');
-  div.className = 'chat-typing';
-  div.id = 'chat-typing-indicator';
-  div.innerHTML = '<span></span><span></span><span></span>';
-  document.getElementById('chat-berichten').appendChild(div);
-  scrollChatOnder();
-}
-
-function verwijderTyping() {
-  const el = document.getElementById('chat-typing-indicator');
-  if (el) el.remove();
 }
 
 function scrollChatOnder() {
@@ -433,92 +426,61 @@ function scrollChatOnder() {
   el.scrollTop = el.scrollHeight;
 }
 
-async function verstuurChatBericht() {
+function antwoordMetDelay(tekst, delay) {
+  chatBezig = true;
+  document.getElementById('chat-stuur').disabled = true;
+
+  setTimeout(() => {
+    const typing = document.createElement('div');
+    typing.className = 'chat-typing';
+    typing.id = 'chat-typing-indicator';
+    typing.innerHTML = '<span></span><span></span><span></span>';
+    document.getElementById('chat-berichten').appendChild(typing);
+    scrollChatOnder();
+
+    setTimeout(() => {
+      const t = document.getElementById('chat-typing-indicator');
+      if (t) t.remove();
+      voegChatToe('assistent', tekst);
+      chatBezig = false;
+      document.getElementById('chat-stuur').disabled = false;
+      document.getElementById('chat-input').focus();
+    }, 900 + Math.random() * 400);
+  }, delay || 0);
+}
+
+function toggleChat() {
+  chatOpen = !chatOpen;
+  document.getElementById('chat-venster').style.display = chatOpen ? 'flex' : 'none';
+  document.getElementById('chat-badge').style.display = 'none';
+  if (chatOpen) {
+    const berichten = document.getElementById('chat-berichten');
+    if (berichten.children.length === 0) {
+      antwoordMetDelay('Goedendag! Ik ben de assistent van JM Mechanica. Kan ik u ergens mee helpen?', 300);
+    } else {
+      document.getElementById('chat-input').focus();
+    }
+  }
+}
+
+function verstuurChat() {
   if (chatBezig) return;
   const input = document.getElementById('chat-input');
   const tekst = input.value.trim();
   if (!tekst) return;
 
-  const key = localStorage.getItem('jm_ai_key');
-  if (!key) { toggleChat(); return; }
-
   input.value = '';
   input.style.height = 'auto';
   voegChatToe('gebruiker', tekst);
-  chatGeschiedenis.push({ role: 'user', content: tekst });
 
-  chatBezig = true;
-  document.getElementById('chat-stuur').disabled = true;
-  voegTypingToe();
-
-  try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': key,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        system: CHAT_SYSTEEM,
-        messages: chatGeschiedenis,
-        stream: true
-      })
-    });
-
-    verwijderTyping();
-
-    if (resp.status === 401) {
-      localStorage.removeItem('jm_ai_key');
-      voegChatToe('assistent', 'API sleutel ongeldig. Ververs de pagina om opnieuw in te voeren.');
-    } else if (!resp.ok) {
-      voegChatToe('assistent', 'Er ging iets mis (fout ' + resp.status + '). Probeer het opnieuw.');
-    } else {
-      const berichtDiv = voegChatToe('assistent', '');
-      let volledigAntwoord = '';
-
-      const reader = resp.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = '';
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-        const regels = buffer.split('\n');
-        buffer = regels.pop();
-
-        for (const regel of regels) {
-          if (!regel.startsWith('data: ')) continue;
-          const data = regel.slice(6).trim();
-          if (data === '[DONE]') continue;
-          try {
-            const evt = JSON.parse(data);
-            if (evt.type === 'content_block_delta' && evt.delta?.type === 'text_delta') {
-              volledigAntwoord += evt.delta.text;
-              berichtDiv.textContent = volledigAntwoord;
-              scrollChatOnder();
-            }
-          } catch (_) {}
-        }
-      }
-
-      if (volledigAntwoord) {
-        chatGeschiedenis.push({ role: 'assistant', content: volledigAntwoord });
-      }
-    }
-  } catch (err) {
-    verwijderTyping();
-    voegChatToe('assistent', 'Verbinding mislukt. Controleer uw internetverbinding en probeer opnieuw.');
-  }
-
-  chatBezig = false;
-  document.getElementById('chat-stuur').disabled = false;
-  document.getElementById('chat-input').focus();
+  const onderwerp = detecteerOnderwerp(tekst);
+  antwoordMetDelay(pickRandom(ANTWOORDEN[onderwerp]));
 }
+
+// Auto-open na 8 seconden
+setTimeout(() => {
+  if (!chatOpen) toggleChat();
+}, 8000);
 </script>
 
 <script>
