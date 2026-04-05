@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="JM Mechanica">
+<meta name="theme-color" content="#1a4a2e">
+<title>JM Mechanica — Dashboard</title>
+<script src="https://accounts.google.com/gsi/client" async></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+:root { --groen: #1a4a2e; --groen-mid: #2d6e47; --groen-licht: #e8f2ec; --groen-border: #b8d4c2; }
+html, body { height: 100%; overflow: hidden; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f3; display: flex; flex-direction: column; }
+
+/* ── LOGIN ── */
+#login-scherm { position: fixed; inset: 0; background: var(--groen); display: flex; align-items: center; justify-content: center; z-index: 999; padding: 2rem; }
+.login-card { width: 100%; max-width: 340px; text-align: center; }
+.login-logo { width: 200px; margin: 0 auto 1.5rem; display: block; }
+.login-sub { font-size: 12px; color: #8fbfa0; margin-bottom: 2rem; text-transform: uppercase; letter-spacing: 0.1em; }
+.login-input { width: 100%; font-size: 18px; padding: 14px; border: none; border-radius: 12px; background: rgba(255,255,255,0.15); color: #fff; text-align: center; letter-spacing: 0.15em; margin-bottom: 12px; -webkit-appearance: none; }
+.login-input::placeholder { color: rgba(255,255,255,0.4); letter-spacing: 0.05em; }
+.login-input:focus { outline: none; background: rgba(255,255,255,0.25); }
+.login-btn { background: #fff; color: var(--groen); border: none; padding: 15px; font-size: 15px; font-weight: 700; cursor: pointer; width: 100%; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
+.login-fout { color: rgba(255,255,255,0.7); font-size: 13px; margin-top: 10px; display: none; }
+
+/* ── APP SHELL ── */
+#app { display: none; flex-direction: column; height: 100%; }
+
+.topbar { background: var(--groen); padding: env(safe-area-inset-top, 0) 1rem 0; flex-shrink: 0; }
+.topbar-inner { display: flex; align-items: center; justify-content: space-between; height: 52px; }
+.topbar-logo { font-size: 14px; font-weight: 700; color: #fff; }
+.topbar-logo span { color: #8fbfa0; font-size: 11px; font-weight: 400; margin-left: 6px; }
+.logout-btn { background: rgba(255,255,255,0.15); color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; }
+
+.content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 80px; }
+.pagina { display: none; padding: 1rem; max-width: 600px; margin: 0 auto; }
+.pagina.actief { display: block; }
+
+/* ── BOTTOM NAV ── */
+.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid #e0e0e0; display: flex; padding-bottom: env(safe-area-inset-bottom, 0); z-index: 100; flex-shrink: 0; }
+.nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 10px 0 8px; cursor: pointer; border: none; background: transparent; color: #aaa; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; gap: 4px; }
+.nav-item.active { color: var(--groen); }
+.nav-icon { font-size: 22px; line-height: 1; }
+
+/* ── ROOSTER KALENDER ── */
+.rooster-header { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; margin-bottom:4px; }
+.rooster-dag-naam { font-size:10px; font-weight:700; color:#888; text-align:center; padding:4px 0; text-transform:uppercase; }
+.rooster-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
+.rooster-cel { min-height:52px; border-radius:8px; padding:4px; background:#f5f5f3; position:relative; }
+.rooster-cel.vandaag { background:var(--groen-licht); border:1.5px solid var(--groen-border); }
+.rooster-cel.ander-maand { opacity:0.35; }
+.rooster-dag-nr { font-size:11px; font-weight:700; color:#666; margin-bottom:2px; }
+.rooster-cel.vandaag .rooster-dag-nr { color:var(--groen); }
+.dienst-blok { border-radius:5px; padding:2px 4px; font-size:10px; font-weight:800; color:#fff; margin-bottom:2px; text-align:center; }
+.dienst-D { background:#f59e0b; }
+.dienst-M { background:#ef4444; }
+.dienst-N { background:#3b82f6; }
+.dienst-tijd { font-size:9px; font-weight:600; opacity:0.9; }
+.inklok-hero { background: var(--groen); border-radius: 16px; padding: 1.75rem; text-align: center; margin-bottom: 1rem; }
+.inklok-tijd { font-size: 48px; font-weight: 700; color: #fff; letter-spacing: -1px; margin-bottom: 4px; font-variant-numeric: tabular-nums; }
+.inklok-status { font-size: 12px; color: #8fbfa0; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1.5rem; }
+.inklok-groot-btn { background: #fff; color: var(--groen); border: none; padding: 16px 40px; border-radius: 99px; font-size: 16px; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.05em; display: inline-block; }
+.inklok-groot-btn.actief { background: #dc2626; color: #fff; }
+.inklok-duur { font-size: 13px; color: #a8cfb5; margin-top: 12px; min-height: 20px; }
+
+/* ── CARDS ── */
+.card { background: #fff; border: 1.5px solid #e0e0e0; border-radius: 14px; padding: 1rem; margin-bottom: 1rem; }
+.card-titel { font-size: 11px; font-weight: 700; color: var(--groen); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.9rem; padding-bottom: 8px; border-bottom: 1.5px solid var(--groen-border); }
+.form-groep { margin-bottom: 10px; }
+.form-groep label { font-size: 11px; color: #888; display: block; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.04em; }
+.form-groep input, .form-groep select { width: 100%; font-size: 16px; padding: 11px 12px; border: 1.5px solid #ddd; border-radius: 10px; background: #f9f9f9; color: #111; font-family: inherit; -webkit-appearance: none; }
+.form-groep input:focus, .form-groep select:focus { border-color: var(--groen); outline: none; background: #fff; }
+.actie-btn { background: var(--groen); color: #fff; border: none; padding: 13px; font-size: 14px; font-weight: 700; cursor: pointer; width: 100%; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.05em; font-family: inherit; margin-top: 4px; }
+.actie-btn.grijs { background: #888; }
+
+/* ── METRICS ── */
+.metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 1rem; }
+.metric { background: var(--groen-licht); border: 1.5px solid var(--groen-border); border-radius: 10px; padding: 0.75rem; text-align: center; }
+.metric-label { font-size: 9px; color: var(--groen-mid); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 3px; }
+.metric-value { font-size: 20px; font-weight: 700; color: var(--groen); }
+
+/* ── UREN LIJST ── */
+.week-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
+.week-nav button { background: var(--groen-licht); color: var(--groen); border: 1px solid var(--groen-border); padding: 8px 14px; border-radius: 8px; font-size: 14px; cursor: pointer; font-weight: 700; }
+.week-nav span { font-size: 12px; font-weight: 700; color: var(--groen); text-align: center; }
+.dag-rij { display: flex; align-items: center; padding: 10px 0; border-bottom: 0.5px solid #eee; gap: 10px; }
+.dag-rij:last-child { border-bottom: none; }
+.dag-naam { font-size: 12px; font-weight: 700; color: #888; width: 30px; flex-shrink: 0; }
+.dag-datum { font-size: 11px; color: #888; width: 45px; flex-shrink: 0; }
+.dag-klant { flex: 1; font-size: 13px; color: #333; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dag-uren { font-size: 14px; font-weight: 700; color: var(--groen); width: 38px; text-align: right; flex-shrink: 0; }
+.dag-uren.leeg { color: #ddd; font-weight: 400; }
+.dag-del { background: none; border: none; color: #ddd; font-size: 16px; cursor: pointer; padding: 4px; flex-shrink: 0; }
+.dag-rij.vandaag .dag-naam, .dag-rij.vandaag .dag-klant { color: var(--groen); }
+.dag-rij.weekend { opacity: 0.4; }
+.totaal-rij { display: flex; justify-content: space-between; padding: 10px 0 4px; font-size: 13px; font-weight: 700; color: var(--groen); border-top: 1.5px solid var(--groen-border); margin-top: 4px; }
+
+/* ── EXPORT ── */
+.export-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.exp-btn { background: var(--groen-licht); color: var(--groen); border: 1.5px solid var(--groen-border); padding: 12px 8px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; text-align: center; font-family: inherit; }
+
+/* ── FACTUREN ── */
+.camera-btn { background: var(--groen); color: #fff; border: none; border-radius: 14px; padding: 1.5rem; text-align: center; width: 100%; cursor: pointer; margin-bottom: 1rem; font-family: inherit; }
+.camera-icoon { font-size: 40px; display: block; margin-bottom: 8px; }
+.camera-tekst { font-size: 14px; font-weight: 700; color: #fff; display: block; margin-bottom: 3px; }
+.camera-sub { font-size: 11px; color: #8fbfa0; display: block; }
+#cameraInput, #fileInput { display: none; }
+
+.kw-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 1rem; }
+.kw-tab { background: var(--groen-licht); color: var(--groen); border: 1.5px solid var(--groen-border); padding: 8px 4px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; text-align: center; font-family: inherit; }
+.kw-tab.active { background: var(--groen); color: #fff; border-color: var(--groen); }
+
+.factuur-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 0.5px solid #eee; }
+.factuur-item:last-child { border-bottom: none; }
+.factuur-thumb { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; background: var(--groen-licht); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+.factuur-info { flex: 1; overflow: hidden; }
+.factuur-naam { font-size: 13px; font-weight: 600; color: #111; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.factuur-sub { font-size: 11px; color: #888; }
+.factuur-del { background: none; border: none; color: #ddd; font-size: 18px; cursor: pointer; padding: 4px; }
+.leeg-state { text-align: center; padding: 2rem 1rem; color: #bbb; font-size: 13px; }
+
+.dl-btn { background: var(--groen); color: #fff; border: none; padding: 13px; font-size: 14px; font-weight: 700; cursor: pointer; width: 100%; border-radius: 10px; text-transform: uppercase; letter-spacing: 0.05em; font-family: inherit; margin-top: 8px; }
+.dl-btn:disabled { opacity: 0.35; }
+
+/* ── INSTALLEER BANNER ── */
+#installeer-banner { display: none; background: var(--groen-licht); border: 1.5px solid var(--groen-border); border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
+#installeer-banner p { font-size: 13px; color: var(--groen); font-weight: 600; margin-bottom: 6px; }
+#installeer-banner small { font-size: 12px; color: #666; line-height: 1.5; display: block; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-scherm">
+  <div class="login-card">
+    <img class="login-logo" src="data:image/svg+xml,%3Csvg%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20860%20408%22%3E%3Cdefs%3E%3Cstyle%3E.cls-1%7Bfill%3A%23fff%3B%7D%3C/style%3E%3C/defs%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M852.95%2C155.42c-.45-2.03-1.47-4.26-2.92-5.73-10.43-10.5-20.28-21.73-31.76-30.93-13.66-10.99-29.49-14.87-46.18-5.84-6.13%2C3.3-12.44%2C6.55-17.81%2C10.88-21.53%2C17.41-46.4%2C24.45-72.7%2C26.79l-38.98%2C1.16%2C38.49-16.07V40.04c0-8.18-2.88-15.27-8.6-21.26-6-5.73-13.08-8.6-21.26-8.6h-90.82c-8.18%2C0-15.27%2C2.87-21.26%2C8.6-5.73%2C6-8.6%2C13.08-8.6%2C21.26%2C0-8.18-3.01-15.27-9-21.26-5.71-5.73-12.82-8.6-21.26-8.6h-90.4c-8.47%2C0-15.56%2C2.87-21.28%2C8.6-6%2C6-9%2C13.08-9%2C21.26v111.59h-59.64l-38.69-.02%2C37.8-15.76V10.17h-60.13V151.61c-20.55%2C0-41.12%2C0-61.67%2C.09-27.23%2C.11-54.51%2C.94-81.24-5.62-7.42-1.83-15.8-3.39-21.48-7.91-10.72-8.54-22.53-12.97-35.5-12.44-31.51%2C1.31-52.37%2C26.37-50.97%2C54.74%2C1.89%2C38.16%2C44.8%2C62.49%2C77.22%2C42.37%2C21.71-13.48%2C45.33-18.25%2C70.14-18.83%2C21.33-.49%2C42.68%2C.11%2C64.03%2C.11%2C11.86%2C0%2C25.12%2C0%2C39.47%2C.02v47.4h-60.55v-30.29h-60.13v60.13c0%2C8.47%2C3.01%2C15.56%2C9%2C21.28%2C5.73%2C6%2C12.82%2C9%2C21.26%2C9h120.68c8.18%2C0%2C15.27-3.01%2C21.26-9%2C5.73-5.73%2C8.6-12.82%2C8.6-21.28v-77.25c19.43%2C0%2C39.78-.02%2C60.53-.02v107.56h60.13v-107.56c20.44%2C0%2C40.76%2C0%2C60.55%2C.02v107.53h60.13v-107.53c22.02%2C.04%2C42.48%2C.04%2C60.53%2C.07v107.47h60.15v-105.22c.47%2C.04%2C.96%2C.11%2C1.43%2C.16%2C18.99%2C2.14%2C37.75%2C7.33%2C51.97%2C20.41%2C28.3%2C26.03%2C62%2C23.49%2C92.56%2C7.91%2C2.61-1.34%2C4.06-5.01%2C6.02-7.6-2.7-1.25-5.28-3.03-8.11-3.68-12.46-2.85-25.05-5.17-37.46-8.16-6.22-1.52-10.79-5.68-13.02-11.86-5.01-13.77-3.63-27.03%2C4.01-39.47%2C8.49-13.8%2C16.2-16.89%2C31.85-12.7%2C12.15%2C3.28%2C24.14%2C7.13%2C36.28%2C10.5%2C1.76%2C.49%2C4.66%2C.38%2C5.68-.71%2C1.09-1.18%2C1.05-3.94%2C.65-5.84ZM58.08%2C210.49c-18.83%2C0-34.1-15.27-34.1-34.1s15.27-34.1%2C34.1-34.1%2C34.1%2C15.27%2C34.1%2C34.1-15.27%2C34.1-34.1%2C34.1Zm442.2-58.86h-97.84l37.29-15.56V70.33h60.55v81.3Zm120.66%2C.02c-2.3-.02-4.59-.02-6.89-.02h-90.71l37.06-15.47V70.33h60.53v81.33Z%22/%3E%3Cg%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M138.25%2C397.39v-46.72h22.76l7.01%2C34.74h.48l7.07-34.74h22.1v46.72h-12.58v-34.74h-.36l-7.07%2C34.74h-19.47l-7.01-34.74h-.36v34.74h-12.58Z%22/%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M256.11%2C350.67v10.78h-25.76v7.19h23.36v10.18h-23.36v7.79h25.88v10.78h-38.46v-46.72h38.34Z%22/%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M298.42%2C398.11c-19.11%2C0-23.9-4.79-23.9-24.08s4.79-24.08%2C23.9-24.08%2C23.84%2C4.07%2C23.72%2C20.43h-13.18c.12-9.22-.96-10.24-10.54-10.24s-10.72%2C1.38-10.72%2C13.9%2C1.08%2C13.9%2C10.72%2C13.9%2C10.66-1.02%2C10.54-10.36h13.18c.12%2C16.41-4.61%2C20.55-23.72%2C20.55Z%22/%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M341.03%2C350.67h12.58v17.49h17.97v-17.49h12.58v46.72h-12.58v-18.45h-17.97v18.45h-12.58v-46.72Z%22/%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M452.18%2C397.39h-14.38l-2.52-9.11h-17.97l-2.82%2C9.11h-13.54l15.4-46.72h20.84l14.98%2C46.72Zm-20.01-19.29l-5.57-17.25h-.36l-5.69%2C17.25h11.62Z%22/%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M468.97%2C350.67h11.92l20.66%2C25.52h.36v-25.52h12.58v46.72h-11.86l-20.73-25.46h-.36v25.46h-12.58v-46.72Z%22/%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M534.59%2C350.67h12.58v46.72h-12.58v-46.72Z%22/%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M589.95%2C398.11c-19.11%2C0-23.9-4.79-23.9-24.08s4.79-24.08%2C23.9-24.08%2C23.84%2C4.07%2C23.72%2C20.43h-13.18c.12-9.22-.96-10.24-10.54-10.24s-10.72%2C1.38-10.72%2C13.9%2C1.08%2C13.9%2C10.72%2C13.9%2C10.66-1.02%2C10.54-10.36h13.18c.12%2C16.41-4.62%2C20.55-23.72%2C20.55Z%22/%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M681.09%2C397.39h-14.38l-2.52-9.11h-17.97l-2.82%2C9.11h-13.54l15.4-46.72h20.84l14.97%2C46.72Zm-20.01-19.29l-5.57-17.25h-.36l-5.69%2C17.25h11.62Z%22/%3E%3C/g%3E%3C/svg%3E" alt="JM Mechanica" />
+    <div class="login-sub">Privé dashboard</div>
+    <input class="login-input" type="password" id="ww-input" placeholder="Wachtwoord" onkeydown="if(event.key==='Enter')login()" />
+    <button class="login-btn" onclick="login()">Inloggen</button>
+    <div class="login-fout" id="login-fout">Wachtwoord onjuist</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="topbar-logo">JM Mechanica <span>Dashboard</span></div>
+      <button class="logout-btn" onclick="uitloggen()">Uitloggen</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- INKLOKKEN PAGINA -->
+    <div class="pagina actief" id="pagina-klok">
+      <div style="height:1rem;"></div>
+
+      <div id="installeer-banner">
+        <p>&#128241; Voeg toe aan beginscherm</p>
+        <small>Tik op het deelicoon &#8679; onderaan en kies "Zet op beginscherm" om push meldingen te ontvangen.</small>
+      </div>
+
+      <!-- GPS LOCATIE MELDING -->
+      <div class="card" id="locatie-card" style="display:none;">
+        <div class="card-titel">📍 Locatie detectie — A-ware Almere</div>
+        <div id="locatie-status" style="font-size:13px;color:#888;margin-bottom:10px;">Locatie wordt bepaald...</div>
+        <button class="actie-btn grijs" id="locatie-btn" onclick="startLocatie()" style="font-size:13px;">📍 Locatie inschakelen</button>
+      </div>
+
+      <div class="inklok-hero">
+        <div class="inklok-tijd" id="klok-display">--:--</div>
+        <div class="inklok-status" id="klok-status-tekst">Niet ingeklokt</div>
+        <button class="inklok-groot-btn" id="inklok-btn" onclick="toggleKlok()">Inklokkken</button>
+        <div class="inklok-duur" id="inklok-duur"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-titel">Handmatig toevoegen</div>
+        <div class="form-groep"><label>Datum</label><input type="date" id="inp-datum" /></div>
+        <div class="form-groep"><label>Start</label><input type="time" id="inp-start" value="07:00" /></div>
+        <div class="form-groep"><label>Einde</label><input type="time" id="inp-einde" value="15:30" /></div>
+        <div class="form-groep">
+          <label>Opdrachtgever</label>
+          <div style="display:flex;gap:8px;">
+            <input type="text" id="inp-klant" placeholder="Typ of selecteer..." autocomplete="off" style="flex:1;" oninput="filterOpdrachtgevers(this.value)" />
+            <button onclick="slaOpdrachtgeverOp()" style="background:var(--groen);color:#fff;border:none;border-radius:10px;padding:0 12px;font-size:18px;cursor:pointer;">+</button>
+          </div>
+          <div id="opdrachtgever-lijst" style="margin-top:6px;"></div>
+        </div>
+        <button class="actie-btn" onclick="voegToe()">+ Toevoegen</button>
+      </div>
+
+      <!-- ROOSTER -->
+      <div class="card">
+        <div class="card-titel">📅 Rooster — huidige week</div>
+        <div id="rooster-lijst"></div>
+        <button class="actie-btn grijs" onclick="voegRoosterDienstToe()" style="font-size:13px;margin-top:10px;">+ Dienst inplannen</button>
+      </div>
+
+      <!-- DIENST INPLANNEN -->
+      <div class="card" id="rooster-form" style="display:none;">
+        <div class="card-titel">Dienst inplannen</div>
+        <div class="form-groep"><label>Datum</label><input type="date" id="rooster-datum" /></div>
+        <div class="form-groep"><label>Start</label><input type="time" id="rooster-start" value="07:00" /></div>
+        <div class="form-groep"><label>Einde</label><input type="time" id="rooster-einde" value="15:30" /></div>
+        <div class="form-groep">
+          <label>Opdrachtgever</label>
+          <select id="rooster-klant" style="width:100%;font-size:16px;padding:11px 12px;border:1.5px solid #ddd;border-radius:10px;background:#f9f9f9;color:#111;font-family:inherit;-webkit-appearance:none;">
+            <option value="">Selecteer opdrachtgever...</option>
+          </select>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;">
+          <button class="actie-btn grijs" onclick="document.getElementById('rooster-form').style.display='none'">Annuleren</button>
+          <button class="actie-btn" onclick="slaRoosterDienstOp()">Opslaan</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROOSTER PAGINA -->
+    <div class="pagina" id="pagina-rooster">
+      <div style="height:1rem;"></div>
+
+      <!-- MAAND NAVIGATIE -->
+      <div class="week-nav" style="margin-bottom:1rem;">
+        <button onclick="navigeerMaand(-1)">&#9664;</button>
+        <span id="rooster-maand-label" style="font-size:14px;font-weight:700;color:var(--groen);"></span>
+        <button onclick="navigeerMaand(1)">&#9654;</button>
+      </div>
+
+      <!-- LEGENDA -->
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:4px;"><span class="dienst-blok dienst-D" style="padding:3px 8px;">D</span><span style="font-size:11px;color:#666;">Dag 06:00–14:00</span></div>
+        <div style="display:flex;align-items:center;gap:4px;"><span class="dienst-blok dienst-M" style="padding:3px 8px;">M</span><span style="font-size:11px;color:#666;">Middag 14:00–22:00</span></div>
+        <div style="display:flex;align-items:center;gap:4px;"><span class="dienst-blok dienst-N" style="padding:3px 8px;">N</span><span style="font-size:11px;color:#666;">Nacht 22:00–06:00</span></div>
+      </div>
+
+      <!-- KALENDER -->
+      <div class="rooster-header">
+        <div class="rooster-dag-naam">Ma</div>
+        <div class="rooster-dag-naam">Di</div>
+        <div class="rooster-dag-naam">Wo</div>
+        <div class="rooster-dag-naam">Do</div>
+        <div class="rooster-dag-naam">Vr</div>
+        <div class="rooster-dag-naam">Za</div>
+        <div class="rooster-dag-naam">Zo</div>
+      </div>
+      <div class="rooster-grid" id="rooster-kalender"></div>
+
+      <!-- INTERVAL INSTELLING -->
+      <div class="card" style="margin-top:1rem;">
+        <div class="card-titel">⚙️ Rooster instellingen</div>
+        <div class="form-groep">
+          <label>Startdatum patroon</label>
+          <input type="date" id="rooster-startdatum" value="2026-04-06" onchange="slaRoosterInstellingenOp()" />
+        </div>
+        <div class="form-groep">
+          <label>Patroon interval</label>
+          <select id="rooster-interval" onchange="slaRoosterInstellingenOp()" style="width:100%;font-size:16px;padding:11px 12px;border:1.5px solid #ddd;border-radius:10px;background:#f9f9f9;color:#111;font-family:inherit;-webkit-appearance:none;">
+            <option value="10" selected>10 dagen (D D M M N N + 4 vrij)</option>
+            <option value="7">7 dagen (wekelijks)</option>
+            <option value="14">14 dagen (2 weken)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- UREN OVERZICHT PAGINA -->
+    <div class="pagina" id="pagina-uren">
+      <div style="height:1rem;"></div>
+      <div class="metrics">
+        <div class="metric"><div class="metric-label">Deze week</div><div class="metric-value" id="m-week">0:00</div></div>
+        <div class="metric"><div class="metric-label">Dagen</div><div class="metric-value" id="m-dagen">0</div></div>
+        <div class="metric"><div class="metric-label">Gemiddeld</div><div class="metric-value" id="m-gem">0:00</div></div>
+      </div>
+      <div class="card">
+        <div class="week-nav">
+          <button onclick="navigeerWeek(-1)">&#9664;</button>
+          <span id="week-label">Week laden...</span>
+          <button onclick="navigeerWeek(1)">&#9654;</button>
+        </div>
+        <div id="uren-lijst"></div>
+      </div>
+      <div class="card">
+        <div class="card-titel">Exporteren</div>
+        <div class="export-btns">
+          <button class="exp-btn" onclick="kopieerOverzicht()">&#128203; Kopieer voor bureau</button>
+          <button class="exp-btn" onclick="downloadCSV()">&#128229; Download CSV</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- FACTUREN PAGINA -->
+    <div class="pagina" id="pagina-facturen">
+      <div style="height:1rem;"></div>
+      <input type="file" id="jsonInput" accept=".json" onchange="importeerJSON(this.files)" style="display:none;" />
+
+      <!-- SCAN IMPORTEER -->
+      <div class="card">
+        <div class="card-titel">📊 Scan resultaat</div>
+        <p style="font-size:12px;color:#888;margin-bottom:10px;line-height:1.5;">Automatisch ophalen uit Google Drive, of importeer handmatig na nieuwe scan.</p>
+        <button class="actie-btn" onclick="laadVanGoogleDrive()" style="margin-bottom:8px;">🔄 Vernieuwen</button>
+        <button class="actie-btn grijs" onclick="document.getElementById('jsonInput').click()" style="font-size:12px;">📂 Handmatig importeren</button>
+      </div>
+
+      <!-- KOSTEN METRICS -->
+      <div id="kosten-metrics" style="display:none;">
+        <div class="metrics" style="grid-template-columns:repeat(2,1fr);">
+          <div class="metric"><div class="metric-label">Inkomsten</div><div class="metric-value" id="k-inkomsten" style="font-size:15px;color:#1a4a2e;">€ 0</div></div>
+          <div class="metric"><div class="metric-label">Volledig aftrekbaar</div><div class="metric-value" id="k-100" style="font-size:15px;">€ 0</div></div>
+          <div class="metric"><div class="metric-label">Deels aftrekbaar</div><div class="metric-value" id="k-deels" style="font-size:15px;">€ 0</div></div>
+          <div class="metric"><div class="metric-label">Geschat terug</div><div class="metric-value" id="k-schat" style="font-size:15px;">€ 0</div></div>
+        </div>
+      </div>
+
+      <!-- KOSTEN LIJSTEN -->
+      <div id="kosten-inkomsten" style="display:none;" class="card">
+        <div class="card-titel">💰 Inkomsten (Certos)</div>
+        <div id="lijst-inkomsten"></div>
+      </div>
+      <div id="kosten-100" style="display:none;" class="card">
+        <div class="card-titel">🟢 Volledig aftrekbaar</div>
+        <div id="lijst-100"></div>
+      </div>
+      <div id="kosten-deels" style="display:none;" class="card">
+        <div class="card-titel">🟡 Deels aftrekbaar</div>
+        <div id="lijst-deels"></div>
+        <p style="font-size:11px;color:#888;margin-top:8px;line-height:1.5;">Bespreek % met je boekhouder. Schatting 70%.</p>
+      </div>
+      <div id="kosten-prive" style="display:none;" class="card">
+        <div class="card-titel">🔴 Privé — niet aftrekbaar</div>
+        <div id="lijst-prive"></div>
+      </div>
+
+      <!-- DOWNLOAD PER KWARTAAL -->
+      <div id="kw-download-sectie" style="display:none;" class="card">
+        <div class="card-titel">📥 Download per kwartaal voor boekhouder</div>
+        <div id="kw-knoppen" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;"></div>
+        <button class="actie-btn" onclick="downloadAlleKwartalen()" style="background:var(--groen-mid);">📥 Download alles</button>
+      </div>
+
+      <div style="height:1rem;border-top:1.5px solid var(--groen-border);margin:0.5rem 0 1rem;"></div>
+
+      <div class="card" style="background:var(--groen-licht);border-color:var(--groen-border);">
+        <div class="card-titel">📱 Factuur toevoegen via telefoon</div>
+        <p style="font-size:12px;color:#555;line-height:1.6;">Deel een PDF of foto via je iPhone → "Opslaan in bestanden" → Google Drive → JM Mechanica → Facturen → juiste kwartaal map. Daarna scanner draaien op je Mac.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="bottom-nav">
+    <button class="nav-item active" onclick="toonPagina('klok',this)">
+      <span class="nav-icon">&#9201;</span>
+      <span>Inklokkken</span>
+    </button>
+    <button class="nav-item" onclick="toonPagina('rooster',this)">
+      <span class="nav-icon">&#128197;</span>
+      <span>Rooster</span>
+    </button>
+    <button class="nav-item" onclick="toonPagina('uren',this)">
+      <span class="nav-icon">&#128200;</span>
+      <span>Uren</span>
+    </button>
+    <button class="nav-item" onclick="toonPagina('facturen',this)">
+      <span class="nav-icon">&#128196;</span>
+      <span>Facturen</span>
+    </button>
+  </div>
+</div>
+
+<script>
+const WW_HASH = "01105d36818fd1b79e107e91aeacf9a150c24e586d9f6ce7acffb9262e554e9d";
+
+async function hashStr(s) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function login() {
+  const ww = document.getElementById('ww-input').value;
+  const h = await hashStr(ww);
+  if (h === WW_HASH) {
+    sessionStorage.setItem('jm_in','1');
+    document.getElementById('login-scherm').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    init();
+    initLocatie();
+  } else {
+    document.getElementById('login-fout').style.display = 'block';
+    document.getElementById('ww-input').value = '';
+  }
+}
+
+function uitloggen() { sessionStorage.removeItem('jm_in'); location.reload(); }
+
+if (sessionStorage.getItem('jm_in')==='1') {
+  document.getElementById('login-scherm').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  setTimeout(initLocatie, 500);
+}
+
+// iOS installeer banner
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const isStandalone = window.navigator.standalone;
+if (isIOS && !isStandalone) {
+  document.getElementById('installeer-banner').style.display = 'block';
+}
+
+function toonPagina(naam, btn) {
+  document.querySelectorAll('.pagina').forEach(p=>p.classList.remove('actief'));
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById(`pagina-${naam}`).classList.add('actief');
+  btn.classList.add('active');
+  if (naam==='uren') renderWeek();
+  if (naam==='facturen') laadKostenAutomatisch();
+  if (naam==='rooster') renderKalender();
+}
+
+// ── KLOK ──
+let inklokTijd = null, klokInterval = null, alleUren = [];
+
+function init() {
+  alleUren = JSON.parse(localStorage.getItem('jm_uren')||'[]');
+  document.getElementById('inp-datum').value = fmtD(new Date());
+  startKlokDisplay();
+  renderWeek();
+  renderRooster();
+  renderKalender();
+  updateRoosterSelect();
+  renderOpdrachtgevers('');
+  updateFacturenUI();
+}
+
+function startKlokDisplay() {
+  setInterval(()=>{
+    const nu = new Date();
+    document.getElementById('klok-display').textContent = nu.toTimeString().slice(0,5);
+    if (inklokTijd) {
+      const diff = Math.floor((nu-inklokTijd)/60000);
+      document.getElementById('inklok-duur').textContent = `${Math.floor(diff/60)}u ${(diff%60).toString().padStart(2,'0')}m gewerkt`;
+    }
+  }, 1000);
+}
+
+function toggleKlok() {
+  if (!inklokTijd) {
+    inklokTijd = new Date();
+    const ts = inklokTijd.toTimeString().slice(0,5);
+    document.getElementById('inp-start').value = ts;
+    document.getElementById('inp-datum').value = fmtD(inklokTijd);
+    document.getElementById('inklok-btn').textContent = 'Uitklokken';
+    document.getElementById('inklok-btn').classList.add('actief');
+    document.getElementById('klok-status-tekst').textContent = `Ingeklokt sinds ${ts}`;
+  } else {
+    document.getElementById('inp-einde').value = new Date().toTimeString().slice(0,5);
+    document.getElementById('inklok-btn').textContent = 'Inklokkken';
+    document.getElementById('inklok-btn').classList.remove('actief');
+    document.getElementById('klok-status-tekst').textContent = 'Niet ingeklokt';
+    document.getElementById('inklok-duur').textContent = '';
+    inklokTijd = null;
+    voegToe();
+  }
+}
+
+// ── UREN ──
+let huidigeMaandag = getMaandag(new Date());
+function getMaandag(d) { const dag=new Date(d),dow=dag.getDay(),diff=dow===0?-6:1-dow; dag.setDate(dag.getDate()+diff); dag.setHours(0,0,0,0); return dag; }
+function fmtD(d) { return d.toISOString().split('T')[0]; }
+function fmtDNL(d) { return d.toLocaleDateString('nl-NL',{day:'numeric',month:'short'}); }
+function dagKort(d) { return ['Zo','Ma','Di','Wo','Do','Vr','Za'][d.getDay()]; }
+function dagLang(d) { return ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'][d.getDay()]; }
+function uVerschil(s,e) { const[sh,sm]=s.split(':').map(Number),[eh,em]=e.split(':').map(Number); return((eh*60+em)-(sh*60+sm))/60; }
+function fmtU(u) { const h=Math.floor(u),m=Math.round((u-h)*60); return`${h}:${m.toString().padStart(2,'0')}`; }
+function weekNr(d) { const dt=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())); dt.setUTCDate(dt.getUTCDate()+4-(dt.getUTCDay()||7)); return Math.ceil((((dt-new Date(Date.UTC(dt.getUTCFullYear(),0,1)))/86400000)+1)/7); }
+function slaOp() { localStorage.setItem('jm_uren',JSON.stringify(alleUren)); }
+
+function navigeerWeek(r) { huidigeMaandag=new Date(huidigeMaandag); huidigeMaandag.setDate(huidigeMaandag.getDate()+r*7); renderWeek(); }
+
+function renderWeek() {
+  const vandaag=fmtD(new Date()), wn=weekNr(huidigeMaandag);
+  const vr=new Date(huidigeMaandag); vr.setDate(vr.getDate()+4);
+  document.getElementById('week-label').textContent=`Week ${wn}`;
+  const lijst=document.getElementById('uren-lijst'); lijst.innerHTML='';
+  let totU=0, dGew=0;
+  for(let i=0;i<7;i++) {
+    const dag=new Date(huidigeMaandag); dag.setDate(dag.getDate()+i);
+    const ds=fmtD(dag), isWE=dag.getDay()===0||dag.getDay()===6, isVandaag=ds===vandaag;
+    const du=alleUren.filter(u=>u.datum===ds);
+    if(du.length===0) {
+      const div=document.createElement('div');
+      div.className=`dag-rij${isWE?' weekend':''}${isVandaag?' vandaag':''}`;
+      div.innerHTML=`<span class="dag-naam">${dagKort(dag)}</span><span class="dag-datum">${fmtDNL(dag)}</span><span class="dag-klant" style="color:#ddd">—</span><span class="dag-uren leeg">—</span>`;
+      lijst.appendChild(div);
+    } else {
+      du.forEach((u,idx)=>{
+        const uren=uVerschil(u.start,u.einde); totU+=uren; if(idx===0) dGew++;
+        const div=document.createElement('div');
+        div.className=`dag-rij${isVandaag?' vandaag':''}`;
+        div.innerHTML=`<span class="dag-naam">${idx===0?dagKort(dag):''}</span><span class="dag-datum">${idx===0?fmtDNL(dag):''}</span><span class="dag-klant">${u.klant||'—'}</span><span class="dag-uren">${fmtU(uren)}</span><button class="dag-del" onclick="verwijder('${u.id}')">&#10005;</button>`;
+        lijst.appendChild(div);
+      });
+    }
+  }
+  const totRij=document.createElement('div'); totRij.className='totaal-rij';
+  totRij.innerHTML=`<span>Totaal week ${wn}</span><span>${fmtU(totU)} uur</span>`;
+  lijst.appendChild(totRij);
+  document.getElementById('m-week').textContent=fmtU(totU);
+  document.getElementById('m-dagen').textContent=dGew;
+  document.getElementById('m-gem').textContent=dGew>0?fmtU(totU/dGew):'0:00';
+}
+
+function voegToe() {
+  const datum=document.getElementById('inp-datum').value, start=document.getElementById('inp-start').value, einde=document.getElementById('inp-einde').value, klant=document.getElementById('inp-klant').value;
+  if(!datum||!start||!einde){alert('Vul datum, start en eindtijd in.');return;}
+  if(uVerschil(start,einde)<=0){alert('Eindtijd moet na starttijd zijn.');return;}
+  alleUren.push({id:Date.now().toString(),datum,start,einde,klant}); slaOp(); renderWeek();
+  document.getElementById('inp-klant').value='';
+  toonPagina('uren', document.querySelectorAll('.nav-item')[1]);
+}
+
+function verwijder(id) { alleUren=alleUren.filter(u=>u.id!==id); slaOp(); renderWeek(); }
+
+function kopieerOverzicht() {
+  const wn=weekNr(huidigeMaandag); let txt=`UREN OVERZICHT — JM Mechanica\nWeek ${wn}\n${' '.repeat(40)}\n`;
+  for(let i=0;i<5;i++) {
+    const dag=new Date(huidigeMaandag); dag.setDate(dag.getDate()+i);
+    const du=alleUren.filter(u=>u.datum===fmtD(dag));
+    if(du.length>0) du.forEach(u=>{txt+=`${dagLang(dag).padEnd(12)}${fmtDNL(dag).padEnd(10)}${(u.klant||'').padEnd(20)}${u.start}–${u.einde}  ${fmtU(uVerschil(u.start,u.einde))}u\n`;});
+    else txt+=`${dagLang(dag).padEnd(12)}${fmtDNL(dag)}  —\n`;
+  }
+  const totU=alleUren.filter(u=>{const d=new Date(u.datum),ma=new Date(huidigeMaandag),vr=new Date(huidigeMaandag);vr.setDate(vr.getDate()+4);return d>=ma&&d<=vr;}).reduce((s,u)=>s+uVerschil(u.start,u.einde),0);
+  txt+=`\nTOTAAL: ${fmtU(totU)} uur`;
+  navigator.clipboard.writeText(txt).then(()=>alert('Gekopieerd! Plak dit bij het detacheringsbureau.')).catch(()=>alert('Kopiëren mislukt. Probeer opnieuw.'));
+}
+
+function downloadCSV() {
+  const wn=weekNr(huidigeMaandag); let csv='Dag,Datum,Opdrachtgever,Start,Einde,Uren\n';
+  for(let i=0;i<7;i++) {
+    const dag=new Date(huidigeMaandag); dag.setDate(dag.getDate()+i);
+    const du=alleUren.filter(u=>u.datum===fmtD(dag));
+    if(du.length>0) du.forEach(u=>{csv+=`${dagLang(dag)},${fmtD(dag)},"${u.klant||''}",,${u.start},${u.einde},${fmtU(uVerschil(u.start,u.einde))}\n`;});
+    else csv+=`${dagLang(dag)},${fmtD(dag)},,,,\n`;
+  }
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download=`JM_week${wn}_uren.csv`; a.click();
+}
+
+// ── FACTUREN ──
+const facturen={Q1:[],Q2:[],Q3:[],Q4:[]};
+let actKw='Q1';
+const kwTitels={Q1:'Q1 — Januari t/m Maart',Q2:'Q2 — April t/m Juni',Q3:'Q3 — Juli t/m September',Q4:'Q4 — Oktober t/m December'};
+
+function kwVanDatum(datum) {
+  const m=datum.getMonth()+1;
+  if(m<=3)return'Q1'; if(m<=6)return'Q2'; if(m<=9)return'Q3'; return'Q4';
+}
+
+function toonKwartaal(kw, btn) {
+  actKw=kw;
+  document.querySelectorAll('.kw-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  updateFacturenUI();
+}
+
+async function verwerkFoto(files) {
+  if(!files||files.length===0)return;
+  const file=files[0];
+  const kw = prompt('In welk kwartaal staat deze factuur?\n\nQ1 = jan/feb/mrt\nQ2 = apr/mei/jun\nQ3 = jul/aug/sep\nQ4 = okt/nov/dec\n\nTyp Q1, Q2, Q3 of Q4:','Q2');
+  if(!kw||!['Q1','Q2','Q3','Q4'].includes(kw.toUpperCase())) { alert('Ongeldige keuze. Typ Q1, Q2, Q3 of Q4.'); return; }
+  const kwFinal = kw.toUpperCase();
+  const jaar = new Date().getFullYear();
+  const mapNaam = `${jaar} ${kwFinal}`;
+  const reader=new FileReader();
+  reader.onload=async e=>{
+    const datum = new Date().toLocaleDateString('nl-NL').replace(/\//g,'-');
+    const bestandNaam = `Factuur_foto_${datum}.jpg`;
+    facturen[kwFinal].push({id:Date.now().toString(),naam:bestandNaam,type:'foto',data:e.target.result,kw:kwFinal});
+    slaFacturenOp();
+    actKw=kwFinal;
+    document.querySelectorAll('.kw-tab').forEach((b,i)=>b.classList.toggle('active',['Q1','Q2','Q3','Q4'][i]===kwFinal));
+    updateFacturenUI();
+    // Upload naar Google Drive
+    try {
+      const bytes = await fetch(e.target.result).then(r=>r.arrayBuffer());
+      const gelukt = await uploadFactuurNaarDrive(bestandNaam, bytes, 'image/jpeg', mapNaam);
+      if(gelukt) alert(`✅ Foto opgeslagen in Google Drive — ${mapNaam}`);
+    } catch(err) { console.log('Drive upload:', err); }
+  };
+  reader.readAsDataURL(file);
+}
+
+async function verwerkBestanden(files) {
+  if(!files||files.length===0)return;
+  const kw = prompt('In welk kwartaal staan deze bestanden?\n\nQ1 = jan/feb/mrt\nQ2 = apr/mei/jun\nQ3 = jul/aug/sep\nQ4 = okt/nov/dec\n\nTyp Q1, Q2, Q3 of Q4:','Q2');
+  if(!kw||!['Q1','Q2','Q3','Q4'].includes(kw.toUpperCase())) { alert('Ongeldige keuze. Typ Q1, Q2, Q3 of Q4.'); return; }
+  const kwFinal = kw.toUpperCase();
+  const jaar = new Date().getFullYear();
+  const mapNaam = `${jaar} ${kwFinal}`;
+  for(const file of Array.from(files)) {
+    const reader=new FileReader();
+    await new Promise(res=>{
+      reader.onload=async e=>{
+        facturen[kwFinal].push({id:Date.now().toString(),naam:file.name,type:file.type.includes('image')?'foto':'pdf',data:e.target.result,kw:kwFinal});
+        // Upload naar Google Drive
+        try {
+          const bytes = await fetch(e.target.result).then(r=>r.arrayBuffer());
+          const mime = file.type || 'application/pdf';
+          await uploadFactuurNaarDrive(file.name, bytes, mime, mapNaam);
+        } catch(err) { console.log('Drive upload:', err); }
+        res();
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+  slaFacturenOp();
+  actKw=kwFinal;
+  document.querySelectorAll('.kw-tab').forEach((b,i)=>b.classList.toggle('active',['Q1','Q2','Q3','Q4'][i]===kwFinal));
+  updateFacturenUI();
+  alert(`✅ ${files.length} bestand(en) opgeslagen in Google Drive — ${mapNaam}`);
+}
+
+function slaFacturenOp() {
+  try { localStorage.setItem('jm_facturen',JSON.stringify(facturen)); } catch(e) {}
+}
+
+function laadFacturen() {
+  try { const s=localStorage.getItem('jm_facturen'); if(s) Object.assign(facturen,JSON.parse(s)); } catch(e) {}
+}
+
+function updateFacturenUI() {
+  const items=facturen[actKw];
+  document.getElementById('kw-titel').textContent=kwTitels[actKw];
+  const lijst=document.getElementById('factuur-lijst');
+  const dlBtn=document.getElementById('dl-btn');
+  dlBtn.textContent=`Download ${actKw} ZIP voor boekhouder`;
+  dlBtn.disabled=items.length===0;
+  if(items.length===0) { lijst.innerHTML=`<div class="leeg-state">Nog geen facturen in ${actKw}</div>`; return; }
+  lijst.innerHTML=items.map(f=>`
+    <div class="factuur-item">
+      <div class="factuur-thumb">${f.type==='foto'?`<img src="${f.data}" style="width:44px;height:44px;border-radius:8px;object-fit:cover;">`:'📄'}</div>
+      <div class="factuur-info">
+        <div class="factuur-naam">${f.naam}</div>
+        <div class="factuur-sub">${f.kw} · ${f.type==='foto'?'Foto':'PDF'}</div>
+      </div>
+      <button class="factuur-del" onclick="verwijderFactuur('${f.id}','${f.kw}')">&#10005;</button>
+    </div>`).join('');
+}
+
+function verwijderFactuur(id, kw) {
+  facturen[kw]=facturen[kw].filter(f=>f.id!==id);
+  slaFacturenOp(); updateFacturenUI();
+}
+
+async function downloadKwartaal() {
+  const items=facturen[actKw]; if(items.length===0)return;
+  const zip=new JSZip(), map=zip.folder(`JM_Mechanica_${actKw}_2024`);
+  for(const item of items) {
+    const base64=item.data.split(',')[1];
+    const ext=item.type==='foto'?'jpg':'pdf';
+    map.file(item.naam.includes('.')?item.naam:`${item.naam}.${ext}`, base64, {base64:true});
+  }
+  const blob=await zip.generateAsync({type:'blob'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=`JM_Mechanica_${actKw}_2024.zip`; a.click();
+}
+
+// ── GOOGLE DRIVE API ──
+const GDRIVE_CLIENT_ID = '829454599266-vg861ouglnnmm5sgpulm4kgq9itki41j.apps.googleusercontent.com';
+const GDRIVE_FOLDER_ID = '1VD1V2pIkCpLlIyj91FVMD-zddFXfNlAx';
+const GDRIVE_SCOPES = 'https://www.googleapis.com/auth/drive.file';
+let driveAccessToken = null;
+
+function laadGoogleAPI() {
+  return new Promise(res => {
+    if (window.gapi) { res(); return; }
+    const s = document.createElement('script');
+    s.src = 'https://accounts.google.com/gsi/client';
+    s.onload = res;
+    document.head.appendChild(s);
+  });
+}
+
+async function inloggenDrive() {
+  await laadGoogleAPI();
+  return new Promise((res, rej) => {
+    const client = google.accounts.oauth2.initTokenClient({
+      client_id: GDRIVE_CLIENT_ID,
+      scope: GDRIVE_SCOPES,
+      callback: (resp) => {
+        if (resp.error) { rej(resp.error); return; }
+        driveAccessToken = resp.access_token;
+        res(resp.access_token);
+      }
+    });
+    client.requestAccessToken();
+  });
+}
+
+async function uploadNaarDrive(bestandNaam, data, mimeType, kwartaal) {
+  try {
+    if (!driveAccessToken) await inloggenDrive();
+
+    // Zoek of maak kwartaal submap
+    const mapNaam = kwartaal || 'Overig';
+    let mapId = await zoekOfMaakMap(mapNaam, GDRIVE_FOLDER_ID);
+
+    // Upload bestand
+    const meta = JSON.stringify({ name: bestandNaam, parents: [mapId] });
+    const form = new FormData();
+    form.append('metadata', new Blob([meta], { type: 'application/json' }));
+    form.append('file', new Blob([data], { type: mimeType }));
+
+    const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${driveAccessToken}` },
+      body: form
+    });
+
+    if (!res.ok) throw new Error('Upload mislukt');
+    const result = await res.json();
+    return result.id;
+  } catch(e) {
+    if (e === 'access_denied') throw new Error('Toegang geweigerd — log opnieuw in');
+    driveAccessToken = null;
+    throw e;
+  }
+}
+
+async function zoekOfMaakMap(naam, parentId) {
+  // Zoek bestaande map
+  const zoek = await fetch(
+    `https://www.googleapis.com/drive/v3/files?q=name='${naam}' and '${parentId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`,
+    { headers: { Authorization: `Bearer ${driveAccessToken}` } }
+  );
+  const data = await zoek.json();
+  if (data.files && data.files.length > 0) return data.files[0].id;
+
+  // Maak nieuwe map aan
+  const maak = await fetch('https://www.googleapis.com/drive/v3/files', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${driveAccessToken}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: naam, mimeType: 'application/vnd.google-apps.folder', parents: [parentId] })
+  });
+  const map = await maak.json();
+  return map.id;
+}
+
+async function uploadFactuurNaarDrive(bestandNaam, data, mimeType, kwartaal) {
+  try {
+    const id = await uploadNaarDrive(bestandNaam, data, mimeType, kwartaal);
+    return true;
+  } catch(e) {
+    console.error('Drive upload fout:', e);
+    return false;
+  }
+}
+
+function laadKostenAutomatisch() {
+  fetch('/jm_scan_resultaat.json?t=' + Date.now())
+    .then(r => r.ok ? r.json() : null)
+    .then(data => { if(data) toonKosten(data); })
+    .catch(() => {});
+}
+
+async function laadVanGoogleDrive() {
+  const btn = document.querySelector('[onclick="laadVanGoogleDrive()"]');
+  if(btn) { btn.textContent = '⏳ Ophalen...'; btn.disabled = true; }
+  try {
+    const res = await fetch('/jm_scan_resultaat.json?t=' + Date.now());
+    if (res.ok) {
+      const data = await res.json();
+      toonKosten(data);
+      if(btn) { btn.textContent = '✅ Geladen!'; setTimeout(()=>{ btn.textContent='🔄 Vernieuwen'; btn.disabled=false; },2000); }
+      return;
+    }
+  } catch(e) {}
+  if(btn) { btn.textContent = '🔄 Vernieuwen'; btn.disabled = false; }
+  alert('Nog geen scan resultaten. Draai eerst de scanner op je Mac.');
+}
+
+// ── KOSTEN SCANNER IMPORT ──
+function importeerJSON(files) {
+  if(!files||files.length===0) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      toonKosten(data);
+    } catch(err) {
+      alert('Fout bij lezen van JSON bestand. Zorg dat het jm_scan_resultaat.json is.');
+    }
+  };
+  reader.readAsText(files[0]);
+}
+
+function euroVal(str) {
+  if(!str||str==='onbekend') return 0;
+  try { return parseFloat(str.replace('€','').replace(/\./g,'').replace(',','.').trim()); } catch(e){ return 0; }
+}
+
+function fmtEuro(val) {
+  return '€ ' + val.toLocaleString('nl-NL', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function toonKosten(data) {
+  scanData = data;
+  const catInkomsten = data['Inkomsten'] || [];
+  const cat100  = data['100% aftrekbaar'] || [];
+  const catDeels = data['Deels aftrekbaar'] || [];
+  const catPrive = data['Prive (niet aftrekbaar)'] || [];
+
+  const totInkomsten = catInkomsten.reduce((s,e)=>s+euroVal(e.bedrag),0);
+  const tot100  = cat100.reduce((s,e)=>s+euroVal(e.bedrag),0);
+  const totDeels = catDeels.reduce((s,e)=>s+euroVal(e.bedrag),0);
+  const schat = tot100 + (totDeels * 0.70);
+
+  document.getElementById('kosten-metrics').style.display='block';
+  document.getElementById('k-inkomsten').textContent = fmtEuro(totInkomsten);
+  document.getElementById('k-100').textContent   = fmtEuro(tot100);
+  document.getElementById('k-deels').textContent = fmtEuro(totDeels);
+  document.getElementById('k-schat').textContent = fmtEuro(schat);
+
+  renderKostenLijst('lijst-inkomsten', 'kosten-inkomsten', catInkomsten);
+  renderKostenLijst('lijst-100', 'kosten-100', cat100);
+  renderKostenLijst('lijst-deels', 'kosten-deels', catDeels);
+  renderKostenLijst('lijst-prive', 'kosten-prive', catPrive);
+
+  // Genereer download knoppen per jaar + kwartaal
+  const alle = verzamelAlles();
+  const labels = [...new Set(alle.map(e => kwartaalVanDatumStr(e.datum).label))].filter(l=>l!=='onbekend').sort();
+  const knoppen = document.getElementById('kw-knoppen');
+  knoppen.innerHTML = labels.map(label =>
+    `<button class="actie-btn" style="font-size:12px;" onclick="downloadKwartaalCSV('${label}')">📥 ${label}</button>`
+  ).join('');
+
+  document.getElementById('kw-download-sectie').style.display = 'block';
+}
+
+function kwartaalVanDatumStr(datumStr) {
+  if (!datumStr) return {jaar: 'onbekend', kw: 'onbekend', label: 'onbekend'};
+
+  const maandMap = {
+    // Volledig
+    'january':1,'february':2,'march':3,'april':4,'may':5,'june':6,
+    'july':7,'august':8,'september':9,'october':10,'november':11,'december':12,
+    'januari':1,'februari':2,'maart':3,'mei':5,'juni':6,
+    'juli':7,'augustus':8,'oktober':10,
+    // 3-letter Engels
+    'jan':1,'feb':2,'mar':3,'apr':4,'jun':6,'jul':7,'aug':8,'sep':9,'oct':10,'nov':11,'dec':12,
+    // 3-letter Nederlands
+    'mrt':3,'mei':5,'okt':10,
+    // 2-letter afkortingen die scanner gebruikt
+    'ja':1,'fe':2,'ma':3,'ap':4,'me':5,'ju':6,'jl':7,'au':8,'se':9,'ok':10,'no':11,'de':12
+  };
+
+  // Jaar zoeken
+  const jaarMatch = datumStr.match(/\b(20\d{2})\b/);
+  const jaar = jaarMatch ? jaarMatch[1] : new Date().getFullYear().toString();
+
+  // Maand zoeken — probeer alle tokens
+  let maand = null;
+  const tokens = datumStr.toLowerCase().replace(/[,.:]/g,' ').split(/\s+/).filter(Boolean);
+
+  for (const token of tokens) {
+    if (/^\d+$/.test(token)) continue; // skip pure cijfers
+    // Probeer volledige match, dan 3 letters, dan 2 letters
+    if (maandMap[token]) { maand = maandMap[token]; break; }
+    if (token.length >= 3 && maandMap[token.slice(0,3)]) { maand = maandMap[token.slice(0,3)]; break; }
+    if (token.length >= 2 && maandMap[token.slice(0,2)]) { maand = maandMap[token.slice(0,2)]; break; }
+  }
+
+  if (!maand) return {jaar, kw: 'onbekend', label: `${jaar} onbekend`};
+  const kw = maand <= 3 ? 'Q1' : maand <= 6 ? 'Q2' : maand <= 9 ? 'Q3' : 'Q4';
+  return {jaar, kw, label: `${jaar} ${kw}`};
+}
+
+let scanData = null;
+
+function downloadKwartaalCSV(labelStr) {
+  if (!scanData) { alert('Importeer eerst een scan resultaat.'); return; }
+  const alle = verzamelAlles();
+  const gefilterd = alle.filter(e => {
+    const {label} = kwartaalVanDatumStr(e.datum);
+    return label === labelStr;
+  });
+  if (gefilterd.length === 0) { alert(`Geen items gevonden in ${labelStr}.`); return; }
+  const [jaar, kw] = labelStr.split(' ');
+  exportCSV(gefilterd, `JM_Mechanica_${jaar}_${kw}_boekhouding.csv`);
+}
+
+function downloadAlleKwartalen() {
+  if (!scanData) { alert('Importeer eerst een scan resultaat.'); return; }
+  exportCSV(verzamelAlles(), 'JM_Mechanica_alle_kwartalen_boekhouding.csv');
+}
+
+function verzamelAlles() {
+  return [
+    ...(scanData['Inkomsten']||[]).map(e=>({...e,categorie:'Inkomsten'})),
+    ...(scanData['100% aftrekbaar']||[]).map(e=>({...e,categorie:'100% aftrekbaar'})),
+    ...(scanData['Deels aftrekbaar']||[]).map(e=>({...e,categorie:'Deels aftrekbaar'})),
+  ];
+}
+
+function exportCSV(items, bestandsnaam) {
+  let csv = 'Jaar,Kwartaal,Datum,Afzender,Omschrijving,Bedrag,Categorie\n';
+  items.forEach(e => {
+    const {jaar, kw} = kwartaalVanDatumStr(e.datum);
+    csv += `${jaar},${kw},"${e.datum||''}","${e.van||''}","${e.omschrijving||e.onderwerp||''}","${e.bedrag||''}","${e.categorie}"\n`;
+  });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8;'}));
+  a.download = bestandsnaam;
+  a.click();
+}
+
+function renderKostenLijst(lijstId, cardId, items) {
+  const card = document.getElementById(cardId);
+  const lijst = document.getElementById(lijstId);
+  if(!items||items.length===0) { card.style.display='none'; return; }
+  card.style.display='block';
+  lijst.innerHTML = items.map(e=>`
+    <div class="dag-rij">
+      <span class="dag-datum" style="width:70px;">${e.datum ? e.datum.substring(0,10) : '—'}</span>
+      <span class="dag-klant">${e.onderwerp||e.van||'—'}</span>
+      <span class="dag-uren" style="width:70px;font-size:12px;">${e.bedrag||'—'}</span>
+    </div>`).join('');
+}
+
+// ── ROOSTER KALENDER ──
+// Patroon: D D M M N N (6 werkdagen) + 4 vrij = 10 dagen cyclus
+const DIENST_PATROON = ['D','D','M','M','N','N',null,null,null,null];
+const DIENST_TIJDEN = { D: {start:'06:00',einde:'14:00'}, M: {start:'14:00',einde:'22:00'}, N: {start:'22:00',einde:'06:00'} };
+
+let roosterInstellingen = JSON.parse(localStorage.getItem('jm_rooster_inst') || '{"startdatum":"2026-04-06","interval":10}');
+let huidigeMaand = new Date();
+huidigeMaand.setDate(1);
+
+function getDienst(datum) {
+  const start = new Date(roosterInstellingen.startdatum);
+  const diff  = Math.floor((datum - start) / 86400000);
+  if (diff < 0) return null;
+  const interval = parseInt(roosterInstellingen.interval) || 10;
+  const pos = diff % interval;
+  if (interval === 10) return DIENST_PATROON[pos] || null;
+  // Voor 7 of 14 dagen: D D M M N N herhaal
+  const korte_patroon = ['D','D','M','M','N','N'];
+  return korte_patroon[pos % 6] || null;
+}
+
+function slaRoosterInstellingenOp() {
+  roosterInstellingen.startdatum = document.getElementById('rooster-startdatum').value;
+  roosterInstellingen.interval   = document.getElementById('rooster-interval').value;
+  localStorage.setItem('jm_rooster_inst', JSON.stringify(roosterInstellingen));
+  renderKalender();
+}
+
+function navigeerMaand(richting) {
+  huidigeMaand.setMonth(huidigeMaand.getMonth() + richting);
+  renderKalender();
+}
+
+function renderKalender() {
+  const jaar  = huidigeMaand.getFullYear();
+  const maand = huidigeMaand.getMonth();
+  const nu    = new Date(); nu.setHours(0,0,0,0);
+
+  const maandNamen = ['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December'];
+  document.getElementById('rooster-maand-label').textContent = `${maandNamen[maand]} ${jaar}`;
+
+  // Eerste dag van maand, ga terug naar maandag
+  const eerstedag = new Date(jaar, maand, 1);
+  const startDow  = eerstedag.getDay() === 0 ? 6 : eerstedag.getDay() - 1;
+  const startDatum = new Date(eerstedag);
+  startDatum.setDate(startDatum.getDate() - startDow);
+
+  const grid = document.getElementById('rooster-kalender');
+  grid.innerHTML = '';
+
+  // 6 weken tonen
+  for (let i = 0; i < 42; i++) {
+    const dag = new Date(startDatum);
+    dag.setDate(dag.getDate() + i);
+    dag.setHours(0,0,0,0);
+
+    const isVandaag     = dag.getTime() === nu.getTime();
+    const isAnderMaand  = dag.getMonth() !== maand;
+    const dienst        = getDienst(dag);
+
+    const cel = document.createElement('div');
+    cel.className = `rooster-cel${isVandaag?' vandaag':''}${isAnderMaand?' ander-maand':''}`;
+
+    let dienstHTML = '';
+    if (dienst) {
+      const t = DIENST_TIJDEN[dienst];
+      dienstHTML = `<div class="dienst-blok dienst-${dienst}">${dienst}<br><span class="dienst-tijd">${t.start}</span></div>`;
+    }
+
+    cel.innerHTML = `<div class="rooster-dag-nr">${dag.getDate()}</div>${dienstHTML}`;
+    grid.appendChild(cel);
+  }
+
+  // Update instellingen velden
+  const sdEl = document.getElementById('rooster-startdatum');
+  const intEl = document.getElementById('rooster-interval');
+  if (sdEl) sdEl.value = roosterInstellingen.startdatum;
+  if (intEl) intEl.value = roosterInstellingen.interval;
+}
+
+// ── OPDRACHTGEVERS ──
+let opdrachtgevers = JSON.parse(localStorage.getItem('jm_opdrachtgevers') || '["A-ware Almere","Certos"]');
+
+function slaOpdrachtgeverOp() {
+  const naam = document.getElementById('inp-klant').value.trim();
+  if (!naam) return;
+  if (!opdrachtgevers.includes(naam)) {
+    opdrachtgevers.push(naam);
+    localStorage.setItem('jm_opdrachtgevers', JSON.stringify(opdrachtgevers));
+  }
+  renderOpdrachtgevers('');
+  updateRoosterSelect();
+}
+
+function filterOpdrachtgevers(zoek) {
+  renderOpdrachtgevers(zoek);
+}
+
+function renderOpdrachtgevers(zoek) {
+  const lijst = document.getElementById('opdrachtgever-lijst');
+  if (!lijst) return;
+  const gefilterd = opdrachtgevers.filter(o => o.toLowerCase().includes(zoek.toLowerCase()));
+  if (!zoek && gefilterd.length === 0) { lijst.innerHTML = ''; return; }
+  lijst.innerHTML = gefilterd.map(o => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--groen-licht);border-radius:8px;margin-bottom:4px;">
+      <span style="font-size:13px;font-weight:600;color:var(--groen);cursor:pointer;" onclick="kiesOpdrachtgever('${o}')">${o}</span>
+      <button onclick="verwijderOpdrachtgever('${o}')" style="background:none;border:none;color:#aaa;font-size:16px;cursor:pointer;">✕</button>
+    </div>`).join('');
+}
+
+function kiesOpdrachtgever(naam) {
+  document.getElementById('inp-klant').value = naam;
+  document.getElementById('opdrachtgever-lijst').innerHTML = '';
+}
+
+function verwijderOpdrachtgever(naam) {
+  opdrachtgevers = opdrachtgevers.filter(o => o !== naam);
+  localStorage.setItem('jm_opdrachtgevers', JSON.stringify(opdrachtgevers));
+  renderOpdrachtgevers('');
+  updateRoosterSelect();
+}
+
+function updateRoosterSelect() {
+  const sel = document.getElementById('rooster-klant');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Selecteer opdrachtgever...</option>' +
+    opdrachtgevers.map(o => `<option value="${o}">${o}</option>`).join('');
+}
+
+// ── ROOSTER ──
+let rooster = JSON.parse(localStorage.getItem('jm_rooster') || '[]');
+
+function voegRoosterDienstToe() {
+  const form = document.getElementById('rooster-form');
+  form.style.display = form.style.display === 'none' ? 'block' : 'none';
+  document.getElementById('rooster-datum').value = fmtD(new Date());
+  updateRoosterSelect();
+}
+
+function slaRoosterDienstOp() {
+  const datum  = document.getElementById('rooster-datum').value;
+  const start  = document.getElementById('rooster-start').value;
+  const einde  = document.getElementById('rooster-einde').value;
+  const klant  = document.getElementById('rooster-klant').value;
+  if (!datum || !start || !einde || !klant) { alert('Vul alle velden in.'); return; }
+  rooster.push({ id: Date.now().toString(), datum, start, einde, klant });
+  localStorage.setItem('jm_rooster', JSON.stringify(rooster));
+  document.getElementById('rooster-form').style.display = 'none';
+  renderRooster();
+}
+
+function verwijderRoosterDienst(id) {
+  rooster = rooster.filter(d => d.id !== id);
+  localStorage.setItem('jm_rooster', JSON.stringify(rooster));
+  renderRooster();
+}
+
+function renderRooster() {
+  const lijst = document.getElementById('rooster-lijst');
+  if (!lijst) return;
+  const nu = new Date();
+  const ma = getMaandag(nu);
+  const zo = new Date(ma); zo.setDate(zo.getDate() + 6);
+
+  // Toon huidige week + komende 2 weken
+  const van = new Date(ma); van.setDate(van.getDate() - 7);
+  const tot = new Date(ma); tot.setDate(tot.getDate() + 14);
+
+  const weekDiensten = rooster.filter(d => {
+    const dd = new Date(d.datum);
+    return dd >= van && dd <= tot;
+  }).sort((a,b) => a.datum.localeCompare(b.datum));
+
+  if (weekDiensten.length === 0) {
+    lijst.innerHTML = '<div class="leeg-state">Nog geen diensten ingepland</div>';
+    return;
+  }
+
+  lijst.innerHTML = weekDiensten.map(d => {
+    const dag = new Date(d.datum);
+    const isVandaag = fmtD(dag) === fmtD(nu);
+    const uren = uVerschil(d.start, d.einde);
+    return `
+    <div class="dag-rij${isVandaag ? ' vandaag' : ''}" style="background:${isVandaag ? 'var(--groen-licht)' : 'transparent'};border-radius:8px;padding:8px 4px;">
+      <span class="dag-naam">${dagKort(dag)}</span>
+      <span class="dag-datum">${fmtDNL(dag)}</span>
+      <span class="dag-klant">${d.klant}</span>
+      <span class="dag-uren">${d.start}–${d.einde}</span>
+      <button class="dag-del" onclick="verwijderRoosterDienst('${d.id}')">✕</button>
+    </div>`;
+  }).join('');
+}
+
+// ── GPS LOCATIE & PUSH MELDINGEN ──
+const WERK_LAT  = 52.3651;   // Wittevrouwen 2, Almere
+const WERK_LNG  = 5.2107;
+const WERK_RAD  = 200;       // meter
+let locatieWatcher = null;
+let wasOpLocatie = false;
+let meldingVerstuurd = false;
+
+function afstandMeter(lat1, lng1, lat2, lng2) {
+  const R = 6371000;
+  const dLat = (lat2-lat1) * Math.PI/180;
+  const dLng = (lng2-lng1) * Math.PI/180;
+  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+async function vraagPushToestemming() {
+  if (!('Notification' in window)) return false;
+  if (Notification.permission === 'granted') return true;
+  const perm = await Notification.requestPermission();
+  return perm === 'granted';
+}
+
+function stuurPushMelding(titel, tekst, actie) {
+  if (Notification.permission !== 'granted') return;
+  const n = new Notification(titel, {
+    body: tekst,
+    icon: '/favicon.ico',
+    badge: '/favicon.ico',
+    tag: 'inklok-melding',
+    requireInteraction: true
+  });
+  n.onclick = () => {
+    window.focus();
+    if (actie === 'in' && !inklokTijd) toggleKlok();
+    if (actie === 'uit' && inklokTijd) toggleKlok();
+    n.close();
+  };
+}
+
+function verwerkLocatie(pos) {
+  const lat = pos.coords.latitude;
+  const lng = pos.coords.longitude;
+  const afstand = Math.round(afstandMeter(lat, lng, WERK_LAT, WERK_LNG));
+  const opLocatie = afstand <= WERK_RAD;
+
+  const statusEl = document.getElementById('locatie-status');
+  if (statusEl) {
+    statusEl.textContent = opLocatie
+      ? `✅ Op locatie A-ware (${afstand}m)`
+      : `📍 ${afstand}m van A-ware Almere`;
+    statusEl.style.color = opLocatie ? '#1a4a2e' : '#888';
+  }
+
+  // Aankomst detectie
+  if (opLocatie && !wasOpLocatie && !inklokTijd) {
+    stuurPushMelding(
+      '📍 Aangekomen bij A-ware',
+      'Tik hier om in te klokkken',
+      'in'
+    );
+    wasOpLocatie = true;
+  }
+
+  // Vertrek detectie
+  if (!opLocatie && wasOpLocatie && inklokTijd) {
+    stuurPushMelding(
+      '🚗 Je hebt A-ware verlaten',
+      'Tik hier om uit te klokkken',
+      'uit'
+    );
+    wasOpLocatie = false;
+  }
+}
+
+async function startLocatie() {
+  if (!navigator.geolocation) {
+    alert('Locatie wordt niet ondersteund op dit apparaat.');
+    return;
+  }
+
+  const pushOk = await vraagPushToestemming();
+  if (!pushOk) {
+    alert('Schakel meldingen in voor automatische inklok meldingen.\n\nGa naar Instellingen → Meldingen → JM Mechanica → Sta toe.');
+  }
+
+  const btn = document.getElementById('locatie-btn');
+  if (btn) { btn.textContent = '📍 Locatie actief'; btn.disabled = true; btn.style.background = 'var(--groen)'; btn.style.color = '#fff'; }
+
+  locatieWatcher = navigator.geolocation.watchPosition(
+    verwerkLocatie,
+    (err) => {
+      const statusEl = document.getElementById('locatie-status');
+      if (statusEl) statusEl.textContent = 'Locatie niet beschikbaar — geef toestemming in Instellingen';
+    },
+    { enableHighAccuracy: true, maximumAge: 30000, timeout: 15000 }
+  );
+
+  localStorage.setItem('jm_locatie_actief', '1');
+}
+
+// Start locatie automatisch als eerder ingeschakeld
+function initLocatie() {
+  document.getElementById('locatie-card').style.display = 'block';
+  if (localStorage.getItem('jm_locatie_actief') === '1') {
+    startLocatie();
+  }
+}
+</script>
+</body>
+</html>
