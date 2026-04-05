@@ -207,6 +207,320 @@
 <!-- Slotje dashboard link -->
 <a class="dashboard-link" href="dashboard.html" title="Dashboard">&#128274;</a>
 
+<!-- AI Chat Widget -->
+<style>
+#chat-knop {
+  position: fixed; bottom: 5rem; right: 1.5rem;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--groen); color: #fff; border: none;
+  font-size: 22px; cursor: pointer; z-index: 998;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.2s, background 0.2s;
+}
+#chat-knop:hover { background: var(--groen-mid); transform: scale(1.08); }
+
+#chat-venster {
+  position: fixed; bottom: 9rem; right: 1.5rem;
+  width: 340px; max-height: 500px;
+  background: #fff; border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  display: none; flex-direction: column;
+  z-index: 997; overflow: hidden;
+  border: 1.5px solid var(--groen-border);
+}
+#chat-header {
+  background: var(--groen); padding: 14px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+#chat-header-info { display: flex; align-items: center; gap: 10px; }
+.chat-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+#chat-header-tekst p { font-size: 13px; font-weight: 700; color: #fff; line-height: 1.2; }
+#chat-header-tekst span { font-size: 10px; color: #8fbfa0; }
+#chat-sluit {
+  background: none; border: none; color: rgba(255,255,255,0.7);
+  font-size: 18px; cursor: pointer; padding: 2px 4px; line-height: 1;
+}
+#chat-sluit:hover { color: #fff; }
+
+#chat-berichten {
+  flex: 1; overflow-y: auto; padding: 14px;
+  display: flex; flex-direction: column; gap: 10px;
+  min-height: 0;
+}
+.chat-bericht {
+  max-width: 82%; padding: 10px 13px;
+  border-radius: 14px; font-size: 13px; line-height: 1.5;
+  word-wrap: break-word;
+}
+.chat-bericht.assistent {
+  background: var(--groen-licht); color: #222;
+  border-bottom-left-radius: 4px; align-self: flex-start;
+  border: 1px solid var(--groen-border);
+}
+.chat-bericht.gebruiker {
+  background: var(--groen); color: #fff;
+  border-bottom-right-radius: 4px; align-self: flex-end;
+}
+.chat-typing {
+  display: flex; gap: 4px; align-items: center;
+  padding: 10px 13px; background: var(--groen-licht);
+  border: 1px solid var(--groen-border);
+  border-radius: 14px; border-bottom-left-radius: 4px;
+  align-self: flex-start;
+}
+.chat-typing span {
+  width: 6px; height: 6px; background: var(--groen-mid);
+  border-radius: 50%; animation: tik 1.2s infinite;
+}
+.chat-typing span:nth-child(2) { animation-delay: 0.2s; }
+.chat-typing span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes tik { 0%,60%,100% { opacity:0.3; transform:scale(0.8); } 30% { opacity:1; transform:scale(1); } }
+
+#chat-invoer {
+  padding: 10px 12px;
+  border-top: 1.5px solid #eee;
+  display: flex; gap: 8px; align-items: flex-end;
+  flex-shrink: 0;
+}
+#chat-input {
+  flex: 1; font-size: 13px; padding: 9px 12px;
+  border: 1.5px solid #ddd; border-radius: 20px;
+  font-family: inherit; resize: none; outline: none;
+  max-height: 80px; overflow-y: auto; line-height: 1.4;
+}
+#chat-input:focus { border-color: var(--groen); }
+#chat-stuur {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--groen); color: #fff; border: none;
+  font-size: 16px; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+#chat-stuur:hover { background: var(--groen-mid); }
+#chat-stuur:disabled { background: #ccc; cursor: default; }
+
+#chat-sleutel-form {
+  padding: 16px; text-align: center;
+}
+#chat-sleutel-form p {
+  font-size: 12px; color: #666; margin-bottom: 10px; line-height: 1.5;
+}
+#chat-sleutel-input {
+  width: 100%; font-size: 13px; padding: 9px 12px;
+  border: 1.5px solid #ddd; border-radius: 8px;
+  font-family: inherit; margin-bottom: 8px; outline: none;
+}
+#chat-sleutel-input:focus { border-color: var(--groen); }
+#chat-sleutel-opslaan {
+  width: 100%; background: var(--groen); color: #fff;
+  border: none; padding: 10px; border-radius: 8px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  font-family: inherit;
+}
+
+@media (max-width: 400px) {
+  #chat-venster { width: calc(100vw - 2rem); right: 1rem; }
+}
+</style>
+
+<button id="chat-knop" onclick="toggleChat()" title="Chat met ons">&#128172;</button>
+
+<div id="chat-venster">
+  <div id="chat-header">
+    <div id="chat-header-info">
+      <div class="chat-avatar">&#129302;</div>
+      <div id="chat-header-tekst">
+        <p>JM Mechanica</p>
+        <span>Assistent &bull; Online</span>
+      </div>
+    </div>
+    <button id="chat-sluit" onclick="toggleChat()">&#10005;</button>
+  </div>
+
+  <div id="chat-sleutel-form" style="display:none;">
+    <p>Voer uw Anthropic API sleutel in.<br>Wordt alleen lokaal opgeslagen.</p>
+    <input id="chat-sleutel-input" type="password" placeholder="sk-ant-..." autocomplete="off" />
+    <button id="chat-sleutel-opslaan" onclick="slaSleutelOp()">Opslaan &amp; starten</button>
+  </div>
+
+  <div id="chat-berichten"></div>
+  <div id="chat-invoer">
+    <textarea id="chat-input" placeholder="Stel een vraag..." rows="1"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();verstuurChatBericht();}"
+      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,80)+'px'"></textarea>
+    <button id="chat-stuur" onclick="verstuurChatBericht()" title="Versturen">&#10148;</button>
+  </div>
+</div>
+
+<script>
+const CHAT_SYSTEEM = `Je bent een vriendelijke assistent van JM Mechanica. Je helpt potentiële opdrachtgevers op een professionele maar toegankelijke manier. Deel informatie stap voor stap, niet alles tegelijk.
+
+Over JM Mechanica:
+- Diensten: Storing en onderhoud aan bedrijfsinstallaties, ondersteuning van technische dienst en projecten
+- Tarief: €77,50 per uur excl. btw, reisuren worden doorberekend. Bij langdurige opdrachten is overleg mogelijk
+- Werkgebied: Noord-Holland, buiten Noord-Holland in overleg voor kortere periodes
+- Beschikbaarheid: Op zoek naar losse klussen naast vaste opdracht, beschikbaar op vrije dagen en buiten roostertijden
+- KvK: 86164309, BTW: NL004201082B62
+
+Bij serieuze interesse: verwijs door naar het contactformulier of vul het voor de klant in. Stel eerst een paar vragen voordat je alle info deelt. Spreek Nederlands.`;
+
+let chatGeschiedenis = [];
+let chatOpen = false;
+let chatBezig = false;
+
+function toggleChat() {
+  chatOpen = !chatOpen;
+  const venster = document.getElementById('chat-venster');
+  venster.style.display = chatOpen ? 'flex' : 'none';
+  if (chatOpen) {
+    const key = localStorage.getItem('jm_ai_key');
+    if (!key) {
+      document.getElementById('chat-sleutel-form').style.display = 'block';
+      document.getElementById('chat-berichten').style.display = 'none';
+      document.getElementById('chat-invoer').style.display = 'none';
+    } else if (chatGeschiedenis.length === 0) {
+      voegChatToe('assistent', 'Goedendag! Ik ben de assistent van JM Mechanica. Waarmee kan ik u helpen?');
+      document.getElementById('chat-input').focus();
+    } else {
+      document.getElementById('chat-input').focus();
+    }
+  }
+}
+
+function slaSleutelOp() {
+  const key = document.getElementById('chat-sleutel-input').value.trim();
+  if (!key.startsWith('sk-ant-')) { alert('Ongeldige sleutel. Begint met sk-ant-'); return; }
+  localStorage.setItem('jm_ai_key', key);
+  document.getElementById('chat-sleutel-form').style.display = 'none';
+  document.getElementById('chat-berichten').style.display = 'flex';
+  document.getElementById('chat-invoer').style.display = 'flex';
+  voegChatToe('assistent', 'Goedendag! Ik ben de assistent van JM Mechanica. Waarmee kan ik u helpen?');
+  document.getElementById('chat-input').focus();
+}
+
+function voegChatToe(rol, tekst) {
+  const div = document.createElement('div');
+  div.className = `chat-bericht ${rol}`;
+  div.textContent = tekst;
+  document.getElementById('chat-berichten').appendChild(div);
+  scrollChatOnder();
+  return div;
+}
+
+function voegTypingToe() {
+  const div = document.createElement('div');
+  div.className = 'chat-typing';
+  div.id = 'chat-typing-indicator';
+  div.innerHTML = '<span></span><span></span><span></span>';
+  document.getElementById('chat-berichten').appendChild(div);
+  scrollChatOnder();
+}
+
+function verwijderTyping() {
+  const el = document.getElementById('chat-typing-indicator');
+  if (el) el.remove();
+}
+
+function scrollChatOnder() {
+  const el = document.getElementById('chat-berichten');
+  el.scrollTop = el.scrollHeight;
+}
+
+async function verstuurChatBericht() {
+  if (chatBezig) return;
+  const input = document.getElementById('chat-input');
+  const tekst = input.value.trim();
+  if (!tekst) return;
+
+  const key = localStorage.getItem('jm_ai_key');
+  if (!key) { toggleChat(); return; }
+
+  input.value = '';
+  input.style.height = 'auto';
+  voegChatToe('gebruiker', tekst);
+  chatGeschiedenis.push({ role: 'user', content: tekst });
+
+  chatBezig = true;
+  document.getElementById('chat-stuur').disabled = true;
+  voegTypingToe();
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: CHAT_SYSTEEM,
+        messages: chatGeschiedenis,
+        stream: true
+      })
+    });
+
+    verwijderTyping();
+
+    if (resp.status === 401) {
+      localStorage.removeItem('jm_ai_key');
+      voegChatToe('assistent', 'API sleutel ongeldig. Ververs de pagina om opnieuw in te voeren.');
+    } else if (!resp.ok) {
+      voegChatToe('assistent', 'Er ging iets mis (fout ' + resp.status + '). Probeer het opnieuw.');
+    } else {
+      const berichtDiv = voegChatToe('assistent', '');
+      let volledigAntwoord = '';
+
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const regels = buffer.split('\n');
+        buffer = regels.pop();
+
+        for (const regel of regels) {
+          if (!regel.startsWith('data: ')) continue;
+          const data = regel.slice(6).trim();
+          if (data === '[DONE]') continue;
+          try {
+            const evt = JSON.parse(data);
+            if (evt.type === 'content_block_delta' && evt.delta?.type === 'text_delta') {
+              volledigAntwoord += evt.delta.text;
+              berichtDiv.textContent = volledigAntwoord;
+              scrollChatOnder();
+            }
+          } catch (_) {}
+        }
+      }
+
+      if (volledigAntwoord) {
+        chatGeschiedenis.push({ role: 'assistant', content: volledigAntwoord });
+      }
+    }
+  } catch (err) {
+    verwijderTyping();
+    voegChatToe('assistent', 'Verbinding mislukt. Controleer uw internetverbinding en probeer opnieuw.');
+  }
+
+  chatBezig = false;
+  document.getElementById('chat-stuur').disabled = false;
+  document.getElementById('chat-input').focus();
+}
+</script>
+
 <script>
 function verstuurFormulier(e) {
   e.preventDefault();
