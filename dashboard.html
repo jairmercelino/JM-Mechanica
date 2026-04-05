@@ -7,6 +7,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="JM Mechanica">
 <meta name="theme-color" content="#1a4a2e">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
 <title>JM Mechanica — Dashboard</title>
 <script src="https://accounts.google.com/gsi/client" async></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -389,7 +391,7 @@ async function login() {
   const ww = document.getElementById('ww-input').value;
   const h = await hashStr(ww);
   if (h === WW_HASH) {
-    sessionStorage.setItem('jm_in','1');
+    localStorage.setItem('jm_in','1');
     document.getElementById('login-scherm').style.display = 'none';
     document.getElementById('app').style.display = 'flex';
     init();
@@ -400,9 +402,9 @@ async function login() {
   }
 }
 
-function uitloggen() { sessionStorage.removeItem('jm_in'); location.reload(); }
+function uitloggen() { localStorage.removeItem('jm_in'); location.reload(); }
 
-if (sessionStorage.getItem('jm_in')==='1') {
+if (localStorage.getItem('jm_in')==='1') {
   document.getElementById('login-scherm').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
   setTimeout(initLocatie, 500);
@@ -1206,19 +1208,33 @@ async function vraagPushToestemming() {
 
 function stuurPushMelding(titel, tekst, actie) {
   if (Notification.permission !== 'granted') return;
-  const n = new Notification(titel, {
-    body: tekst,
-    icon: '/favicon.ico',
-    badge: '/favicon.ico',
-    tag: 'inklok-melding',
-    requireInteraction: true
-  });
-  n.onclick = () => {
-    window.focus();
-    if (actie === 'in' && !inklokTijd) toggleKlok();
-    if (actie === 'uit' && inklokTijd) toggleKlok();
-    n.close();
-  };
+  // Gebruik service worker showNotification als beschikbaar (werkt ook bij gesloten/achtergrond app)
+  if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.ready.then(reg => {
+      reg.showNotification(titel, {
+        body: tekst,
+        icon: './icon.svg',
+        badge: './icon.svg',
+        tag: 'inklok-melding',
+        requireInteraction: true,
+        data: { actie }
+      });
+    });
+  } else {
+    const n = new Notification(titel, {
+      body: tekst,
+      icon: './icon.svg',
+      badge: './icon.svg',
+      tag: 'inklok-melding',
+      requireInteraction: true
+    });
+    n.onclick = () => {
+      window.focus();
+      if (actie === 'in' && !inklokTijd) toggleKlok();
+      if (actie === 'uit' && inklokTijd) toggleKlok();
+      n.close();
+    };
+  }
 }
 
 function verwerkLocatie(pos) {
@@ -1288,6 +1304,20 @@ function initLocatie() {
   if (localStorage.getItem('jm_locatie_actief') === '1') {
     startLocatie();
   }
+}
+
+// Herstart locatie & push wanneer gebruiker terugkeert naar de app
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && localStorage.getItem('jm_in') === '1') {
+    if (localStorage.getItem('jm_locatie_actief') === '1' && !locatieWatcher) {
+      startLocatie();
+    }
+  }
+});
+
+// Service Worker registreren voor PWA + push notificaties
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
 }
 </script>
 </body>
