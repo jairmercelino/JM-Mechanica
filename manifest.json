@@ -1,0 +1,18 @@
+{
+  "name": "JM Mechanica Dashboard",
+  "short_name": "JM Mechanica",
+  "description": "Privé dashboard voor JM Mechanica — uren, rooster en facturen",
+  "start_url": "/dashboard.html",
+  "display": "standalone",
+  "background_color": "#1a4a2e",
+  "theme_color": "#1a4a2e",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
