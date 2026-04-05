@@ -282,13 +282,13 @@
 }
 .chat-typing {
   display: flex; gap: 4px; align-items: center;
-  padding: 10px 13px; background: var(--groen-licht);
-  border: 1px solid var(--groen-border);
+  padding: 10px 13px; background: #eff6ff;
+  border: 1px solid #bfdbfe;
   border-radius: 14px; border-bottom-left-radius: 4px;
   align-self: flex-start;
 }
 .chat-typing span {
-  width: 6px; height: 6px; background: var(--groen-mid);
+  width: 6px; height: 6px; background: #3b82f6;
   border-radius: 50%; animation: tik 1.2s infinite;
 }
 .chat-typing span:nth-child(2) { animation-delay: 0.2s; }
@@ -319,7 +319,7 @@
 }
 </style>
 
-<button id="chat-knop" onclick="toggleChat()" title="Chat met ons" style="position:relative;">
+<button id="chat-knop" onclick="toggleChat()" title="Chat met ons">
   &#128172;
   <span id="chat-badge">1</span>
 </button>
@@ -380,6 +380,11 @@ const ANTWOORDEN = {
     'Goed om te horen dat u serieus interesse heeft. De snelste weg is even bellen: +31 6 29 22 93 95. Of vul het contactformulier in, dan nemen wij contact op.',
     'Dan stel ik voor dat u direct contact opneemt met Jair — bel +31 6 29 22 93 95 of gebruik het formulier onderaan de pagina.'
   ],
+  begroeting: [
+    'Goedendag! Waar kan ik u mee helpen? U kunt vragen stellen over onze diensten, tarieven, werkgebied of beschikbaarheid.',
+    'Hallo! Fijn dat u contact opneemt met JM Mechanica. Waarmee kan ik u van dienst zijn?',
+    'Goedendag! Ik help u graag verder. Heeft u een vraag over onze diensten, het tarief of de beschikbaarheid?'
+  ],
   onbekend: [
     'Dat is een goede vraag. Kunt u iets meer vertellen over wat u zoekt? Dan kan ik u beter helpen.',
     'Ik begrijp uw vraag niet helemaal. Vraagt u naar onze diensten, tarieven, werkgebied of beschikbaarheid?',
@@ -393,12 +398,14 @@ function pickRandom(arr) {
 
 function detecteerOnderwerp(tekst) {
   const t = tekst.toLowerCase();
+  const isBegroet  = /^(hallo|hoi|hey|hi|goedendag|goedemorgen|goedemiddag|goedenavond|dag|goed|morgen|middag|avond)[.!?]?\s*$/.test(t.trim());
   const isContact  = /contact|offerte|bel|mail|formulier|interesse|inschakelen|aanvragen|afspraak/.test(t);
   const isTarief   = /tarief|prijs|kosten|uur|btw|bedrag|rekening|betalen/.test(t);
   const isBeschik  = /beschikbaar|wanneer|vrij|planning|agenda|starten|datum|hoe snel/.test(t);
   const isDienst   = /dienst|werk|wat doe|installat|storing|onderhoud|monteur|project|td|technisch/.test(t);
   const isGebied   = /gebied|locatie|waar|regio|provincie|amsterdam|noord.holland|alkmaar|haarlem|zaandam/.test(t);
 
+  if (isBegroet)  return 'begroeting';
   if (isContact) serieuzeInteresse++;
   if (isTarief)  serieuzeInteresse++;
   if (isBeschik) serieuzeInteresse++;
