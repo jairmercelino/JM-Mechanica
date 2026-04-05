@@ -210,10 +210,10 @@
 <!-- FAQ Chatbot -->
 <style>
 #chat-knop {
-  position: fixed; bottom: 5rem; right: 1.5rem;
-  width: 52px; height: 52px; border-radius: 50%;
+  position: fixed; bottom: 80px; right: 1.5rem;
+  width: 60px; height: 60px; border-radius: 50%;
   background: #3b82f6; color: #fff; border: none;
-  font-size: 22px; cursor: pointer; z-index: 998;
+  font-size: 24px; cursor: pointer; z-index: 998;
   box-shadow: 0 4px 16px rgba(0,0,0,0.25);
   display: flex; align-items: center; justify-content: center;
   transition: transform 0.2s, background 0.2s;
@@ -232,8 +232,8 @@
   50% { transform: scale(1.2); box-shadow: 0 0 0 6px rgba(239,68,68,0); }
 }
 #chat-venster {
-  position: fixed; bottom: 9rem; right: 1.5rem;
-  width: 340px; max-height: 500px;
+  position: fixed; bottom: 160px; right: 1.5rem;
+  width: 360px; max-height: 520px;
   background: #fff; border-radius: 16px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.18);
   display: none; flex-direction: column;
@@ -243,7 +243,7 @@
 }
 @keyframes chatIn { from { opacity:0; transform:translateY(12px) scale(0.97); } to { opacity:1; transform:none; } }
 #chat-header {
-  background: var(--groen); padding: 14px 16px;
+  background: #3b82f6; padding: 14px 16px;
   display: flex; align-items: center; justify-content: space-between;
   flex-shrink: 0;
 }
@@ -272,9 +272,9 @@
   word-wrap: break-word;
 }
 .chat-bericht.assistent {
-  background: var(--groen-licht); color: #222;
+  background: #eff6ff; color: #222;
   border-bottom-left-radius: 4px; align-self: flex-start;
-  border: 1px solid var(--groen-border);
+  border: 1px solid #bfdbfe;
 }
 .chat-bericht.gebruiker {
   background: var(--groen); color: #fff;
@@ -307,12 +307,12 @@
 #chat-input:focus { border-color: var(--groen); }
 #chat-stuur {
   width: 36px; height: 36px; border-radius: 50%;
-  background: var(--groen); color: #fff; border: none;
+  background: #3b82f6; color: #fff; border: none;
   font-size: 16px; cursor: pointer; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
   transition: background 0.15s;
 }
-#chat-stuur:hover { background: var(--groen-mid); }
+#chat-stuur:hover { background: #2563eb; }
 #chat-stuur:disabled { background: #ccc; cursor: default; }
 @media (max-width: 400px) {
   #chat-venster { width: calc(100vw - 2rem); right: 1rem; }
