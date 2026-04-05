@@ -266,6 +266,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
             <option value="14">14 dagen (2 weken)</option>
           </select>
         </div>
+        <div style="background:var(--groen-licht);border-radius:10px;padding:10px;margin-top:8px;">
+          <p style="font-size:12px;color:var(--groen);font-weight:600;margin-bottom:4px;">Dienst aanpassen</p>
+          <p style="font-size:11px;color:#666;line-height:1.5;">Tik op een dag in de kalender om de dienst te wijzigen. Aangepaste dagen krijgen een ✎ symbool. Laat leeg om terug te keren naar het vaste patroon.</p>
+        </div>
       </div>
     </div>
 
@@ -761,10 +765,18 @@ async function uploadFactuurNaarDrive(bestandNaam, data, mimeType, kwartaal) {
 }
 
 function laadKostenAutomatisch() {
-  fetch('/jm_scan_resultaat.json?t=' + Date.now())
+  // Laad van GitHub Pages (geen cache)
+  const url = 'https://jairmercelino.github.io/JM-Mechanica/jm_scan_resultaat.json?t=' + Date.now();
+  fetch(url)
     .then(r => r.ok ? r.json() : null)
     .then(data => { if(data) toonKosten(data); })
-    .catch(() => {});
+    .catch(() => {
+      // Fallback naar zelfde domein
+      fetch('/jm_scan_resultaat.json?t=' + Date.now())
+        .then(r => r.ok ? r.json() : null)
+        .then(data => { if(data) toonKosten(data); })
+        .catch(() => {});
+    });
 }
 
 async function laadVanGoogleDrive() {
@@ -932,24 +944,67 @@ function renderKostenLijst(lijstId, cardId, items) {
 }
 
 // ── ROOSTER KALENDER ──
-// Patroon: D D M M N N (6 werkdagen) + 4 vrij = 10 dagen cyclus
 const DIENST_PATROON = ['D','D','M','M','N','N',null,null,null,null];
-const DIENST_TIJDEN = { D: {start:'06:00',einde:'14:00'}, M: {start:'14:00',einde:'22:00'}, N: {start:'22:00',einde:'06:00'} };
+const DIENST_TIJDEN = { D: {start:'05:30',einde:'13:30'}, M: {start:'13:30',einde:'21:30'}, N: {start:'21:30',einde:'05:30'} };
 
 let roosterInstellingen = JSON.parse(localStorage.getItem('jm_rooster_inst') || '{"startdatum":"2026-04-06","interval":10}');
+let roosterAanpassingen = JSON.parse(localStorage.getItem('jm_rooster_aanp') || '{}');
 let huidigeMaand = new Date();
 huidigeMaand.setDate(1);
 
 function getDienst(datum) {
+  const datumStr = fmtD(datum);
+  // Check handmatige aanpassing
+  if (roosterAanpassingen[datumStr] !== undefined) {
+    return roosterAanpassingen[datumStr] || null;
+  }
   const start = new Date(roosterInstellingen.startdatum);
   const diff  = Math.floor((datum - start) / 86400000);
   if (diff < 0) return null;
   const interval = parseInt(roosterInstellingen.interval) || 10;
   const pos = diff % interval;
   if (interval === 10) return DIENST_PATROON[pos] || null;
-  // Voor 7 of 14 dagen: D D M M N N herhaal
   const korte_patroon = ['D','D','M','M','N','N'];
   return korte_patroon[pos % 6] || null;
+}
+
+function passDienstAan(datumStr) {
+  const huidig = roosterAanpassingen[datumStr] !== undefined 
+    ? roosterAanpassingen[datumStr] 
+    : getDienstVanPatroon(datumStr);
+  
+  const keuze = prompt(
+    `Dienst voor ${datumStr}:\n\nD = Dag (05:30–13:30)\nM = Middag (13:30–21:30)\nN = Nacht (21:30–05:30)\nV = Vrij\n\nHuidige: ${huidig || 'Vrij'}\nTyp D, M, N of V (leeg = reset naar patroon):`,
+    huidig || 'V'
+  );
+  
+  if (keuze === null) return; // Geannuleerd
+  
+  if (keuze.trim() === '') {
+    // Reset naar patroon
+    delete roosterAanpassingen[datumStr];
+  } else if (['D','M','N'].includes(keuze.toUpperCase())) {
+    roosterAanpassingen[datumStr] = keuze.toUpperCase();
+  } else if (keuze.toUpperCase() === 'V') {
+    roosterAanpassingen[datumStr] = null; // Vrij
+  } else {
+    alert('Ongeldige keuze. Typ D, M, N of V.');
+    return;
+  }
+  
+  localStorage.setItem('jm_rooster_aanp', JSON.stringify(roosterAanpassingen));
+  renderKalender();
+}
+
+function getDienstVanPatroon(datumStr) {
+  const datum = new Date(datumStr);
+  const start = new Date(roosterInstellingen.startdatum);
+  const diff  = Math.floor((datum - start) / 86400000);
+  if (diff < 0) return null;
+  const interval = parseInt(roosterInstellingen.interval) || 10;
+  const pos = diff % interval;
+  if (interval === 10) return DIENST_PATROON[pos] || null;
+  return ['D','D','M','M','N','N'][pos % 6] || null;
 }
 
 function slaRoosterInstellingenOp() {
@@ -960,6 +1015,7 @@ function slaRoosterInstellingenOp() {
 }
 
 function navigeerMaand(richting) {
+  huidigeMaand = new Date(huidigeMaand);
   huidigeMaand.setMonth(huidigeMaand.getMonth() + richting);
   renderKalender();
 }
@@ -972,7 +1028,6 @@ function renderKalender() {
   const maandNamen = ['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December'];
   document.getElementById('rooster-maand-label').textContent = `${maandNamen[maand]} ${jaar}`;
 
-  // Eerste dag van maand, ga terug naar maandag
   const eerstedag = new Date(jaar, maand, 1);
   const startDow  = eerstedag.getDay() === 0 ? 6 : eerstedag.getDay() - 1;
   const startDatum = new Date(eerstedag);
@@ -981,30 +1036,32 @@ function renderKalender() {
   const grid = document.getElementById('rooster-kalender');
   grid.innerHTML = '';
 
-  // 6 weken tonen
   for (let i = 0; i < 42; i++) {
     const dag = new Date(startDatum);
     dag.setDate(dag.getDate() + i);
     dag.setHours(0,0,0,0);
 
-    const isVandaag     = dag.getTime() === nu.getTime();
-    const isAnderMaand  = dag.getMonth() !== maand;
-    const dienst        = getDienst(dag);
+    const isVandaag    = dag.getTime() === nu.getTime();
+    const isAnderMaand = dag.getMonth() !== maand;
+    const datumStr     = fmtD(dag);
+    const dienst       = getDienst(dag);
+    const isAangepast  = roosterAanpassingen[datumStr] !== undefined;
 
     const cel = document.createElement('div');
     cel.className = `rooster-cel${isVandaag?' vandaag':''}${isAnderMaand?' ander-maand':''}`;
+    cel.style.cursor = 'pointer';
+    cel.onclick = () => passDienstAan(datumStr);
 
     let dienstHTML = '';
     if (dienst) {
       const t = DIENST_TIJDEN[dienst];
-      dienstHTML = `<div class="dienst-blok dienst-${dienst}">${dienst}<br><span class="dienst-tijd">${t.start}</span></div>`;
+      dienstHTML = `<div class="dienst-blok dienst-${dienst}" style="${isAangepast?'outline:2px solid #fff;':''}">${dienst}<br><span class="dienst-tijd">${t.start}</span></div>`;
     }
 
-    cel.innerHTML = `<div class="rooster-dag-nr">${dag.getDate()}</div>${dienstHTML}`;
+    cel.innerHTML = `<div class="rooster-dag-nr">${dag.getDate()}${isAangepast?'<span style="color:var(--groen);font-size:8px;">✎</span>':''}</div>${dienstHTML}`;
     grid.appendChild(cel);
   }
 
-  // Update instellingen velden
   const sdEl = document.getElementById('rooster-startdatum');
   const intEl = document.getElementById('rooster-interval');
   if (sdEl) sdEl.value = roosterInstellingen.startdatum;
