@@ -289,8 +289,8 @@ tailwind.config = {
     <!-- Photo -->
     <div class="relative order-2 lg:order-1">
       <div class="relative overflow-hidden shadow-2xl" style="aspect-ratio:4/5;">
-        <img src="assets/images/jair-monteur.jpg" alt="Jair Mercelino aan het werk" class="w-full h-full object-cover" style="filter:brightness(0.75);" onerror="this.style.display='none'"/>
-        <div class="absolute inset-0 bg-gradient-to-br from-[#022448]/40 to-transparent"></div>
+        <img src="assets/images/jair-monteur.jpg" alt="Jair Mercelino aan het werk" class="w-full h-full object-cover" style="filter:brightness(0.55);" onerror="this.style.display='none'"/>
+        <div class="absolute inset-0 bg-gradient-to-br from-[#022448]/50 to-transparent"></div>
       </div>
       <div class="absolute bottom-6 right-0 md:-right-6 bg-[#022448] text-white p-6 md:p-8">
         <p class="text-4xl font-black font-headline text-[#f97316]">15+</p>
@@ -485,24 +485,6 @@ tailwind.config = {
 <script>
 function toggleMenu() { document.getElementById('mobile-menu').classList.toggle('hidden'); }
 
-let chatOpen=false, chatBezig=false;
-
-// ── CONVERSATION STATE ──
-const chat = {
-  score: 0,
-  besproken: new Set(),
-  geschiedenis: [],
-  leadVerstuurd: false,
-  naam: null,
-  email: null,
-  telefoon: null,
-  bedrijf: null,
-  dienst: null,
-  locatie: null,
-  formulierAangeboden: false
-};
-
-// ── RESPONSE POOL (per topic, meerdere varianten) ──
 const ANTWOORDEN = {
   identiteit: [
     'Ik ben de digitale assistent van JM Mechanica. Jair Mercelino is een allround monteur gespecialiseerd in storing en onderhoud van bedrijfsinstallaties in Noord-Holland.',
@@ -799,7 +781,7 @@ function verstuurChat() {
   const antwoord = bouwAntwoord(onderwerp, t);
   antwoordMetDelay(antwoord);
 }
-setTimeout(() => { if (!chatOpen) toggleChat(); }, 8000);
+// Chatbot opent alleen als gebruiker klikt
 
 function verstuurFormulier(e){
   e.preventDefault();const form=document.getElementById('contact-form');const data=new FormData(form);
