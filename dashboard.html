@@ -1297,9 +1297,13 @@ async function startLocatie() {
     return;
   }
 
-  const pushOk = await vraagPushToestemming();
-  if (!pushOk) {
-    alert('Schakel meldingen in voor automatische inklok meldingen.\n\nGa naar Instellingen → Meldingen → JM Mechanica → Sta toe.');
+  // Vraag push toestemming alleen als PWA (standalone) — Safari bladwijzers ondersteunen geen meldingen
+  const isStandalonePWA = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+  if (isStandalonePWA) {
+    const pushOk = await vraagPushToestemming();
+    if (!pushOk) {
+      alert('Schakel meldingen in voor automatische inklok meldingen.\n\nGa naar Instellingen → Meldingen → JM Mechanica → Sta toe.');
+    }
   }
 
   const btn = document.getElementById('locatie-btn');
