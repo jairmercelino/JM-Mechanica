@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Diensten | JM Mechanica</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        "primary": "#022448",
+        "primary-container": "#1e3a5f",
+        "on-primary-container": "#8aa4cf",
+        "surface": "#f9f9ff",
+        "surface-container-low": "#f0f3ff",
+        "surface-container": "#e7eeff",
+        "surface-container-high": "#dee9ff",
+        "surface-container-lowest": "#ffffff",
+        "outline": "#74777f",
+        "background": "#f9f9ff"
+      },
+      fontFamily: { "headline": ["Space Grotesk"], "body": ["Inter"], "label": ["Inter"] }
+    }
+  }
+}
+</script>
+<style>
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+.blueprint-grid { background-image: radial-gradient(#6b8ab8 0.5px, transparent 0.5px); background-size: 20px 20px; }
+</style>
+</head>
+<body class="bg-background text-on-background font-body" style="--on-background:#001c3b;">
+
+<!-- Mobile menu overlay -->
+<div id="mobile-menu" class="hidden fixed inset-0 bg-[#022448] z-[60] flex flex-col p-8">
+  <div class="flex justify-between items-center mb-12">
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-[#f97316]" style="font-variation-settings:'FILL' 1;">precision_manufacturing</span>
+      <span class="text-xl font-black text-white tracking-tighter font-headline">JM MECHANICA</span>
+    </div>
+    <button onclick="toggleMenu()" class="text-white"><span class="material-symbols-outlined">close</span></button>
+  </div>
+  <nav class="flex flex-col gap-6">
+    <a href="index.html" class="text-2xl font-black text-white font-headline border-b border-white/10 pb-6">Home</a>
+    <a href="diensten.html" class="text-2xl font-black text-[#f97316] font-headline border-b border-white/10 pb-6">Diensten</a>
+    <a href="over-mij.html" class="text-2xl font-black text-white font-headline border-b border-white/10 pb-6">Over Mij</a>
+    <a href="index.html#contact" class="mt-4 bg-[#f97316] text-white px-8 py-4 font-black font-headline text-center">OFFERTE AANVRAGEN</a>
+  </nav>
+</div>
+
+<!-- Header -->
+<header class="fixed top-0 w-full z-50 bg-[#022448]/90 backdrop-blur-md" style="box-shadow:0 10px 40px -15px rgba(0,28,59,0.2);">
+  <div class="max-w-7xl mx-auto px-6 flex justify-between items-center" style="height:72px;">
+    <a href="index.html" class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-[#f97316]" style="font-variation-settings:'FILL' 1;">precision_manufacturing</span>
+      <span class="text-lg font-black text-white tracking-tighter font-headline">JM MECHANICA</span>
+    </a>
+    <nav class="hidden md:flex items-center gap-8">
+      <a href="index.html" class="text-white/80 font-medium hover:text-[#f97316] transition-colors font-headline text-sm">Home</a>
+      <a href="diensten.html" class="text-[#f97316] font-bold border-b-2 border-[#f97316] pb-0.5 font-headline text-sm">Diensten</a>
+      <a href="over-mij.html" class="text-white/80 font-medium hover:text-[#f97316] transition-colors font-headline text-sm">Over Mij</a>
+      <a href="index.html#contact" class="bg-[#f97316] text-white px-6 py-2 font-bold text-sm hover:opacity-90 transition-all">OFFERTE AANVRAGEN</a>
+    </nav>
+    <button onclick="toggleMenu()" class="md:hidden text-white"><span class="material-symbols-outlined">menu</span></button>
+  </div>
+</header>
+
+<main style="padding-top:72px;">
+
+<!-- Page hero -->
+<section class="relative py-28 overflow-hidden bg-gradient-to-br from-[#022448] to-[#1e3a5f] blueprint-grid">
+  <div class="absolute inset-0">
+    <img src="assets/images/Siroop%20vulmachine" alt="" class="w-full h-full object-cover" style="opacity:0.15;filter:blur(1px);" onerror="this.style.display='none'"/>
+    <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(2,36,72,0.7) 0%,rgba(30,58,95,0.5) 100%);"></div>
+  </div>
+  <div class="max-w-7xl mx-auto px-6 md:px-8 relative z-10">
+    <span class="text-[#f97316] font-bold text-sm tracking-[0.3em] font-label">Specialisaties</span>
+    <h1 class="font-black text-white tracking-tighter font-headline mt-3 leading-[0.9]" style="font-size:clamp(3rem,8vw,5.5rem);">DIENSTEN.</h1>
+    <p class="text-on-primary-container mt-4 max-w-xl text-lg font-light leading-relaxed">Uitgebreide industriële ondersteuning op maat — van storingsdiagnose tot complete projectbegeleiding.</p>
+  </div>
+</section>
+
+<!-- Service 1: Storingen & Onderhoud -->
+<section class="py-24 bg-white px-6 md:px-8">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <!-- Image -->
+      <div class="relative overflow-hidden" style="aspect-ratio:4/3;">
+        <img src="assets/images/Dagcontrole%202tons%20metaal%20drukpers" alt="Storingen en onderhoud — industriële drukpers" class="w-full h-full object-cover" style="filter:blur(4px) brightness(0.7);" onerror="this.style.display='none'"/>
+        <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(2,36,72,0.55) 0%,transparent 70%);"></div>
+        <div class="absolute top-6 left-6">
+          <span class="bg-[#f97316] text-white text-[10px] font-bold tracking-[0.2em] px-3 py-1 font-label uppercase">Dienst 01</span>
+        </div>
+      </div>
+      <!-- Text -->
+      <div class="space-y-6">
+        <div>
+          <span class="text-[#f97316] font-bold text-sm tracking-[0.3em] font-label">Dienst 01</span>
+          <h2 class="text-3xl md:text-4xl font-black text-[#022448] font-headline tracking-tighter mt-2 leading-[0.9]">STORINGEN &amp;<br/>ONDERHOUD</h2>
+        </div>
+        <p class="text-outline leading-relaxed">Preventief en correctief onderhoud aan bedrijfsinstallaties is de kern van wat ik doe. Door tijdig te onderhouden voorkom je ongeplande stilstand en verleng je de levensduur van uw installaties aanzienlijk.</p>
+        <div class="space-y-3">
+          <div class="flex items-start gap-3 p-4 bg-surface-container-low border-l-4 border-[#f97316]">
+            <span class="material-symbols-outlined text-[#f97316] flex-shrink-0 mt-0.5" style="font-size:1.2rem;">check</span>
+            <div>
+              <h4 class="font-bold text-[#022448] font-headline text-sm">Storingsdiagnose & Herstel</h4>
+              <p class="text-outline text-xs mt-1 leading-relaxed">Snelle diagnose van mechanische, pneumatische en elektrotechnische storingen met duurzame oplossingen.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-4 bg-surface-container-low">
+            <span class="material-symbols-outlined text-[#022448] flex-shrink-0 mt-0.5" style="font-size:1.2rem;">check</span>
+            <div>
+              <h4 class="font-bold text-[#022448] font-headline text-sm">Preventief Onderhoud</h4>
+              <p class="text-outline text-xs mt-1 leading-relaxed">Gepland onderhoud op basis van fabrieksspecificaties of conditiemonitoring om uitval te voorkomen.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-4 bg-surface-container-low">
+            <span class="material-symbols-outlined text-[#022448] flex-shrink-0 mt-0.5" style="font-size:1.2rem;">check</span>
+            <div>
+              <h4 class="font-bold text-[#022448] font-headline text-sm">Inspectie &amp; Audits</h4>
+              <p class="text-outline text-xs mt-1 leading-relaxed">Technische inspectie van installaties met helder rapport en aanbevelingen voor verbetering.</p>
+            </div>
+          </div>
+        </div>
+        <a href="index.html#contact" class="inline-flex items-center gap-2 bg-[#f97316] text-white px-8 py-4 font-bold hover:opacity-90 transition-all">
+          OFFERTE AANVRAGEN <span class="material-symbols-outlined">arrow_forward</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Service 2: TD Ondersteuning -->
+<section class="py-24 bg-surface-container-low px-6 md:px-8">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <!-- Text — left on this one -->
+      <div class="space-y-6 order-2 lg:order-1">
+        <div>
+          <span class="text-[#f97316] font-bold text-sm tracking-[0.3em] font-label">Dienst 02</span>
+          <h2 class="text-3xl md:text-4xl font-black text-[#022448] font-headline tracking-tighter mt-2 leading-[0.9]">TECHNISCHE DIENST<br/>ONDERSTEUNING</h2>
+        </div>
+        <p class="text-outline leading-relaxed">Uw technische dienst heeft soms extra handen nodig of specifieke kennis voor een vraagstuk dat buiten de eigen expertise valt. JM Mechanica springt in waar u dat nodig heeft — flexibel, snel en vakkundig.</p>
+        <div class="space-y-3">
+          <div class="flex items-start gap-3 p-4 bg-white border-l-4 border-[#f97316]">
+            <span class="material-symbols-outlined text-[#f97316] flex-shrink-0 mt-0.5" style="font-size:1.2rem;">check</span>
+            <div>
+              <h4 class="font-bold text-[#022448] font-headline text-sm">Tijdelijke TD-versterking</h4>
+              <p class="text-outline text-xs mt-1 leading-relaxed">Extra capaciteit voor uw technische dienst tijdens pieken, ziekte of grote onderhoudsstops.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-4 bg-white">
+            <span class="material-symbols-outlined text-[#022448] flex-shrink-0 mt-0.5" style="font-size:1.2rem;">check</span>
+            <div>
+              <h4 class="font-bold text-[#022448] font-headline text-sm">Specifieke Vakkennis</h4>
+              <p class="text-outline text-xs mt-1 leading-relaxed">Ondersteuning bij complexe storingen of vraagstukken die specialistische kennis vereisen.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-4 bg-white">
+            <span class="material-symbols-outlined text-[#022448] flex-shrink-0 mt-0.5" style="font-size:1.2rem;">check</span>
+            <div>
+              <h4 class="font-bold text-[#022448] font-headline text-sm">Elektrotechnische Diagnose</h4>
+              <p class="text-outline text-xs mt-1 leading-relaxed">Meting, diagnose en herstel van elektrotechnische componenten en besturingskasten.</p>
+            </div>
+          </div>
+        </div>
+        <a href="index.html#contact" class="inline-flex items-center gap-2 bg-[#022448] text-white px-8 py-4 font-bold hover:bg-[#1e3a5f] transition-colors">
+          OFFERTE AANVRAGEN <span class="material-symbols-outlined">arrow_forward</span>
+        </a>
+      </div>
+      <!-- Image -->
+      <div class="relative overflow-hidden order-1 lg:order-2" style="aspect-ratio:4/3;">
+        <img src="assets/images/Elactrakast" alt="Elektrotechnische kast — TD ondersteuning" class="w-full h-full object-cover" style="filter:blur(3px) brightness(0.6);" onerror="this.style.display='none'"/>
+        <div class="absolute inset-0 bg-[#022448]/50"></div>
+        <div class="absolute top-6 left-6">
+          <span class="bg-[#f97316] text-white text-[10px] font-bold tracking-[0.2em] px-3 py-1 font-label uppercase">Dienst 02</span>
+        </div>
+        <div class="absolute bottom-6 right-6">
+          <span class="material-symbols-outlined text-white/30" style="font-size:6rem;">support_agent</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Service 3: Projecten -->
+<section class="py-24 bg-white px-6 md:px-8">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <!-- Image -->
+      <div class="relative overflow-hidden" style="aspect-ratio:4/3;">
+        <img src="assets/images/Kaas%20Uitpakken%20en%20controle" alt="Projectwerk — installatie en controle" class="w-full h-full object-cover" style="filter:blur(4px) brightness(0.65);" onerror="this.style.display='none'"/>
+        <div class="absolute inset-0" style="background:linear-gradient(to right,rgba(2,36,72,0.6) 0%,transparent 70%);"></div>
+        <div class="absolute top-6 left-6">
+          <span class="bg-[#f97316] text-white text-[10px] font-bold tracking-[0.2em] px-3 py-1 font-label uppercase">Dienst 03</span>
+        </div>
+      </div>
+      <!-- Text -->
+      <div class="space-y-6">
+        <div>
+          <span class="text-[#f97316] font-bold text-sm tracking-[0.3em] font-label">Dienst 03</span>
+          <h2 class="text-3xl md:text-4xl font-black text-[#022448] font-headline tracking-tighter mt-2 leading-[0.9]">PROJECTEN &amp;<br/>INSTALLATIES</h2>
+        </div>
+        <p class="text-outline leading-relaxed">Van de eerste schets tot de definitieve oplevering — JM Mechanica begeleidt en voert technische projecten uit met oog voor detail, planning en veiligheid. Van enkelvoudige installaties tot complexe productielijn-wijzigingen.</p>
+        <div class="space-y-3">
+          <div class="flex items-start gap-3 p-4 bg-surface-container-low border-l-4 border-[#f97316]">
+            <span class="material-symbols-outlined text-[#f97316] flex-shrink-0 mt-0.5" style="font-size:1.2rem;">check</span>
+            <div>
+              <h4 class="font-bold text-[#022448] font-headline text-sm">Machinestallaties</h4>
+              <p class="text-outline text-xs mt-1 leading-relaxed">Plaatsing, aansluiting en inbedrijfstelling van nieuwe machines en productielijnen.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-4 bg-surface-container-low">
+            <span class="material-symbols-outlined text-[#022448] flex-shrink-0 mt-0.5" style="font-size:1.2rem;">check</span>
+            <div>
+              <h4 class="font-bold text-[#022448] font-headline text-sm">Relocatie &amp; Verplaatsing</h4>
+              <p class="text-outline text-xs mt-1 leading-relaxed">Demontage, transport en her-installatie van machines met minimale productieonderbreking.</p>
+            </div>
+          </div>
+          <div class="flex items-start gap-3 p-4 bg-surface-container-low">
+            <span class="material-symbols-outlined text-[#022448] flex-shrink-0 mt-0.5" style="font-size:1.2rem;">check</span>
+            <div>
+              <h4 class="font-bold text-[#022448] font-headline text-sm">Optimalisatie &amp; Modificatie</h4>
+              <p class="text-outline text-xs mt-1 leading-relaxed">Aanpassingen en verbeteringen aan bestaande installaties voor hogere efficiëntie en betrouwbaarheid.</p>
+            </div>
+          </div>
+        </div>
+        <a href="index.html#contact" class="inline-flex items-center gap-2 bg-[#f97316] text-white px-8 py-4 font-bold hover:opacity-90 transition-all">
+          OFFERTE AANVRAGEN <span class="material-symbols-outlined">arrow_forward</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Tarief -->
+<section class="py-24 px-6 md:px-8 relative overflow-hidden" style="background:#022448;">
+  <div class="absolute inset-0 blueprint-grid opacity-20"></div>
+  <div class="absolute inset-0">
+    <img src="assets/images/Modernde%20doos%20inpakk%20mach%20Leeg" alt="" class="w-full h-full object-cover" style="opacity:0.08;mix-blend-mode:luminosity;" onerror="this.style.display='none'"/>
+  </div>
+  <div class="max-w-5xl mx-auto relative z-10">
+    <div class="text-center mb-12">
+      <span class="text-[#f97316] font-bold text-sm tracking-[0.3em] font-label">Tarieven</span>
+      <h2 class="text-3xl font-black text-white font-headline tracking-tighter mt-2">TRANSPARANT TARIEF</h2>
+      <div class="w-12 h-1 bg-[#f97316] mx-auto mt-4"></div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-white/5 border border-white/10 p-8 text-center">
+        <span class="material-symbols-outlined text-[#f97316] block mb-4" style="font-size:2rem;">schedule</span>
+        <p class="text-4xl font-black text-[#f97316] font-headline">€77,50</p>
+        <p class="text-white/60 text-sm mt-2 font-label uppercase tracking-widest">Per uur excl. btw</p>
+        <p class="text-white/40 text-xs mt-3 leading-relaxed">Standaard uurtarief voor alle werkzaamheden</p>
+      </div>
+      <div class="bg-[#f97316] p-8 text-center">
+        <span class="material-symbols-outlined text-white block mb-4" style="font-size:2rem;">directions_car</span>
+        <p class="text-4xl font-black text-white font-headline">Incl.</p>
+        <p class="text-white/80 text-sm mt-2 font-label uppercase tracking-widest">Reisuren</p>
+        <p class="text-white/70 text-xs mt-3 leading-relaxed">Reistijd wordt doorberekend tegen hetzelfde tarief</p>
+      </div>
+      <div class="bg-white/5 border border-white/10 p-8 text-center">
+        <span class="material-symbols-outlined text-[#f97316] block mb-4" style="font-size:2rem;">handshake</span>
+        <p class="text-4xl font-black text-[#f97316] font-headline">In overleg</p>
+        <p class="text-white/60 text-sm mt-2 font-label uppercase tracking-widest">Langdurige opdrachten</p>
+        <p class="text-white/40 text-xs mt-3 leading-relaxed">Bij langlopende projecten of vaste opdracht mogelijk afwijkend tarief</p>
+      </div>
+    </div>
+    <div class="mt-10 text-center">
+      <p class="text-white/40 text-sm">Alle vermelde tarieven zijn exclusief btw &bull; KvK: 86164309 &bull; BTW: NL004201082B62</p>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="py-24 bg-surface-container-low px-6 md:px-8">
+  <div class="max-w-3xl mx-auto">
+    <div class="text-center mb-12">
+      <span class="text-[#f97316] font-bold text-sm tracking-[0.3em] font-label">Veelgestelde vragen</span>
+      <h2 class="text-3xl font-black text-[#022448] font-headline tracking-tighter mt-2">FAQ</h2>
+      <div class="w-12 h-1 bg-[#f97316] mx-auto mt-4"></div>
+    </div>
+    <div class="space-y-4">
+      <details class="bg-white p-6 group">
+        <summary class="flex justify-between items-center cursor-pointer font-bold text-[#022448] font-headline list-none">
+          Wat is het werkgebied van JM Mechanica?
+          <span class="material-symbols-outlined text-[#f97316] group-open:rotate-180 transition-transform">expand_more</span>
+        </summary>
+        <p class="mt-4 text-outline text-sm leading-relaxed">JM Mechanica is primair actief in Noord-Holland (Zaandam, Amsterdam, Alkmaar, Haarlem en omgeving). Opdrachten buiten Noord-Holland zijn mogelijk in overleg, met name voor kortere periodes of speciale projecten.</p>
+      </details>
+      <details class="bg-white p-6 group">
+        <summary class="flex justify-between items-center cursor-pointer font-bold text-[#022448] font-headline list-none">
+          Hoe snel bent u beschikbaar bij een storing?
+          <span class="material-symbols-outlined text-[#f97316] group-open:rotate-180 transition-transform">expand_more</span>
+        </summary>
+        <p class="mt-4 text-outline text-sm leading-relaxed">De beschikbaarheid is afhankelijk van de lopende opdracht en het rooster. Voor dringende storingen neem direct contact op via +31 6 29 22 93 95 om de mogelijkheden te bespreken. Als losse klussen naast de vaste opdracht zijn er regelmatig vrije momenten.</p>
+      </details>
+      <details class="bg-white p-6 group">
+        <summary class="flex justify-between items-center cursor-pointer font-bold text-[#022448] font-headline list-none">
+          Werkt u ook in de avond of het weekend?
+          <span class="material-symbols-outlined text-[#f97316] group-open:rotate-180 transition-transform">expand_more</span>
+        </summary>
+        <p class="mt-4 text-outline text-sm leading-relaxed">Ja, in overleg is werken buiten kantooruren mogelijk. Dit is afhankelijk van de urgentie en planning. Neem contact op om de mogelijkheden te bespreken.</p>
+      </details>
+      <details class="bg-white p-6 group">
+        <summary class="flex justify-between items-center cursor-pointer font-bold text-[#022448] font-headline list-none">
+          Heeft u ervaring met mijn type installatie?
+          <span class="material-symbols-outlined text-[#f97316] group-open:rotate-180 transition-transform">expand_more</span>
+        </summary>
+        <p class="mt-4 text-outline text-sm leading-relaxed">Als allround monteur heb ik brede ervaring met mechanische, pneumatische, hydraulische en elektrotechnische installaties in diverse industriële sectoren. Neem contact op voor een specifieke vraag — in een korte kennismaking bespreken we of ik de juiste persoon ben voor uw opdracht.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="py-20 px-6 md:px-8 bg-white border-t border-surface-container-high">
+  <div class="max-w-4xl mx-auto text-center space-y-6">
+    <h2 class="text-3xl md:text-4xl font-black text-[#022448] font-headline tracking-tighter">INTERESSE IN EEN SAMENWERKING?</h2>
+    <p class="text-outline text-lg max-w-xl mx-auto">Neem vrijblijvend contact op voor een technische beoordeling of vraag direct een offerte aan.</p>
+    <div class="flex flex-wrap gap-4 justify-center pt-4">
+      <a href="index.html#contact" class="bg-[#f97316] text-white px-10 py-4 font-bold hover:opacity-90 transition-all flex items-center gap-2">
+        OFFERTE AANVRAGEN <span class="material-symbols-outlined">arrow_forward</span>
+      </a>
+      <a href="tel:+31629229395" class="bg-[#022448] text-white px-10 py-4 font-bold hover:bg-[#1e3a5f] transition-all flex items-center gap-2">
+        <span class="material-symbols-outlined">call</span> +31 6 29 22 93 95
+      </a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- Footer -->
+<footer class="py-12 px-6 md:px-8" style="background:#001020;">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 pb-8 border-b border-white/10">
+      <div class="md:col-span-2 space-y-4">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-[#f97316]" style="font-variation-settings:'FILL' 1;">precision_manufacturing</span>
+          <span class="text-xl font-black text-white tracking-tighter font-headline">JM MECHANICA</span>
+        </div>
+        <p class="text-white/35 text-sm leading-relaxed max-w-xs">Allround monteur voor storing, onderhoud en technische projectondersteuning in Noord-Holland.</p>
+      </div>
+      <div class="space-y-3">
+        <h4 class="text-white font-bold text-xs uppercase tracking-widest font-label">Navigatie</h4>
+        <div class="flex flex-col gap-2">
+          <a href="index.html" class="text-white/40 hover:text-[#f97316] text-sm transition-colors">Home</a>
+          <a href="diensten.html" class="text-[#f97316] text-sm">Diensten</a>
+          <a href="over-mij.html" class="text-white/40 hover:text-[#f97316] text-sm transition-colors">Over Mij</a>
+          <a href="index.html#contact" class="text-white/40 hover:text-[#f97316] text-sm transition-colors">Contact</a>
+        </div>
+      </div>
+      <div class="space-y-3">
+        <h4 class="text-white font-bold text-xs uppercase tracking-widest font-label">Contact</h4>
+        <div class="flex flex-col gap-2">
+          <a href="tel:+31629229395" class="text-white/40 hover:text-[#f97316] text-sm transition-colors">+31 6 29 22 93 95</a>
+          <a href="mailto:info@jmmechanica.nl" class="text-white/40 hover:text-[#f97316] text-sm transition-colors">info@jmmechanica.nl</a>
+          <span class="text-white/40 text-sm">Zaandam, Noord-Holland</span>
+        </div>
+      </div>
+    </div>
+    <div class="pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+      <p class="text-white/25 text-xs">© 2026 JM Mechanica &bull; Zaandam, Noord-Holland</p>
+      <div class="flex gap-6 flex-wrap justify-center">
+        <span class="text-white/25 text-xs">KvK: 86164309</span>
+        <span class="text-white/25 text-xs">BTW: NL004201082B62</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function toggleMenu() { document.getElementById('mobile-menu').classList.toggle('hidden'); }
+</script>
+</body>
+</html>
