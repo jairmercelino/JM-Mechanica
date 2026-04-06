@@ -504,10 +504,15 @@ const chat = {
 
 // ── RESPONSE POOL (per topic, meerdere varianten) ──
 const ANTWOORDEN = {
+  identiteit: [
+    'Ik ben de digitale assistent van JM Mechanica. Jair Mercelino is een allround monteur gespecialiseerd in storing en onderhoud van bedrijfsinstallaties in Noord-Holland.',
+    'JM Mechanica is het bedrijf van Jair Mercelino — een ervaren allround monteur uit Zaandam, gespecialiseerd in industrieel onderhoud, storingen en projectwerk in Noord-Holland.',
+    'Ik help u namens JM Mechanica. Jair Mercelino is de eigenaar — een allround monteur met 15+ jaar ervaring in de industrie, gevestigd in Zaandam.'
+  ],
   diensten: [
-    'JM Mechanica biedt drie kerndiensten: storingsoplossing, preventief onderhoud en TD-ondersteuning. Heeft u een specifiek type installatie in gedachten?',
-    'Wij zijn breed inzetbaar — van acute storingen tot complete projectbegeleiding. Waar zoekt u ondersteuning voor?',
-    'Van PLC-diagnose tot mechanische reparaties en projectinstallaties — JM Mechanica is uw allround partner. Welk type werk heeft u in gedachten?'
+    'JM Mechanica biedt drie kerndiensten:\n\n1. Storingen & Onderhoud — preventief en correctief onderhoud aan bedrijfsinstallaties\n2. TD Ondersteuning — versterking van uw technische dienst bij complexe storingen\n3. Projecten & Installaties — van installatie tot oplevering\n\nWaar kan ik u meer over vertellen?',
+    'Onze drie specialiteiten:\n\n1. Storingen & Onderhoud — snel schakelen bij uitval en preventief onderhoud\n2. TD Ondersteuning — elektrotechnische en mechanische diagnoses\n3. Projectwerk — complete projectbegeleiding en installaties\n\nHeeft u een specifiek type klus in gedachten?',
+    'JM Mechanica is breed inzetbaar met drie diensten:\n\n1. Storingsoplossing en preventief onderhoud\n2. Technische dienst ondersteuning bij complexe vraagstukken\n3. Projecten en installaties van A tot Z\n\nVoor welke dienst zoekt u ondersteuning?'
   ],
   tarief: [
     'Het uurtarief is €77,50 excl. btw. Reisuren worden doorberekend. Bij langdurige opdrachten is overleg over het tarief mogelijk.',
@@ -543,9 +548,9 @@ const ANTWOORDEN = {
     'Met 15+ jaar ervaring in industriële omgevingen kent Jair de uitdagingen van productieomgevingen door en door.'
   ],
   onbekend: [
-    'Dat is een goede vraag. Kunt u iets meer vertellen over wat u zoekt? Dan kan ik u beter helpen.',
-    'Ik begrijp uw vraag niet helemaal. Vraagt u naar onze diensten, tarieven, werkgebied of beschikbaarheid?',
-    'Daar heb ik niet direct een antwoord op, maar Jair zeker wel. Bel +31 6 29 22 93 95 of stel een andere vraag.'
+    'Ik kan u helpen met vragen over:\n\n- Onze diensten en specialiteiten\n- Tarieven en kosten\n- Werkgebied en locatie\n- Beschikbaarheid en planning\n- Certificeringen en ervaring\n- Contact opnemen met Jair\n\nWaar bent u naar op zoek?',
+    'Daar heb ik niet direct een antwoord op. Ik kan u wel vertellen over onze diensten, tarieven (€77,50/uur), werkgebied (Noord-Holland), beschikbaarheid of certificeringen. Of bel Jair direct: +31 6 29 22 93 95.',
+    'Die vraag kan ik het beste doorspelen aan Jair zelf. U kunt hem bereiken op +31 6 29 22 93 95 of via info@jmmechanica.nl. Ik help u verder met vragen over diensten, tarieven, werkgebied of beschikbaarheid.'
   ]
 };
 
@@ -557,8 +562,11 @@ function pickRandom(arr) {
 function detecteerOnderwerp(tekst) {
   const t = tekst.toLowerCase().trim();
 
-  // Begroeting
-  if (/^(hallo|hoi|hey|hi|goedendag|goedemorgen|goedemiddag|goedenavond|dag|goed|morgen|middag|avond)[.!?]?\s*$/i.test(t)) return 'begroeting';
+  // Begroeting (ook met extra woorden erna, bijv "hallo daar")
+  if (/^(hallo|hoi|hey|hi|goedendag|goedemorgen|goedemiddag|goedenavond|dag|yo|welkom)(\s+(daar|zeg|even|allemaal))?[.!?\s]*$/i.test(t)) return 'begroeting';
+
+  // Identiteit ("wie ben jij", "over jullie", etc.)
+  if (/wie ben|wie is|wie zijn|over jullie|over jou|over jm|vertel over|wat is jm|wat voor bedrijf/.test(t)) return 'identiteit';
 
   // Detect naam, email, telefoon uit bericht
   const naamMatch = t.match(/(?:ik\s+ben|mijn\s+naam\s+is|naam\s*[:\-]?\s*)([a-zA-ZÀ-ÿ\s]{2,30})/i);
@@ -579,7 +587,7 @@ function detecteerOnderwerp(tekst) {
   const topics = [];
   if (/tarief|prijs|kosten|uur|btw|bedrag|rekening|betalen|wat kost|hoeveel/.test(t)) topics.push('tarief');
   if (/beschikbaar|wanneer|vrij|planning|agenda|starten|datum|hoe snel|inzetbaar|capaciteit/.test(t)) topics.push('beschikbaar');
-  if (/dienst|werk|wat doe|installat|storing|onderhoud|monteur|project|td|technisch|reparati|preventief/.test(t)) topics.push('diensten');
+  if (/dienst|werk|wat doe|wat kun|wat bied|installat|storing|onderhoud|monteur|project|td|technisch|reparati|preventief|specialit|werkzaamhed|activiteit|aanbod|wat voor/.test(t)) topics.push('diensten');
   if (/gebied|locatie|waar|regio|provincie|amsterdam|noord.holland|alkmaar|haarlem|zaandam|almere|utrecht/.test(t)) topics.push('werkgebied');
   if (/contact|offerte|bel|formulier|inschakelen|aanvragen|afspraak|gesprek/.test(t)) topics.push('contact');
   if (/vca|certificat|gecertificeerd|diploma|veiligheid|kwalificati/.test(t)) topics.push('certificering');
@@ -734,7 +742,10 @@ function voegChatToe(rol, tekst) {
   d.className = 'chat-bericht ' + rol;
   // Support links in assistant messages
   if (rol === 'assistent') {
-    d.innerHTML = tekst.replace(/((\+31|0)\s?\d[\s\-]?(\d[\s\-]?){7,8})/g, '<a href="tel:$1" style="color:#f97316;font-weight:700;text-decoration:none;">$1</a>');
+    d.innerHTML = tekst
+      .replace(/\n/g, '<br>')
+      .replace(/((\+31|0)\s?\d[\s\-]?(\d[\s\-]?){7,8})/g, '<a href="tel:$1" style="color:#f97316;font-weight:700;text-decoration:none;">$1</a>')
+      .replace(/(info@jmmechanica\.nl)/g, '<a href="mailto:$1" style="color:#f97316;font-weight:700;text-decoration:none;">$1</a>');
   } else {
     d.textContent = tekst;
   }
