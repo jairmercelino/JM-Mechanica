@@ -1,214 +1,45 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JM Mechanica — Allround monteur Zaandam</title>
-  <meta name="description" content="JM Mechanica — Allround monteur voor de metaal- en voedingsindustrie. Technische ondersteuning TD, installatie en storingsoplossing in Noord-Holland.">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { --groen: #1a4a2e; --groen-mid: #2d6e47; --groen-licht: #e8f2ec; --groen-border: #b8d4c2; --radius: 12px; --radius-sm: 8px; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f3; color: #111; line-height: 1.6; }
-
-    nav { background: #fff; border-bottom: 1px solid #e0e0e0; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 100; }
-    .nav-logo { height: 32px; width: auto; }
-    .nav-links { display: flex; gap: 2rem; font-size: 13px; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: 0.05em; }
-    .nav-links a { text-decoration: none; color: #555; }
-    .nav-links a:hover { color: var(--groen); }
-    .nav-cta { background: var(--groen); color: #fff; padding: 9px 18px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; text-decoration: none; }
-
-    .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem; }
-
-    .hero { background: var(--groen); padding: 4rem 2rem 3rem; }
-    .hero .container { display: flex; align-items: center; gap: 3rem; flex-wrap: wrap; }
-    .hero-logo { width: 260px; height: auto; flex-shrink: 0; }
-    .hero-text .tag { font-size: 11px; color: #8fbfa0; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem; }
-    .hero-text h1 { font-size: 2rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem; }
-    .hero-text p { font-size: 15px; color: #a8cfb5; margin-bottom: 1.75rem; line-height: 1.7; max-width: 420px; }
-    .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
-    .btn-wit { background: #fff; color: var(--groen); padding: 12px 24px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; display: inline-block; text-decoration: none; cursor: pointer; border: none; }
-    .btn-wa { background: #25D366; color: #fff; padding: 12px 24px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; display: inline-block; text-decoration: none; }
-
-    .info-bar { background: #fff; border-bottom: 1px solid #e0e0e0; }
-    .info-bar .container { display: grid; grid-template-columns: repeat(3, 1fr); }
-    .info-item { padding: 1.25rem 1.5rem; border-right: 1px solid #e0e0e0; }
-    .info-item:last-child { border-right: none; }
-    .info-label { font-size: 10px; color: var(--groen-mid); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
-    .info-value { font-size: 14px; font-weight: 700; color: var(--groen); }
-
-    section { padding: 3rem 0; }
-    .section-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem; padding-bottom: 8px; border-bottom: 1.5px solid var(--groen-border); }
-
-    .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
-    .service-card { background: #fff; border: 1.5px solid #e0e0e0; border-top: 3px solid var(--groen); border-radius: var(--radius); padding: 1.25rem; }
-    .service-num { font-size: 11px; color: var(--groen-mid); font-weight: 700; margin-bottom: 8px; }
-    .service-card h3 { font-size: 14px; font-weight: 700; color: #111; margin-bottom: 6px; }
-    .service-card p { font-size: 13px; color: #666; line-height: 1.5; }
-
-    .industries { display: flex; gap: 10px; flex-wrap: wrap; }
-    .pill { background: var(--groen); color: #fff; padding: 7px 16px; border-radius: 99px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
-
-    .about-card { background: var(--groen-licht); border: 1.5px solid var(--groen-border); border-left: 4px solid var(--groen); border-radius: var(--radius); padding: 2rem; display: flex; gap: 2rem; align-items: flex-start; flex-wrap: wrap; }
-    .about-logo { width: 160px; height: auto; flex-shrink: 0; }
-    .about-text h3 { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--groen); margin-bottom: 10px; }
-    .about-text p { font-size: 14px; color: #444; line-height: 1.7; }
-
-    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-    .contact-info { background: var(--groen); border-radius: var(--radius); padding: 2rem; }
-    .contact-info h3 { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #8fbfa0; margin-bottom: 1.25rem; }
-    .contact-detail { display: flex; flex-direction: column; padding: 10px 0; border-bottom: 1px solid #2d6e47; }
-    .contact-detail:last-child { border-bottom: none; }
-    .contact-detail-label { font-size: 11px; color: #8fbfa0; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
-    .contact-detail-value { font-size: 14px; font-weight: 700; color: #fff; }
-    .contact-form { background: #fff; border: 1.5px solid #e0e0e0; border-radius: var(--radius); padding: 2rem; }
-    .contact-form h3 { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--groen); margin-bottom: 1.25rem; }
-    .form-row { margin-bottom: 12px; }
-    .form-row label { font-size: 11px; color: #888; display: block; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
-    .form-row input, .form-row textarea, .form-row select { width: 100%; font-size: 14px; padding: 10px 12px; border: 1.5px solid #ddd; background: #f9f9f9; color: #111; border-radius: var(--radius-sm); font-family: inherit; }
-    .form-row input:focus, .form-row textarea:focus, .form-row select:focus { border-color: var(--groen); outline: none; background: #fff; }
-    .form-row textarea { height: 100px; resize: vertical; }
-    .submit-btn { background: var(--groen); color: #fff; border: none; padding: 13px; font-size: 13px; font-weight: 700; cursor: pointer; width: 100%; text-transform: uppercase; letter-spacing: 0.08em; border-radius: var(--radius-sm); font-family: inherit; }
-    .submit-btn:hover { background: var(--groen-mid); }
-    .form-succes { display: none; background: var(--groen-licht); border: 1.5px solid var(--groen-border); border-radius: var(--radius-sm); padding: 1rem; text-align: center; font-size: 14px; color: var(--groen); font-weight: 600; }
-
-    footer { background: #111; color: #888; padding: 2rem; text-align: center; font-size: 13px; }
-    footer img { height: 28px; margin-bottom: 1rem; display: block; margin-left: auto; margin-right: auto; opacity: 0.6; }
-
-    /* Slotje rechtsonder */
-    .dashboard-link { position: fixed; bottom: 1.5rem; right: 1.5rem; background: var(--groen); color: #fff; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); z-index: 999; opacity: 0.7; transition: opacity 0.2s; }
-    .dashboard-link:hover { opacity: 1; }
-
-    /* Succes pagina */
-    #succes-melding { display: none; background: var(--groen-licht); border: 1.5px solid var(--groen-border); border-radius: var(--radius); padding: 1.5rem; text-align: center; margin-top: 1rem; }
-    #succes-melding p { color: var(--groen); font-weight: 600; font-size: 15px; }
-
-    @media (max-width: 600px) {
-      .hero .container { flex-direction: column; gap: 1.5rem; }
-      .hero-logo { width: 180px; }
-      .info-bar .container { grid-template-columns: 1fr; }
-      .info-item { border-right: none; border-bottom: 1px solid #e0e0e0; }
-      .contact-grid { grid-template-columns: 1fr; }
-      nav .nav-links { display: none; }
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>JM Mechanica | Allround Monteur Noord-Holland</title>
+<link rel="manifest" href="manifest.json"/>
+<link rel="apple-touch-icon" href="icon.svg"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "primary": "#022448",
+        "primary-container": "#1e3a5f",
+        "on-primary-container": "#8aa4cf",
+        "surface": "#f9f9ff",
+        "surface-container-low": "#f0f3ff",
+        "surface-container": "#e7eeff",
+        "surface-container-high": "#dee9ff",
+        "surface-container-lowest": "#ffffff",
+        "on-background": "#001c3b",
+        "outline": "#74777f",
+        "background": "#f9f9ff"
+      },
+      fontFamily: {
+        "headline": ["Space Grotesk"],
+        "body": ["Inter"],
+        "label": ["Inter"]
+      }
     }
-  </style>
-</head>
-<body>
-
-<nav>
-  <img class="nav-logo" src="data:image/svg+xml,%3Csvg%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20860%20408%22%3E%3Cpath%20d%3D%22M852.95%2C155.42c-.45-2.03-1.47-4.26-2.92-5.73-10.43-10.5-20.28-21.73-31.76-30.93-13.66-10.99-29.49-14.87-46.18-5.84-6.13%2C3.3-12.44%2C6.55-17.81%2C10.88-21.53%2C17.41-46.4%2C24.45-72.7%2C26.79l-38.98%2C1.16%2C38.49-16.07V40.04c0-8.18-2.88-15.27-8.6-21.26-6-5.73-13.08-8.6-21.26-8.6h-90.82c-8.18%2C0-15.27%2C2.87-21.26%2C8.6-5.73%2C6-8.6%2C13.08-8.6%2C21.26%2C0-8.18-3.01-15.27-9-21.26-5.71-5.73-12.82-8.6-21.26-8.6h-90.4c-8.47%2C0-15.56%2C2.87-21.28%2C8.6-6%2C6-9%2C13.08-9%2C21.26v111.59h-59.64l-38.69-.02%2C37.8-15.76V10.17h-60.13V151.61c-20.55%2C0-41.12%2C0-61.67%2C.09-27.23%2C.11-54.51%2C.94-81.24-5.62-7.42-1.83-15.8-3.39-21.48-7.91-10.72-8.54-22.53-12.97-35.5-12.44-31.51%2C1.31-52.37%2C26.37-50.97%2C54.74%2C1.89%2C38.16%2C44.8%2C62.49%2C77.22%2C42.37%2C21.71-13.48%2C45.33-18.25%2C70.14-18.83%2C21.33-.49%2C42.68%2C.11%2C64.03%2C.11%2C11.86%2C0%2C25.12%2C0%2C39.47%2C.02v47.4h-60.55v-30.29h-60.13v60.13c0%2C8.47%2C3.01%2C15.56%2C9%2C21.28%2C5.73%2C6%2C12.82%2C9%2C21.26%2C9h120.68c8.18%2C0%2C15.27-3.01%2C21.26-9%2C5.73-5.73%2C8.6-12.82%2C8.6-21.28v-77.25c19.43%2C0%2C39.78-.02%2C60.53-.02v107.56h60.13v-107.56c20.44%2C0%2C40.76%2C0%2C60.55%2C.02v107.53h60.13v-107.53c22.02%2C.04%2C42.48%2C.04%2C60.53%2C.07v107.47h60.15v-105.22c.47%2C.04%2C.96%2C.11%2C1.43%2C.16%2C18.99%2C2.14%2C37.75%2C7.33%2C51.97%2C20.41%2C28.3%2C26.03%2C62%2C23.49%2C92.56%2C7.91%2C2.61-1.34%2C4.06-5.01%2C6.02-7.6-2.7-1.25-5.28-3.03-8.11-3.68-12.46-2.85-25.05-5.17-37.46-8.16-6.22-1.52-10.79-5.68-13.02-11.86-5.01-13.77-3.63-27.03%2C4.01-39.47%2C8.49-13.8%2C16.2-16.89%2C31.85-12.7%2C12.15%2C3.28%2C24.14%2C7.13%2C36.28%2C10.5%2C1.76%2C.49%2C4.66%2C.38%2C5.68-.71%2C1.09-1.18%2C1.05-3.94%2C.65-5.84ZM58.08%2C210.49c-18.83%2C0-34.1-15.27-34.1-34.1s15.27-34.1%2C34.1-34.1%2C34.1%2C15.27%2C34.1%2C34.1-15.27%2C34.1-34.1%2C34.1Zm442.2-58.86h-97.84l37.29-15.56V70.33h60.55v81.3Zm120.66%2C.02c-2.3-.02-4.59-.02-6.89-.02h-90.71l37.06-15.47V70.33h60.53v81.33Z%22/%3E%3Cg%3E%3Cpath%20d%3D%22M138.25%2C397.39v-46.72h22.76l7.01%2C34.74h.48l7.07-34.74h22.1v46.72h-12.58v-34.74h-.36l-7.07%2C34.74h-19.47l-7.01-34.74h-.36v34.74h-12.58Z%22/%3E%3Cpath%20d%3D%22M256.11%2C350.67v10.78h-25.76v7.19h23.36v10.18h-23.36v7.79h25.88v10.78h-38.46v-46.72h38.34Z%22/%3E%3Cpath%20d%3D%22M298.42%2C398.11c-19.11%2C0-23.9-4.79-23.9-24.08s4.79-24.08%2C23.9-24.08%2C23.84%2C4.07%2C23.72%2C20.43h-13.18c.12-9.22-.96-10.24-10.54-10.24s-10.72%2C1.38-10.72%2C13.9%2C1.08%2C13.9%2C10.72%2C13.9%2C10.66-1.02%2C10.54-10.36h13.18c.12%2C16.41-4.61%2C20.55-23.72%2C20.55Z%22/%3E%3Cpath%20d%3D%22M341.03%2C350.67h12.58v17.49h17.97v-17.49h12.58v46.72h-12.58v-18.45h-17.97v18.45h-12.58v-46.72Z%22/%3E%3Cpath%20d%3D%22M452.18%2C397.39h-14.38l-2.52-9.11h-17.97l-2.82%2C9.11h-13.54l15.4-46.72h20.84l14.98%2C46.72Zm-20.01-19.29l-5.57-17.25h-.36l-5.69%2C17.25h11.62Z%22/%3E%3Cpath%20d%3D%22M468.97%2C350.67h11.92l20.66%2C25.52h.36v-25.52h12.58v46.72h-11.86l-20.73-25.46h-.36v25.46h-12.58v-46.72Z%22/%3E%3Cpath%20d%3D%22M534.59%2C350.67h12.58v46.72h-12.58v-46.72Z%22/%3E%3Cpath%20d%3D%22M589.95%2C398.11c-19.11%2C0-23.9-4.79-23.9-24.08s4.79-24.08%2C23.9-24.08%2C23.84%2C4.07%2C23.72%2C20.43h-13.18c.12-9.22-.96-10.24-10.54-10.24s-10.72%2C1.38-10.72%2C13.9%2C1.08%2C13.9%2C10.72%2C13.9%2C10.66-1.02%2C10.54-10.36h13.18c.12%2C16.41-4.62%2C20.55-23.72%2C20.55Z%22/%3E%3Cpath%20d%3D%22M681.09%2C397.39h-14.38l-2.52-9.11h-17.97l-2.82%2C9.11h-13.54l15.4-46.72h20.84l14.97%2C46.72Zm-20.01-19.29l-5.57-17.25h-.36l-5.69%2C17.25h11.62Z%22/%3E%3C/g%3E%3C/svg%3E" alt="JM Mechanica" />
-  <div class="nav-links">
-    <a href="#diensten">Diensten</a>
-    <a href="#over">Over</a>
-    <a href="#contact">Contact</a>
-  </div>
-  <a class="nav-cta" href="#contact">Contact</a>
-</nav>
-
-<section class="hero">
-  <div class="container">
-    <img class="hero-logo" src="data:image/svg+xml,%3Csvg%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20860%20408%22%3E%3Cdefs%3E%3Cstyle%3E.cls-1%7Bfill%3A%23fff%3B%7D%3C/style%3E%3C/defs%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M852.95%2C155.42c-.45-2.03-1.47-4.26-2.92-5.73-10.43-10.5-20.28-21.73-31.76-30.93-13.66-10.99-29.49-14.87-46.18-5.84-6.13%2C3.3-12.44%2C6.55-17.81%2C10.88-21.53%2C17.41-46.4%2C24.45-72.7%2C26.79l-38.98%2C1.16%2C38.49-16.07V40.04c0-8.18-2.88-15.27-8.6-21.26-6-5.73-13.08-8.6-21.26-8.6h-90.82c-8.18%2C0-15.27%2C2.87-21.26%2C8.6-5.73%2C6-8.6%2C13.08-8.6%2C21.26%2C0-8.18-3.01-15.27-9-21.26-5.71-5.73-12.82-8.6-21.26-8.6h-90.4c-8.47%2C0-15.56%2C2.87-21.28%2C8.6-6%2C6-9%2C13.08-9%2C21.26v111.59h-59.64l-38.69-.02%2C37.8-15.76V10.17h-60.13V151.61c-20.55%2C0-41.12%2C0-61.67%2C.09-27.23%2C.11-54.51%2C.94-81.24-5.62-7.42-1.83-15.8-3.39-21.48-7.91-10.72-8.54-22.53-12.97-35.5-12.44-31.51%2C1.31-52.37%2C26.37-50.97%2C54.74%2C1.89%2C38.16%2C44.8%2C62.49%2C77.22%2C42.37%2C21.71-13.48%2C45.33-18.25%2C70.14-18.83%2C21.33-.49%2C42.68%2C.11%2C64.03%2C.11%2C11.86%2C0%2C25.12%2C0%2C39.47%2C.02v47.4h-60.55v-30.29h-60.13v60.13c0%2C8.47%2C3.01%2C15.56%2C9%2C21.28%2C5.73%2C6%2C12.82%2C9%2C21.26%2C9h120.68c8.18%2C0%2C15.27-3.01%2C21.26-9%2C5.73-5.73%2C8.6-12.82%2C8.6-21.28v-77.25c19.43%2C0%2C39.78-.02%2C60.53-.02v107.56h60.13v-107.56c20.44%2C0%2C40.76%2C0%2C60.55%2C.02v107.53h60.13v-107.53c22.02%2C.04%2C42.48%2C.04%2C60.53%2C.07v107.47h60.15v-105.22c.47%2C.04%2C.96%2C.11%2C1.43%2C.16%2C18.99%2C2.14%2C37.75%2C7.33%2C51.97%2C20.41%2C28.3%2C26.03%2C62%2C23.49%2C92.56%2C7.91%2C2.61-1.34%2C4.06-5.01%2C6.02-7.6-2.7-1.25-5.28-3.03-8.11-3.68-12.46-2.85-25.05-5.17-37.46-8.16-6.22-1.52-10.79-5.68-13.02-11.86-5.01-13.77-3.63-27.03%2C4.01-39.47%2C8.49-13.8%2C16.2-16.89%2C31.85-12.7%2C12.15%2C3.28%2C24.14%2C7.13%2C36.28%2C10.5%2C1.76%2C.49%2C4.66%2C.38%2C5.68-.71%2C1.09-1.18%2C1.05-3.94%2C.65-5.84ZM58.08%2C210.49c-18.83%2C0-34.1-15.27-34.1-34.1s15.27-34.1%2C34.1-34.1%2C34.1%2C15.27%2C34.1%2C34.1-15.27%2C34.1-34.1%2C34.1Zm442.2-58.86h-97.84l37.29-15.56V70.33h60.55v81.3Zm120.66%2C.02c-2.3-.02-4.59-.02-6.89-.02h-90.71l37.06-15.47V70.33h60.53v81.33Z%22/%3E%3Cg%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M138.25%2C397.39v-46.72h22.76l7.01%2C34.74h.48l7.07-34.74h22.1v46.72h-12.58v-34.74h-.36l-7.07%2C34.74h-19.47l-7.01-34.74h-.36v34.74h-12.58Z%22/%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M256.11%2C350.67v10.78h-25.76v7.19h23.36v10.18h-23.36v7.79h25.88v10.78h-38.46v-46.72h38.34Z%22/%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M298.42%2C398.11c-19.11%2C0-23.9-4.79-23.9-24.08s4.79-24.08%2C23.9-24.08%2C23.84%2C4.07%2C23.72%2C20.43h-13.18c.12-9.22-.96-10.24-10.54-10.24s-10.72%2C1.38-10.72%2C13.9%2C1.08%2C13.9%2C10.72%2C13.9%2C10.66-1.02%2C10.54-10.36h13.18c.12%2C16.41-4.61%2C20.55-23.72%2C20.55Z%22/%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M341.03%2C350.67h12.58v17.49h17.97v-17.49h12.58v46.72h-12.58v-18.45h-17.97v18.45h-12.58v-46.72Z%22/%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M452.18%2C397.39h-14.38l-2.52-9.11h-17.97l-2.82%2C9.11h-13.54l15.4-46.72h20.84l14.98%2C46.72Zm-20.01-19.29l-5.57-17.25h-.36l-5.69%2C17.25h11.62Z%22/%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M468.97%2C350.67h11.92l20.66%2C25.52h.36v-25.52h12.58v46.72h-11.86l-20.73-25.46h-.36v25.46h-12.58v-46.72Z%22/%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M534.59%2C350.67h12.58v46.72h-12.58v-46.72Z%22/%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M589.95%2C398.11c-19.11%2C0-23.9-4.79-23.9-24.08s4.79-24.08%2C23.9-24.08%2C23.84%2C4.07%2C23.72%2C20.43h-13.18c.12-9.22-.96-10.24-10.54-10.24s-10.72%2C1.38-10.72%2C13.9%2C1.08%2C13.9%2C10.72%2C13.9%2C10.66-1.02%2C10.54-10.36h13.18c.12%2C16.41-4.62%2C20.55-23.72%2C20.55Z%22/%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M681.09%2C397.39h-14.38l-2.52-9.11h-17.97l-2.82%2C9.11h-13.54l15.4-46.72h20.84l14.97%2C46.72Zm-20.01-19.29l-5.57-17.25h-.36l-5.69%2C17.25h11.62Z%22/%3E%3C/g%3E%3C/svg%3E" alt="JM Mechanica" />
-    <div class="hero-text">
-      <div class="tag">ZZP &middot; Allround monteur &middot; Zaandam</div>
-      <h1>JM Mechanica</h1>
-      <p>Technische ondersteuning van uw TD en allround monteur voor de metaal- en voedingsindustrie &mdash; flexibel inzetbaar in Noord-Holland.</p>
-      <div class="hero-btns">
-        <a class="btn-wit" href="#contact">Contact opnemen</a>
-        <a class="btn-wa" href="https://wa.me/31629229395" target="_blank">WhatsApp</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="info-bar">
-  <div class="container">
-    <div class="info-item"><div class="info-label">Telefoon</div><div class="info-value">+31 6 29 22 93 95</div></div>
-    <div class="info-item"><div class="info-label">Vestiging</div><div class="info-value">Zaandam</div></div>
-    <div class="info-item"><div class="info-label">Werkgebied</div><div class="info-value">Noord-Holland</div></div>
-  </div>
-</div>
-
-<section id="diensten">
-  <div class="container">
-    <div class="section-label">Diensten</div>
-    <div class="services-grid">
-      <div class="service-card"><div class="service-num">01</div><h3>Technische ondersteuning TD</h3><p>Ondersteuning van de technische dienst bij storingen, inspecties en onderhoud.</p></div>
-      <div class="service-card"><div class="service-num">02</div><h3>Installatie &amp; montage</h3><p>Installatie van industriële en procestechnische systemen en installaties.</p></div>
-      <div class="service-card"><div class="service-num">03</div><h3>Storingsoplossing</h3><p>Snelle diagnose en herstel van storingen in productieomgevingen.</p></div>
-      <div class="service-card"><div class="service-num">04</div><h3>Allround inzetbaar</h3><p>Flexibel inzetbaar voor projecten, pieken en langdurige opdrachten.</p></div>
-    </div>
-    <div class="section-label" style="margin-top:2.5rem;">Sectoren</div>
-    <div class="industries">
-      <span class="pill">Metaalindustrie</span>
-      <span class="pill">Voedingsindustrie</span>
-      <span class="pill">Productie &amp; proces</span>
-    </div>
-  </div>
-</section>
-
-<section id="over" style="background:#fff; border-top:1px solid #e0e0e0; border-bottom:1px solid #e0e0e0;">
-  <div class="container">
-    <div class="section-label">Over JM Mechanica</div>
-    <div class="about-card">
-      <img class="about-logo" src="data:image/svg+xml,%3Csvg%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20860%20408%22%3E%3Cpath%20d%3D%22M852.95%2C155.42c-.45-2.03-1.47-4.26-2.92-5.73-10.43-10.5-20.28-21.73-31.76-30.93-13.66-10.99-29.49-14.87-46.18-5.84-6.13%2C3.3-12.44%2C6.55-17.81%2C10.88-21.53%2C17.41-46.4%2C24.45-72.7%2C26.79l-38.98%2C1.16%2C38.49-16.07V40.04c0-8.18-2.88-15.27-8.6-21.26-6-5.73-13.08-8.6-21.26-8.6h-90.82c-8.18%2C0-15.27%2C2.87-21.26%2C8.6-5.73%2C6-8.6%2C13.08-8.6%2C21.26%2C0-8.18-3.01-15.27-9-21.26-5.71-5.73-12.82-8.6-21.26-8.6h-90.4c-8.47%2C0-15.56%2C2.87-21.28%2C8.6-6%2C6-9%2C13.08-9%2C21.26v111.59h-59.64l-38.69-.02%2C37.8-15.76V10.17h-60.13V151.61c-20.55%2C0-41.12%2C0-61.67%2C.09-27.23%2C.11-54.51%2C.94-81.24-5.62-7.42-1.83-15.8-3.39-21.48-7.91-10.72-8.54-22.53-12.97-35.5-12.44-31.51%2C1.31-52.37%2C26.37-50.97%2C54.74%2C1.89%2C38.16%2C44.8%2C62.49%2C77.22%2C42.37%2C21.71-13.48%2C45.33-18.25%2C70.14-18.83%2C21.33-.49%2C42.68%2C.11%2C64.03%2C.11%2C11.86%2C0%2C25.12%2C0%2C39.47%2C.02v47.4h-60.55v-30.29h-60.13v60.13c0%2C8.47%2C3.01%2C15.56%2C9%2C21.28%2C5.73%2C6%2C12.82%2C9%2C21.26%2C9h120.68c8.18%2C0%2C15.27-3.01%2C21.26-9%2C5.73-5.73%2C8.6-12.82%2C8.6-21.28v-77.25c19.43%2C0%2C39.78-.02%2C60.53-.02v107.56h60.13v-107.56c20.44%2C0%2C40.76%2C0%2C60.55%2C.02v107.53h60.13v-107.53c22.02%2C.04%2C42.48%2C.04%2C60.53%2C.07v107.47h60.15v-105.22c.47%2C.04%2C.96%2C.11%2C1.43%2C.16%2C18.99%2C2.14%2C37.75%2C7.33%2C51.97%2C20.41%2C28.3%2C26.03%2C62%2C23.49%2C92.56%2C7.91%2C2.61-1.34%2C4.06-5.01%2C6.02-7.6-2.7-1.25-5.28-3.03-8.11-3.68-12.46-2.85-25.05-5.17-37.46-8.16-6.22-1.52-10.79-5.68-13.02-11.86-5.01-13.77-3.63-27.03%2C4.01-39.47%2C8.49-13.8%2C16.2-16.89%2C31.85-12.7%2C12.15%2C3.28%2C24.14%2C7.13%2C36.28%2C10.5%2C1.76%2C.49%2C4.66%2C.38%2C5.68-.71%2C1.09-1.18%2C1.05-3.94%2C.65-5.84ZM58.08%2C210.49c-18.83%2C0-34.1-15.27-34.1-34.1s15.27-34.1%2C34.1-34.1%2C34.1%2C15.27%2C34.1%2C34.1-15.27%2C34.1-34.1%2C34.1Zm442.2-58.86h-97.84l37.29-15.56V70.33h60.55v81.3Zm120.66%2C.02c-2.3-.02-4.59-.02-6.89-.02h-90.71l37.06-15.47V70.33h60.53v81.33Z%22/%3E%3Cg%3E%3Cpath%20d%3D%22M138.25%2C397.39v-46.72h22.76l7.01%2C34.74h.48l7.07-34.74h22.1v46.72h-12.58v-34.74h-.36l-7.07%2C34.74h-19.47l-7.01-34.74h-.36v34.74h-12.58Z%22/%3E%3Cpath%20d%3D%22M256.11%2C350.67v10.78h-25.76v7.19h23.36v10.18h-23.36v7.79h25.88v10.78h-38.46v-46.72h38.34Z%22/%3E%3Cpath%20d%3D%22M298.42%2C398.11c-19.11%2C0-23.9-4.79-23.9-24.08s4.79-24.08%2C23.9-24.08%2C23.84%2C4.07%2C23.72%2C20.43h-13.18c.12-9.22-.96-10.24-10.54-10.24s-10.72%2C1.38-10.72%2C13.9%2C1.08%2C13.9%2C10.72%2C13.9%2C10.66-1.02%2C10.54-10.36h13.18c.12%2C16.41-4.61%2C20.55-23.72%2C20.55Z%22/%3E%3Cpath%20d%3D%22M341.03%2C350.67h12.58v17.49h17.97v-17.49h12.58v46.72h-12.58v-18.45h-17.97v18.45h-12.58v-46.72Z%22/%3E%3Cpath%20d%3D%22M452.18%2C397.39h-14.38l-2.52-9.11h-17.97l-2.82%2C9.11h-13.54l15.4-46.72h20.84l14.98%2C46.72Zm-20.01-19.29l-5.57-17.25h-.36l-5.69%2C17.25h11.62Z%22/%3E%3Cpath%20d%3D%22M468.97%2C350.67h11.92l20.66%2C25.52h.36v-25.52h12.58v46.72h-11.86l-20.73-25.46h-.36v25.46h-12.58v-46.72Z%22/%3E%3Cpath%20d%3D%22M534.59%2C350.67h12.58v46.72h-12.58v-46.72Z%22/%3E%3Cpath%20d%3D%22M589.95%2C398.11c-19.11%2C0-23.9-4.79-23.9-24.08s4.79-24.08%2C23.9-24.08%2C23.84%2C4.07%2C23.72%2C20.43h-13.18c.12-9.22-.96-10.24-10.54-10.24s-10.72%2C1.38-10.72%2C13.9%2C1.08%2C13.9%2C10.72%2C13.9%2C10.66-1.02%2C10.54-10.36h13.18c.12%2C16.41-4.62%2C20.55-23.72%2C20.55Z%22/%3E%3Cpath%20d%3D%22M681.09%2C397.39h-14.38l-2.52-9.11h-17.97l-2.82%2C9.11h-13.54l15.4-46.72h20.84l14.97%2C46.72Zm-20.01-19.29l-5.57-17.25h-.36l-5.69%2C17.25h11.62Z%22/%3E%3C/g%3E%3C/svg%3E" alt="JM Mechanica" />
-      <div class="about-text">
-        <h3>Vakmanschap in de industrie</h3>
-        <p>Ervaren allround monteur gevestigd in Zaandam, actief in Noord-Holland en omgeving. Bekend met de hoge eisen van de metaal- en voedingsindustrie op het gebied van veiligheid, hygi&euml;ne en productiecontinuiteit. Zelfstandig werkend, snel inzetbaar en gewend aan veeleisende industriële omgevingen.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="contact">
-  <div class="container">
-    <div class="section-label">Contact</div>
-    <div class="contact-grid">
-      <div class="contact-info">
-        <h3>Directe bereikbaarheid</h3>
-        <div class="contact-detail"><span class="contact-detail-label">Telefoon</span><span class="contact-detail-value">+31 6 29 22 93 95</span></div>
-        <div class="contact-detail"><span class="contact-detail-label">WhatsApp</span><span class="contact-detail-value">+31 6 29 22 93 95</span></div>
-        <div class="contact-detail"><span class="contact-detail-label">E-mail</span><span class="contact-detail-value">info@jmmechanica.nl</span></div>
-        <div class="contact-detail"><span class="contact-detail-label">Vestiging</span><span class="contact-detail-value">Zaandam, Noord-Holland</span></div>
-        <div class="contact-detail"><span class="contact-detail-label">Werkgebied</span><span class="contact-detail-value">Noord-Holland &amp; omgeving</span></div>
-      </div>
-      <div class="contact-form">
-        <h3>Stuur een bericht</h3>
-        <div id="succes-melding" style="display:none; background:var(--groen-licht); border:1.5px solid var(--groen-border); border-radius:var(--radius-sm); padding:1rem; text-align:center; margin-bottom:1rem;">
-          <p style="color:var(--groen); font-weight:600; font-size:15px;">&#10003; Bericht verzonden! We nemen zo snel mogelijk contact op.</p>
-        </div>
-        <form id="contact-form" name="contact" netlify netlify-honeypot="bot-field" onsubmit="verstuurFormulier(event)">
-          <input type="hidden" name="form-name" value="contact" />
-          <div style="display:none;"><input name="bot-field" /></div>
-          <div class="form-row"><label>Naam / bedrijf</label><input type="text" name="naam" placeholder="Uw naam of bedrijfsnaam" required /></div>
-          <div class="form-row"><label>Telefoonnummer</label><input type="tel" name="telefoon" placeholder="06 - ..." /></div>
-          <div class="form-row"><label>E-mailadres</label><input type="email" name="email" placeholder="uw@email.nl" required /></div>
-          <div class="form-row"><label>Type opdracht</label>
-            <select name="opdracht">
-              <option>Technische ondersteuning TD</option>
-              <option>Installatie / montage</option>
-              <option>Storingsoplossing</option>
-              <option>Langdurige inzet / project</option>
-            </select>
-          </div>
-          <div class="form-row"><label>Omschrijving</label><textarea name="bericht" placeholder="Wat heeft u nodig?"></textarea></div>
-          <button type="submit" class="submit-btn">Versturen</button>
-        </form>
-      </div>
-    </div>
-  </div>
-</section>
-
-<footer>
-  <img src="data:image/svg+xml,%3Csvg%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20860%20408%22%3E%3Cdefs%3E%3Cstyle%3E.cls-1%7Bfill%3A%23fff%3B%7D%3C/style%3E%3C/defs%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M852.95%2C155.42c-.45-2.03-1.47-4.26-2.92-5.73-10.43-10.5-20.28-21.73-31.76-30.93-13.66-10.99-29.49-14.87-46.18-5.84-6.13%2C3.3-12.44%2C6.55-17.81%2C10.88-21.53%2C17.41-46.4%2C24.45-72.7%2C26.79l-38.98%2C1.16%2C38.49-16.07V40.04c0-8.18-2.88-15.27-8.6-21.26-6-5.73-13.08-8.6-21.26-8.6h-90.82c-8.18%2C0-15.27%2C2.87-21.26%2C8.6-5.73%2C6-8.6%2C13.08-8.6%2C21.26%2C0-8.18-3.01-15.27-9-21.26-5.71-5.73-12.82-8.6-21.26-8.6h-90.4c-8.47%2C0-15.56%2C2.87-21.28%2C8.6-6%2C6-9%2C13.08-9%2C21.26v111.59h-59.64l-38.69-.02%2C37.8-15.76V10.17h-60.13V151.61c-20.55%2C0-41.12%2C0-61.67%2C.09-27.23%2C.11-54.51%2C.94-81.24-5.62-7.42-1.83-15.8-3.39-21.48-7.91-10.72-8.54-22.53-12.97-35.5-12.44-31.51%2C1.31-52.37%2C26.37-50.97%2C54.74%2C1.89%2C38.16%2C44.8%2C62.49%2C77.22%2C42.37%2C21.71-13.48%2C45.33-18.25%2C70.14-18.83%2C21.33-.49%2C42.68%2C.11%2C64.03%2C.11%2C11.86%2C0%2C25.12%2C0%2C39.47%2C.02v47.4h-60.55v-30.29h-60.13v60.13c0%2C8.47%2C3.01%2C15.56%2C9%2C21.28%2C5.73%2C6%2C12.82%2C9%2C21.26%2C9h120.68c8.18%2C0%2C15.27-3.01%2C21.26-9%2C5.73-5.73%2C8.6-12.82%2C8.6-21.28v-77.25c19.43%2C0%2C39.78-.02%2C60.53-.02v107.56h60.13v-107.56c20.44%2C0%2C40.76%2C0%2C60.55%2C.02v107.53h60.13v-107.53c22.02%2C.04%2C42.48%2C.04%2C60.53%2C.07v107.47h60.15v-105.22c.47%2C.04%2C.96%2C.11%2C1.43%2C.16%2C18.99%2C2.14%2C37.75%2C7.33%2C51.97%2C20.41%2C28.3%2C26.03%2C62%2C23.49%2C92.56%2C7.91%2C2.61-1.34%2C4.06-5.01%2C6.02-7.6-2.7-1.25-5.28-3.03-8.11-3.68-12.46-2.85-25.05-5.17-37.46-8.16-6.22-1.52-10.79-5.68-13.02-11.86-5.01-13.77-3.63-27.03%2C4.01-39.47%2C8.49-13.8%2C16.2-16.89%2C31.85-12.7%2C12.15%2C3.28%2C24.14%2C7.13%2C36.28%2C10.5%2C1.76%2C.49%2C4.66%2C.38%2C5.68-.71%2C1.09-1.18%2C1.05-3.94%2C.65-5.84ZM58.08%2C210.49c-18.83%2C0-34.1-15.27-34.1-34.1s15.27-34.1%2C34.1-34.1%2C34.1%2C15.27%2C34.1%2C34.1-15.27%2C34.1-34.1%2C34.1Zm442.2-58.86h-97.84l37.29-15.56V70.33h60.55v81.3Zm120.66%2C.02c-2.3-.02-4.59-.02-6.89-.02h-90.71l37.06-15.47V70.33h60.53v81.33Z%22/%3E%3Cg%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M138.25%2C397.39v-46.72h22.76l7.01%2C34.74h.48l7.07-34.74h22.1v46.72h-12.58v-34.74h-.36l-7.07%2C34.74h-19.47l-7.01-34.74h-.36v34.74h-12.58Z%22/%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M256.11%2C350.67v10.78h-25.76v7.19h23.36v10.18h-23.36v7.79h25.88v10.78h-38.46v-46.72h38.34Z%22/%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M298.42%2C398.11c-19.11%2C0-23.9-4.79-23.9-24.08s4.79-24.08%2C23.9-24.08%2C23.84%2C4.07%2C23.72%2C20.43h-13.18c.12-9.22-.96-10.24-10.54-10.24s-10.72%2C1.38-10.72%2C13.9%2C1.08%2C13.9%2C10.72%2C13.9%2C10.66-1.02%2C10.54-10.36h13.18c.12%2C16.41-4.61%2C20.55-23.72%2C20.55Z%22/%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M341.03%2C350.67h12.58v17.49h17.97v-17.49h12.58v46.72h-12.58v-18.45h-17.97v18.45h-12.58v-46.72Z%22/%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M452.18%2C397.39h-14.38l-2.52-9.11h-17.97l-2.82%2C9.11h-13.54l15.4-46.72h20.84l14.98%2C46.72Zm-20.01-19.29l-5.57-17.25h-.36l-5.69%2C17.25h11.62Z%22/%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M468.97%2C350.67h11.92l20.66%2C25.52h.36v-25.52h12.58v46.72h-11.86l-20.73-25.46h-.36v25.46h-12.58v-46.72Z%22/%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M534.59%2C350.67h12.58v46.72h-12.58v-46.72Z%22/%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M589.95%2C398.11c-19.11%2C0-23.9-4.79-23.9-24.08s4.79-24.08%2C23.9-24.08%2C23.84%2C4.07%2C23.72%2C20.43h-13.18c.12-9.22-.96-10.24-10.54-10.24s-10.72%2C1.38-10.72%2C13.9%2C1.08%2C13.9%2C10.72%2C13.9%2C10.66-1.02%2C10.54-10.36h13.18c.12%2C16.41-4.62%2C20.55-23.72%2C20.55Z%22/%3E%3Cpath%20class%3D%22cls-1%22%20d%3D%22M681.09%2C397.39h-14.38l-2.52-9.11h-17.97l-2.82%2C9.11h-13.54l15.4-46.72h20.84l14.97%2C46.72Zm-20.01-19.29l-5.57-17.25h-.36l-5.69%2C17.25h11.62Z%22/%3E%3C/g%3E%3C/svg%3E" alt="JM Mechanica" />
-  <p>&copy; 2026 JM Mechanica &mdash; Zaandam, Noord-Holland</p>
-  <p style="margin-top:4px;">+31 6 29 22 93 95 &mdash; info@jmmechanica.nl</p>
-  <p style="margin-top:4px;">KvK: 86164309</p>
-</footer>
-
-<!-- Slotje dashboard link -->
-<a class="dashboard-link" href="dashboard.html" title="Dashboard">&#128274;</a>
-
-<!-- FAQ Chatbot -->
+  }
+}
+</script>
 <style>
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+.blueprint-grid { background-image: radial-gradient(#6b8ab8 0.5px, transparent 0.5px); background-size: 20px 20px; }
+/* Chat */
 #chat-knop {
   position: fixed; bottom: 80px; right: 1.5rem;
   width: 60px; height: 60px; border-radius: 50%;
@@ -228,24 +59,19 @@
   animation: badge-pulse 1.5s ease-in-out infinite;
 }
 @keyframes badge-pulse {
-  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239,68,68,0.5); }
+  0%,100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239,68,68,0.5); }
   50% { transform: scale(1.2); box-shadow: 0 0 0 6px rgba(239,68,68,0); }
 }
 #chat-venster {
   position: fixed; bottom: 160px; right: 1.5rem;
-  width: 360px; max-height: 520px;
-  background: #fff; border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-  display: none; flex-direction: column;
-  z-index: 997; overflow: hidden;
-  border: 1.5px solid var(--groen-border);
-  animation: chatIn 0.22s ease;
+  width: 360px; max-height: 520px; background: #fff;
+  border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  display: none; flex-direction: column; z-index: 997;
+  overflow: hidden; border: 1.5px solid #bfdbfe;
 }
-@keyframes chatIn { from { opacity:0; transform:translateY(12px) scale(0.97); } to { opacity:1; transform:none; } }
 #chat-header {
   background: #3b82f6; padding: 14px 16px;
-  display: flex; align-items: center; justify-content: space-between;
-  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
 }
 #chat-header-info { display: flex; align-items: center; gap: 10px; }
 .chat-avatar {
@@ -255,75 +81,430 @@
   font-size: 16px; flex-shrink: 0;
 }
 #chat-header-tekst p { font-size: 13px; font-weight: 700; color: #fff; line-height: 1.2; }
-#chat-header-tekst span { font-size: 10px; color: #8fbfa0; }
-#chat-sluit {
-  background: none; border: none; color: rgba(255,255,255,0.7);
-  font-size: 18px; cursor: pointer; padding: 2px 4px; line-height: 1;
-}
+#chat-header-tekst span { font-size: 10px; color: rgba(255,255,255,0.7); }
+#chat-sluit { background: none; border: none; color: rgba(255,255,255,0.7); font-size: 18px; cursor: pointer; padding: 2px 4px; }
 #chat-sluit:hover { color: #fff; }
-#chat-berichten {
-  flex: 1; overflow-y: auto; padding: 14px;
-  display: flex; flex-direction: column; gap: 10px;
-  min-height: 0;
-}
-.chat-bericht {
-  max-width: 84%; padding: 10px 13px;
-  border-radius: 14px; font-size: 13px; line-height: 1.55;
-  word-wrap: break-word;
-}
-.chat-bericht.assistent {
-  background: #eff6ff; color: #222;
-  border-bottom-left-radius: 4px; align-self: flex-start;
-  border: 1px solid #bfdbfe;
-}
-.chat-bericht.gebruiker {
-  background: var(--groen); color: #fff;
-  border-bottom-right-radius: 4px; align-self: flex-end;
-}
-.chat-typing {
-  display: flex; gap: 4px; align-items: center;
-  padding: 10px 13px; background: #eff6ff;
-  border: 1px solid #bfdbfe;
-  border-radius: 14px; border-bottom-left-radius: 4px;
-  align-self: flex-start;
-}
-.chat-typing span {
-  width: 6px; height: 6px; background: #3b82f6;
-  border-radius: 50%; animation: tik 1.2s infinite;
-}
+#chat-berichten { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+.chat-bericht { max-width: 84%; padding: 10px 13px; border-radius: 14px; font-size: 13px; line-height: 1.55; word-wrap: break-word; }
+.chat-bericht.assistent { background: #eff6ff; color: #222; border-bottom-left-radius: 4px; align-self: flex-start; border: 1px solid #bfdbfe; }
+.chat-bericht.gebruiker { background: #f97316; color: #fff; border-bottom-right-radius: 4px; align-self: flex-end; }
+.chat-typing { display: flex; gap: 4px; align-items: center; padding: 10px 13px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 14px; border-bottom-left-radius: 4px; align-self: flex-start; }
+.chat-typing span { width: 6px; height: 6px; background: #3b82f6; border-radius: 50%; animation: tik 1.2s infinite; }
 .chat-typing span:nth-child(2) { animation-delay: 0.2s; }
 .chat-typing span:nth-child(3) { animation-delay: 0.4s; }
 @keyframes tik { 0%,60%,100%{opacity:.3;transform:scale(.8)} 30%{opacity:1;transform:scale(1)} }
-#chat-invoer {
-  padding: 10px 12px; border-top: 1.5px solid #eee;
-  display: flex; gap: 8px; align-items: flex-end; flex-shrink: 0;
-}
-#chat-input {
-  flex: 1; font-size: 13px; padding: 9px 12px;
-  border: 1.5px solid #ddd; border-radius: 20px;
-  font-family: inherit; resize: none; outline: none;
-  max-height: 80px; overflow-y: auto; line-height: 1.4;
-}
-#chat-input:focus { border-color: var(--groen); }
-#chat-stuur {
-  width: 36px; height: 36px; border-radius: 50%;
-  background: #3b82f6; color: #fff; border: none;
-  font-size: 16px; cursor: pointer; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  transition: background 0.15s;
-}
+#chat-invoer { padding: 10px 12px; border-top: 1.5px solid #eee; display: flex; gap: 8px; align-items: flex-end; flex-shrink: 0; }
+#chat-input { flex: 1; font-size: 13px; padding: 9px 12px; border: 1.5px solid #ddd; border-radius: 20px; font-family: inherit; resize: none; outline: none; max-height: 80px; overflow-y: auto; line-height: 1.4; }
+#chat-input:focus { border-color: #3b82f6; }
+#chat-stuur { width: 36px; height: 36px; border-radius: 50%; background: #3b82f6; color: #fff; border: none; font-size: 16px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
 #chat-stuur:hover { background: #2563eb; }
 #chat-stuur:disabled { background: #ccc; cursor: default; }
-@media (max-width: 400px) {
-  #chat-venster { width: calc(100vw - 2rem); right: 1rem; }
-}
+/* Dashboard lock */
+.dashboard-link { position: fixed; bottom: 1.5rem; right: 1.5rem; background: #022448; color: #fff; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); z-index: 999; opacity: 0.7; transition: opacity 0.2s; }
+.dashboard-link:hover { opacity: 1; }
+@media (max-width: 400px) { #chat-venster { width: calc(100vw - 2rem); right: 1rem; } }
 </style>
+</head>
+<body class="bg-background text-on-background font-body">
 
+<!-- Mobile menu overlay -->
+<div id="mobile-menu" class="hidden fixed inset-0 bg-[#022448] z-[60] flex flex-col p-8">
+  <div class="flex justify-between items-center mb-12">
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-[#f97316]" style="font-variation-settings:'FILL' 1;">precision_manufacturing</span>
+      <span class="text-xl font-black text-white tracking-tighter font-headline">JM MECHANICA</span>
+    </div>
+    <button onclick="toggleMenu()" class="text-white"><span class="material-symbols-outlined">close</span></button>
+  </div>
+  <nav class="flex flex-col gap-6">
+    <a href="index.html" class="text-2xl font-black text-[#f97316] font-headline border-b border-white/10 pb-6">Home</a>
+    <a href="diensten.html" class="text-2xl font-black text-white font-headline border-b border-white/10 pb-6">Diensten</a>
+    <a href="over-mij.html" class="text-2xl font-black text-white font-headline border-b border-white/10 pb-6">Over Mij</a>
+    <a href="#contact" onclick="toggleMenu()" class="mt-4 bg-[#f97316] text-white px-8 py-4 font-black font-headline text-center">OFFERTE AANVRAGEN</a>
+  </nav>
+</div>
+
+<!-- Header -->
+<header class="fixed top-0 w-full z-50 bg-[#022448]/90 backdrop-blur-md" style="box-shadow:0 10px 40px -15px rgba(0,28,59,0.2);">
+  <div class="max-w-7xl mx-auto px-6 flex justify-between items-center" style="height:72px;">
+    <a href="index.html" class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-[#f97316]" style="font-variation-settings:'FILL' 1;">precision_manufacturing</span>
+      <span class="text-lg font-black text-white tracking-tighter font-headline">JM MECHANICA</span>
+    </a>
+    <nav class="hidden md:flex items-center gap-8">
+      <a href="index.html" class="text-[#f97316] font-bold border-b-2 border-[#f97316] pb-0.5 font-headline text-sm">Home</a>
+      <a href="diensten.html" class="text-white/80 font-medium hover:text-[#f97316] transition-colors font-headline text-sm">Diensten</a>
+      <a href="over-mij.html" class="text-white/80 font-medium hover:text-[#f97316] transition-colors font-headline text-sm">Over Mij</a>
+      <a href="#contact" class="bg-[#f97316] text-white px-6 py-2 font-bold text-sm tracking-tight hover:opacity-90 transition-all">OFFERTE AANVRAGEN</a>
+    </nav>
+    <button onclick="toggleMenu()" class="md:hidden text-white"><span class="material-symbols-outlined">menu</span></button>
+  </div>
+</header>
+
+<main style="padding-top:72px;">
+
+<!-- Hero -->
+<section class="relative flex flex-col justify-center overflow-hidden bg-gradient-to-br from-[#022448] to-[#1e3a5f] blueprint-grid" style="min-height:calc(100vh - 72px);">
+  <div class="absolute inset-0">
+    <img src="assets/images/Siroop%20vulmachine" alt="" class="w-full h-full object-cover" style="opacity:0.25; filter:blur(1px);" onerror="this.style.display='none'"/>
+    <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(2,36,72,0.85) 0%,rgba(30,58,95,0.65) 100%);"></div>
+  </div>
+  <div class="max-w-7xl mx-auto px-6 md:px-8 relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center py-20">
+    <div class="space-y-8">
+      <div class="inline-flex items-center gap-2 px-3 py-1 bg-[#f97316]">
+        <span class="text-[10px] font-bold tracking-[0.2em] uppercase font-label text-white">Noord-Holland Precisie</span>
+      </div>
+      <h1 class="font-black text-white leading-[0.95] tracking-tighter font-headline" style="font-size:clamp(3rem,8vw,5.5rem);">
+        ENGINEERED <br/><span class="text-[#f97316]">RELIABILITY.</span>
+      </h1>
+      <p class="text-lg text-on-primary-container max-w-lg font-light leading-relaxed">
+        Expert freelance allround monteur voor storing, onderhoud en technische projectondersteuning in de industrie van Noord-Holland.
+      </p>
+      <div class="flex flex-wrap gap-4">
+        <a href="#contact" class="bg-[#f97316] text-white px-8 py-4 font-bold text-base tracking-tight hover:opacity-90 active:scale-95 transition-all flex items-center gap-3">
+          OFFERTE AANVRAGEN <span class="material-symbols-outlined">arrow_forward</span>
+        </a>
+        <a href="diensten.html" class="border border-white/20 text-white px-8 py-4 font-bold text-base hover:bg-white/5 transition-all">
+          BEKIJK DIENSTEN
+        </a>
+      </div>
+      <div class="flex flex-wrap gap-8 pt-4 border-t border-white/10">
+        <div>
+          <p class="text-2xl font-black text-[#f97316] font-headline">€77,50</p>
+          <p class="text-xs text-white/40 uppercase tracking-widest font-label">Per uur excl. btw</p>
+        </div>
+        <div>
+          <p class="text-2xl font-black text-[#f97316] font-headline">Noord-Holland</p>
+          <p class="text-xs text-white/40 uppercase tracking-widest font-label">Werkgebied</p>
+        </div>
+        <div>
+          <p class="text-2xl font-black text-[#f97316] font-headline">Zaandam</p>
+          <p class="text-xs text-white/40 uppercase tracking-widest font-label">Vestiging</p>
+        </div>
+      </div>
+    </div>
+    <!-- Right card -->
+    <div class="hidden lg:block relative">
+      <div class="relative overflow-hidden border border-white/10" style="aspect-ratio:1;">
+        <img src="assets/images/Moderne%20Dozen%20inpak%20machine%20kaas" alt="Industriële werkplek" class="absolute inset-0 w-full h-full object-cover" style="filter:blur(5px);opacity:0.35;" onerror="this.style.display='none'"/>
+        <div class="absolute inset-0" style="background:linear-gradient(to top,rgba(2,36,72,0.95) 30%,transparent 100%);"></div>
+        <div class="absolute top-0 right-0 p-6 pointer-events-none">
+          <span class="font-black text-white/5 font-headline" style="font-size:8rem;line-height:1;">01</span>
+        </div>
+        <div class="absolute bottom-0 left-0 right-0 p-8 space-y-2">
+          <div class="w-12 h-1 bg-[#f97316]"></div>
+          <h3 class="text-2xl font-bold text-white font-headline">JAIR MERCELINO</h3>
+          <p class="text-white/50 text-sm font-label uppercase tracking-widest">Allround Monteur &bull; Zaandam</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Services bento grid -->
+<section class="py-24 bg-surface px-6 md:px-8" id="services">
+  <div class="max-w-7xl mx-auto">
+    <div class="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <div>
+        <span class="text-[#f97316] font-bold text-sm tracking-[0.3em] font-label">Specialisaties</span>
+        <h2 class="text-4xl md:text-5xl font-black text-[#022448] font-headline tracking-tighter mt-2">TECHNISCHE DIENSTEN</h2>
+      </div>
+      <p class="text-outline max-w-md text-sm md:text-base leading-relaxed">Uitgebreide industriële ondersteuning gericht op het minimaliseren van stilstand en optimaliseren van installaties.</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+      <!-- Service 1: Storingen & Onderhoud — col-span-8 with real image -->
+      <div class="md:col-span-8 group overflow-hidden relative" style="min-height:400px;">
+        <img src="assets/images/Dagcontrole%202tons%20metaal%20drukpers" alt="Industrieel onderhoud" class="absolute inset-0 w-full h-full object-cover" style="filter:blur(3px);" onerror="this.style.display='none'"/>
+        <div class="absolute inset-0 bg-[#022448]" style="opacity:0.72;"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-[#022448] to-transparent" style="opacity:0.5;"></div>
+        <div class="p-10 flex flex-col justify-between h-full relative z-10">
+          <div>
+            <span class="material-symbols-outlined text-[#f97316]" style="font-size:2.5rem;font-variation-settings:'FILL' 1;">settings_suggest</span>
+            <h3 class="text-3xl font-black text-white font-headline mt-6 mb-4">Storingen &amp; Onderhoud</h3>
+            <p class="text-white/75 max-w-md leading-relaxed">Preventief en correctief onderhoud aan bedrijfsinstallaties om uitval te voorkomen en de levensduur te maximaliseren.</p>
+          </div>
+          <ul class="space-y-2 text-sm font-bold text-white/60 font-label mt-8">
+            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-[#f97316] flex-shrink-0 inline-block"></span>PREVENTIEF ONDERHOUD</li>
+            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-[#f97316] flex-shrink-0 inline-block"></span>STORINGSOPLOSSING</li>
+            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-[#f97316] flex-shrink-0 inline-block"></span>SYSTEEM AUDITS</li>
+          </ul>
+        </div>
+      </div>
+      <!-- Service 2: TD Ondersteuning — col-span-4 dark -->
+      <div class="md:col-span-4 bg-[#022448] text-white p-10 flex flex-col justify-between group relative overflow-hidden" style="min-height:320px;">
+        <div class="absolute inset-0">
+          <img src="assets/images/Elactrakast" alt="" class="w-full h-full object-cover" style="opacity:0.15;mix-blend-mode:luminosity;" onerror="this.style.display='none'"/>
+        </div>
+        <div class="relative z-10">
+          <span class="material-symbols-outlined text-[#f97316]" style="font-size:2.5rem;">support_agent</span>
+          <h3 class="text-2xl font-black font-headline mt-6 mb-4 leading-none">TD Ondersteuning</h3>
+          <p class="text-white/65 text-sm leading-relaxed">Ondersteuning van uw technische dienst bij complexe storingen, elektrotechnische vraagstukken en diagnoses.</p>
+        </div>
+        <a href="diensten.html" class="relative z-10 inline-flex items-center gap-2 text-[#f97316] font-bold text-sm tracking-widest mt-8 group-hover:translate-x-2 transition-transform">
+          MEER INFO <span class="material-symbols-outlined">chevron_right</span>
+        </a>
+      </div>
+      <!-- Service 3: Projecten — col-span-4 light with image -->
+      <div class="md:col-span-4 bg-surface-container-high p-10 border-b-4 border-[#f97316] relative overflow-hidden group" style="min-height:280px;">
+        <div class="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity">
+          <img src="assets/images/Kaas%20Uitpakken%20en%20controle" alt="" class="w-full h-full object-cover" style="filter:blur(2px);" onerror="this.style.display='none'"/>
+        </div>
+        <div class="relative z-10">
+          <span class="material-symbols-outlined text-[#022448]" style="font-size:2.5rem;">account_tree</span>
+          <h3 class="text-2xl font-black text-[#022448] font-headline mt-6 mb-4 leading-none">Projecten</h3>
+          <p class="text-outline text-sm leading-relaxed">Begeleiding van installaties, relocaties en assemblagelijn-optimalisaties van ontwerp tot oplevering.</p>
+        </div>
+      </div>
+      <!-- Service 4: Werkgebied + tarief — col-span-8 -->
+      <div class="md:col-span-8 bg-surface-container-low p-10 flex flex-col md:flex-row gap-10 items-center">
+        <div class="flex-1">
+          <h3 class="text-2xl font-black text-[#022448] font-headline mb-4">Noord-Holland Specialist</h3>
+          <p class="text-outline text-sm leading-relaxed mb-6">Gevestigd in Zaandam, met snelle responstijden naar industriegebieden in Amsterdam, Alkmaar, Haarlem en omgeving. Buiten Noord-Holland inzetbaar in overleg.</p>
+          <div class="flex flex-wrap gap-3">
+            <span class="bg-[#022448] text-white px-4 py-2 text-[10px] font-bold font-label">SNEL INZETBAAR</span>
+            <span class="bg-[#022448] text-white px-4 py-2 text-[10px] font-bold font-label">LOKALE EXPERTISE</span>
+            <span class="bg-[#f97316] text-white px-4 py-2 text-[10px] font-bold font-label">BUITEN REGIO IN OVERLEG</span>
+          </div>
+        </div>
+        <div class="text-center flex-shrink-0">
+          <div class="text-5xl font-black text-[#f97316] font-headline">€77,50</div>
+          <div class="text-sm font-bold text-[#022448] mt-1 font-headline">per uur excl. btw</div>
+          <div class="text-xs text-outline mt-1">reisuren doorberekend</div>
+          <a href="diensten.html" class="mt-4 inline-block text-[#f97316] font-bold text-sm underline underline-offset-4">Meer over tarieven →</a>
+        </div>
+      </div>
+    </div>
+    <div class="mt-10 text-center">
+      <a href="diensten.html" class="inline-flex items-center gap-2 bg-[#022448] text-white px-8 py-4 font-bold hover:bg-[#1e3a5f] transition-colors">
+        ALLE DIENSTEN BEKIJKEN <span class="material-symbols-outlined">arrow_forward</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- About preview -->
+<section class="py-24 bg-white px-6 md:px-8" id="about">
+  <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+    <!-- Photo -->
+    <div class="relative order-2 lg:order-1">
+      <div class="relative overflow-hidden shadow-2xl" style="aspect-ratio:4/5;">
+        <img src="assets/images/Moderne%20Dozen%20inpak%20machine%20kaas" alt="Industriële omgeving JM Mechanica" class="w-full h-full object-cover" style="filter:blur(5px) brightness(0.75);" onerror="this.style.display='none'"/>
+        <div class="absolute inset-0 bg-gradient-to-br from-[#022448]/40 to-transparent"></div>
+      </div>
+      <div class="absolute bottom-6 right-0 md:-right-6 bg-[#022448] text-white p-6 md:p-8">
+        <p class="text-4xl font-black font-headline text-[#f97316]">15+</p>
+        <p class="text-xs font-bold tracking-[0.2em] font-label uppercase">Jaar Ervaring</p>
+      </div>
+    </div>
+    <!-- Text -->
+    <div class="order-1 lg:order-2 space-y-8">
+      <span class="text-[#f97316] font-bold text-sm tracking-[0.3em] font-label">De Vakman</span>
+      <h2 class="text-4xl md:text-5xl font-black text-[#022448] font-headline tracking-tighter leading-[0.9]">PRECISIE IS <br/>NIET ONDERHANDELBAAR.</h2>
+      <p class="text-outline text-lg leading-relaxed">Als freelance allround monteur bied ik de flexibiliteit van een ZZP'er met de vakkennis en standaarden van een groot ingenieursbureau. Gespecialiseerd in storing, onderhoud en technische ondersteuning voor de Noord-Hollandse industrie.</p>
+      <div class="space-y-4">
+        <div class="flex items-start gap-4 p-4 bg-surface-container-low border-l-4 border-[#f97316]">
+          <span class="material-symbols-outlined text-[#022448]">verified</span>
+          <div>
+            <h4 class="font-bold text-[#022448] font-headline">VCA-VOL Gecertificeerd</h4>
+            <p class="text-sm text-outline">Veiligheid staat voorop. Gecertificeerd en gespecialiseerd in complexe mechanische en elektrotechnische systemen.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 p-4 bg-surface-container-low">
+          <span class="material-symbols-outlined text-[#022448]">speed</span>
+          <div>
+            <h4 class="font-bold text-[#022448] font-headline">Minimale Stilstand</h4>
+            <p class="text-sm text-outline">Elk uur stilstand kost geld. Mijn werkwijze is gericht op snelle diagnose en duurzame oplossingen.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-4 p-4 bg-surface-container-low">
+          <span class="material-symbols-outlined text-[#022448]">event_available</span>
+          <div>
+            <h4 class="font-bold text-[#022448] font-headline">Flexibel Beschikbaar</h4>
+            <p class="text-sm text-outline">Beschikbaar voor losse klussen naast de vaste opdracht — op vrije dagen en buiten roostertijden.</p>
+          </div>
+        </div>
+      </div>
+      <a href="over-mij.html" class="inline-flex items-center gap-2 bg-[#022448] text-white px-8 py-4 font-bold hover:bg-[#1e3a5f] transition-colors">
+        MEER OVER MIJ <span class="material-symbols-outlined">arrow_forward</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="py-24 bg-surface-container-low px-6 md:px-8">
+  <div class="max-w-7xl mx-auto">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl font-black text-[#022448] font-headline tracking-tighter">WAT OPDRACHTGEVERS ZEGGEN</h2>
+      <div class="w-12 h-1 bg-[#f97316] mx-auto mt-4"></div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="bg-white p-8 space-y-6">
+        <div class="flex text-[#f97316]">
+          <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">star</span>
+          <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">star</span>
+          <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">star</span>
+          <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">star</span>
+          <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">star</span>
+        </div>
+        <p class="text-[#1e3a5f] italic font-medium">"Essentieel voor ons onderhoudsprogramma. JM Mechanica loste een terugkerende storing op die ons team maandenlang had beziggehouden."</p>
+        <div>
+          <p class="font-bold text-[#022448] text-sm font-headline">Productiemanager</p>
+          <p class="text-outline text-xs uppercase tracking-widest font-label">Logistiek Bedrijf Zaandam</p>
+        </div>
+      </div>
+      <div class="bg-[#022448] text-white p-8 space-y-6">
+        <div class="flex text-[#f97316]">
+          <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">star</span>
+          <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">star</span>
+          <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">star</span>
+          <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">star</span>
+          <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">star</span>
+        </div>
+        <p class="text-white/80 italic font-medium">"Professioneel, punctueel en vakkundig. De volledige verhuizing van onze assemblagelijn verliep zonder onverwachte vertragingen."</p>
+        <div>
+          <p class="font-bold text-white text-sm font-headline">Vestigingsmanager</p>
+          <p class="text-white/40 text-xs uppercase tracking-widest font-label">Productiebedrijf Noord-Holland</p>
+        </div>
+      </div>
+      <div class="bg-white p-8 space-y-6">
+        <div class="flex text-[#f97316]">
+          <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">star</span>
+          <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">star</span>
+          <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">star</span>
+          <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">star</span>
+          <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">star</span>
+        </div>
+        <p class="text-[#1e3a5f] italic font-medium">"Betrouwbare TD-ondersteuning waarop wij kunnen rekenen tijdens drukke productieperiodes. Een echte industriële partner."</p>
+        <div>
+          <p class="font-bold text-[#022448] text-sm font-headline">Operations Lead</p>
+          <p class="text-outline text-xs uppercase tracking-widest font-label">Voedselverwerkingsbedrijf Alkmaar</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Contact -->
+<section class="py-24 bg-white px-6 md:px-8" id="contact">
+  <div class="max-w-7xl mx-auto flex flex-col lg:flex-row overflow-hidden shadow-2xl">
+    <!-- Left panel -->
+    <div class="lg:w-5/12 p-10 md:p-12 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-white/10" style="background:linear-gradient(135deg,#022448 0%,#1e3a5f 100%);">
+      <div>
+        <h2 class="text-4xl font-black font-headline tracking-tighter mb-6 text-[#f97316]">OFFERTE<br/>AANVRAGEN.</h2>
+        <p class="text-white/60 text-sm leading-relaxed mb-8">Klaar om uw industriële installaties te optimaliseren? Vul uw gegevens in voor een vrijblijvende technische beoordeling.</p>
+        <div class="space-y-5">
+          <a href="tel:+31629229395" class="flex items-center gap-4 text-white hover:text-[#f97316] transition-colors">
+            <span class="material-symbols-outlined text-[#f97316]">call</span>
+            <span class="font-bold font-headline">+31 6 29 22 93 95</span>
+          </a>
+          <a href="mailto:info@jmmechanica.nl" class="flex items-center gap-4 text-white hover:text-[#f97316] transition-colors">
+            <span class="material-symbols-outlined text-[#f97316]">mail</span>
+            <span class="font-bold font-headline">info@jmmechanica.nl</span>
+          </a>
+          <div class="flex items-center gap-4 text-white">
+            <span class="material-symbols-outlined text-[#f97316]">location_on</span>
+            <span class="font-bold font-headline">Zaandam, Noord-Holland</span>
+          </div>
+        </div>
+      </div>
+      <div class="mt-10 pt-8 border-t border-white/10 space-y-1">
+        <p class="text-white/30 text-[10px] font-bold tracking-[0.2em] font-label uppercase">KvK: 86164309</p>
+        <p class="text-white/30 text-[10px] font-bold tracking-[0.2em] font-label uppercase">BTW: NL004201082B62</p>
+      </div>
+    </div>
+    <!-- Form -->
+    <div class="lg:w-7/12 p-10 md:p-12 bg-white">
+      <form id="contact-form" onsubmit="verstuurFormulier(event)" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="space-y-2">
+          <label class="block text-[11px] font-bold text-outline uppercase tracking-widest font-label">Naam</label>
+          <input name="naam" type="text" required placeholder="Jan de Vries" class="w-full bg-surface-container-high text-[#022448] py-3 px-4 font-bold outline-none border-b-2 border-transparent focus:border-[#022448] transition-all"/>
+        </div>
+        <div class="space-y-2">
+          <label class="block text-[11px] font-bold text-outline uppercase tracking-widest font-label">Bedrijf</label>
+          <input name="bedrijf" type="text" placeholder="Bedrijf BV" class="w-full bg-surface-container-high text-[#022448] py-3 px-4 font-bold outline-none border-b-2 border-transparent focus:border-[#022448] transition-all"/>
+        </div>
+        <div class="space-y-2">
+          <label class="block text-[11px] font-bold text-outline uppercase tracking-widest font-label">E-mailadres</label>
+          <input name="email" type="email" required placeholder="jan@bedrijf.nl" class="w-full bg-surface-container-high text-[#022448] py-3 px-4 font-bold outline-none border-b-2 border-transparent focus:border-[#022448] transition-all"/>
+        </div>
+        <div class="space-y-2">
+          <label class="block text-[11px] font-bold text-outline uppercase tracking-widest font-label">Type Opdracht</label>
+          <select name="type" class="w-full bg-surface-container-high text-[#022448] py-3 px-4 font-bold outline-none border-b-2 border-transparent focus:border-[#022448] transition-all">
+            <option>Storingen &amp; Onderhoud</option>
+            <option>TD Ondersteuning</option>
+            <option>Projectwerk</option>
+            <option>Anders</option>
+          </select>
+        </div>
+        <div class="md:col-span-2 space-y-2">
+          <label class="block text-[11px] font-bold text-outline uppercase tracking-widest font-label">Omschrijving</label>
+          <textarea name="omschrijving" rows="4" placeholder="Omschrijf de technische vereisten..." class="w-full bg-surface-container-high text-[#022448] py-3 px-4 font-bold outline-none border-b-2 border-transparent focus:border-[#022448] transition-all"></textarea>
+        </div>
+        <div class="md:col-span-2 pt-2">
+          <button type="submit" class="w-full md:w-auto px-12 py-4 bg-[#f97316] text-white font-black font-headline tracking-tighter hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+            VERSTUREN <span class="material-symbols-outlined">send</span>
+          </button>
+        </div>
+      </form>
+      <div id="succes-melding" style="display:none;" class="py-16 text-center">
+        <span class="material-symbols-outlined block mb-4 text-[#f97316]" style="font-size:3rem;font-variation-settings:'FILL' 1;">check_circle</span>
+        <h3 class="text-2xl font-black text-[#022448] font-headline mb-2">Bericht verzonden!</h3>
+        <p class="text-outline">Jair neemt zo snel mogelijk contact met u op.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- Footer -->
+<footer class="py-12 px-6 md:px-8" style="background:#001020;">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 pb-8 border-b border-white/10">
+      <div class="md:col-span-2 space-y-4">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-[#f97316]" style="font-variation-settings:'FILL' 1;">precision_manufacturing</span>
+          <span class="text-xl font-black text-white tracking-tighter font-headline">JM MECHANICA</span>
+        </div>
+        <p class="text-white/35 text-sm leading-relaxed max-w-xs">Allround monteur voor storing, onderhoud en technische projectondersteuning in de industrie van Noord-Holland.</p>
+      </div>
+      <div class="space-y-3">
+        <h4 class="text-white font-bold text-xs uppercase tracking-widest font-label">Navigatie</h4>
+        <div class="flex flex-col gap-2">
+          <a href="index.html" class="text-white/40 hover:text-[#f97316] text-sm transition-colors">Home</a>
+          <a href="diensten.html" class="text-white/40 hover:text-[#f97316] text-sm transition-colors">Diensten</a>
+          <a href="over-mij.html" class="text-white/40 hover:text-[#f97316] text-sm transition-colors">Over Mij</a>
+          <a href="#contact" class="text-white/40 hover:text-[#f97316] text-sm transition-colors">Contact</a>
+        </div>
+      </div>
+      <div class="space-y-3">
+        <h4 class="text-white font-bold text-xs uppercase tracking-widest font-label">Contact</h4>
+        <div class="flex flex-col gap-2">
+          <a href="tel:+31629229395" class="text-white/40 hover:text-[#f97316] text-sm transition-colors">+31 6 29 22 93 95</a>
+          <a href="mailto:info@jmmechanica.nl" class="text-white/40 hover:text-[#f97316] text-sm transition-colors">info@jmmechanica.nl</a>
+          <span class="text-white/40 text-sm">Zaandam, Noord-Holland</span>
+        </div>
+      </div>
+    </div>
+    <div class="pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+      <p class="text-white/25 text-xs">© 2026 JM Mechanica &bull; Zaandam, Noord-Holland</p>
+      <div class="flex gap-6 flex-wrap justify-center">
+        <span class="text-white/25 text-xs">KvK: 86164309</span>
+        <span class="text-white/25 text-xs">BTW: NL004201082B62</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Dashboard lock -->
+<a class="dashboard-link" href="dashboard.html" title="Dashboard">&#128274;</a>
+
+<!-- Chat -->
 <button id="chat-knop" onclick="toggleChat()" title="Chat met ons">
   &#128172;
   <span id="chat-badge">1</span>
 </button>
-
 <div id="chat-venster">
   <div id="chat-header">
     <div id="chat-header-info">
@@ -345,171 +526,62 @@
 </div>
 
 <script>
-let chatOpen = false;
-let chatBezig = false;
-let serieuzeInteresse = 0;
+function toggleMenu() { document.getElementById('mobile-menu').classList.toggle('hidden'); }
 
-const ANTWOORDEN = {
-  diensten: [
-    'JM Mechanica verzorgt storing en onderhoud aan bedrijfsinstallaties, ondersteunt uw technische dienst en is inzetbaar voor projecten. Heeft u een specifiek type klus in gedachten?',
-    'Wij bieden allround monteursdiensten: storingsoplossing, preventief onderhoud en ondersteuning van uw TD. Voor welk type installatie heeft u ondersteuning nodig?',
-    'Van storingsdiagnose tot technische projectondersteuning — JM Mechanica is breed inzetbaar in de industrie. Waar kan ik u meer over vertellen?'
-  ],
-  tarief: [
-    'Het uurtarief is €77,50 excl. btw. Reisuren worden doorberekend. Bij langdurige opdrachten is overleg mogelijk over een afwijkend tarief.',
-    'Wij hanteren €77,50 per uur excl. btw. Voor langdurige of terugkerende opdrachten kijken we graag samen naar de mogelijkheden.',
-    'Het tarief bedraagt €77,50 per uur excl. btw, inclusief reistijd. Heeft u een langdurig project? Dan is er ruimte voor overleg.'
-  ],
-  werkgebied: [
-    'JM Mechanica is actief in heel Noord-Holland. Buiten Noord-Holland is inzet mogelijk in overleg, met name voor kortere periodes.',
-    'Ons werkgebied is Noord-Holland. Voor opdrachten daarbuiten kijken we graag of inzet haalbaar is — dit gaat altijd in overleg.',
-    'Primair actief in Noord-Holland, maar ook buiten de regio inzetbaar voor kortlopende opdrachten. In welke regio heeft u de opdracht?'
-  ],
-  beschikbaar: [
-    'Jair is beschikbaar voor losse klussen naast zijn vaste opdracht — op vrije dagen en buiten roostertijden. Wanneer zou u iemand nodig hebben?',
-    'Er is beschikbaarheid op vrije dagen en buiten vaste roostertijden. Heeft u een idee van de gewenste startdatum of duur?',
-    'Losse klussen zijn welkom. De beschikbaarheid hangt af van het rooster, maar er is regelmatig ruimte. Wat is de omvang van de opdracht?'
-  ],
-  contact: [
-    'U kunt Jair bereiken via het contactformulier op deze pagina of direct bellen op +31 6 29 22 93 95. Hoe neemt u het liefst contact op?',
-    'Neem gerust contact op via het formulier hieronder, of bel direct: +31 6 29 22 93 95. Jair reageert zo snel mogelijk.',
-    'Ik kan u doorverbinden met Jair. Wilt u het contactformulier invullen of liever direct bellen op +31 6 29 22 93 95?'
-  ],
-  interesse: [
-    'Dat klinkt als een concrete opdracht! Ik kan u doorverbinden met Jair. Wilt u het contactformulier invullen of liever direct bellen op +31 6 29 22 93 95?',
-    'Goed om te horen dat u serieus interesse heeft. De snelste weg is even bellen: +31 6 29 22 93 95. Of vul het contactformulier in, dan nemen wij contact op.',
-    'Dan stel ik voor dat u direct contact opneemt met Jair — bel +31 6 29 22 93 95 of gebruik het formulier onderaan de pagina.'
-  ],
-  begroeting: [
-    'Goedendag! Waar kan ik u mee helpen? U kunt vragen stellen over onze diensten, tarieven, werkgebied of beschikbaarheid.',
-    'Hallo! Fijn dat u contact opneemt met JM Mechanica. Waarmee kan ik u van dienst zijn?',
-    'Goedendag! Ik help u graag verder. Heeft u een vraag over onze diensten, het tarief of de beschikbaarheid?'
-  ],
-  onbekend: [
-    'Dat is een goede vraag. Kunt u iets meer vertellen over wat u zoekt? Dan kan ik u beter helpen.',
-    'Ik begrijp uw vraag niet helemaal. Vraagt u naar onze diensten, tarieven, werkgebied of beschikbaarheid?',
-    'Daar heb ik niet direct een antwoord op. U kunt voor specifieke vragen altijd bellen: +31 6 29 22 93 95.'
-  ]
+let chatOpen=false, chatBezig=false, serieuzeInteresse=0;
+const ANTWOORDEN={
+  diensten:['JM Mechanica verzorgt storing en onderhoud aan bedrijfsinstallaties, ondersteunt uw technische dienst en is inzetbaar voor projecten. Heeft u een specifiek type klus in gedachten?','Wij bieden allround monteursdiensten: storingsoplossing, preventief onderhoud en TD-ondersteuning. Voor welk type installatie heeft u ondersteuning nodig?','Van storingsdiagnose tot technische projectondersteuning — JM Mechanica is breed inzetbaar. Waar kan ik u meer over vertellen?'],
+  tarief:['Het uurtarief is €77,50 excl. btw. Reisuren worden doorberekend. Bij langdurige opdrachten is overleg mogelijk.','Wij hanteren €77,50 per uur excl. btw. Voor langdurige of terugkerende opdrachten kijken we graag samen naar de mogelijkheden.','Het tarief bedraagt €77,50 per uur excl. btw, inclusief reistijd. Langdurig project? Dan is er ruimte voor overleg.'],
+  werkgebied:['JM Mechanica is actief in heel Noord-Holland. Buiten Noord-Holland in overleg, met name voor kortere periodes.','Ons werkgebied is Noord-Holland. Daarbuiten kijken we graag of inzet haalbaar is — altijd in overleg.','Primair actief in Noord-Holland, maar ook buiten de regio inzetbaar voor kortlopende opdrachten. In welke regio heeft u de opdracht?'],
+  beschikbaar:['Jair is beschikbaar voor losse klussen naast zijn vaste opdracht — op vrije dagen en buiten roostertijden. Wanneer zou u iemand nodig hebben?','Er is beschikbaarheid op vrije dagen en buiten vaste roostertijden. Heeft u een idee van de gewenste startdatum?','Losse klussen zijn welkom. De beschikbaarheid hangt af van het rooster, maar er is regelmatig ruimte.'],
+  contact:['U kunt Jair bereiken via het contactformulier op deze pagina of direct bellen op +31 6 29 22 93 95.','Neem contact op via het formulier hieronder, of bel direct: +31 6 29 22 93 95. Jair reageert zo snel mogelijk.','Wilt u het contactformulier invullen of liever direct bellen op +31 6 29 22 93 95?'],
+  interesse:['Dat klinkt als een concrete opdracht! Wilt u het contactformulier invullen of liever direct bellen op +31 6 29 22 93 95?','Goed om te horen dat u serieus interesse heeft. De snelste weg is even bellen: +31 6 29 22 93 95.','Dan stel ik voor dat u direct contact opneemt met Jair — bel +31 6 29 22 93 95 of gebruik het formulier onderaan de pagina.'],
+  begroeting:['Goedendag! Waar kan ik u mee helpen? U kunt vragen stellen over onze diensten, tarieven, werkgebied of beschikbaarheid.','Hallo! Fijn dat u contact opneemt met JM Mechanica. Waarmee kan ik u van dienst zijn?','Goedendag! Ik help u graag verder. Heeft u een vraag over onze diensten, het tarief of de beschikbaarheid?'],
+  onbekend:['Dat is een goede vraag. Kunt u iets meer vertellen over wat u zoekt? Dan kan ik u beter helpen.','Ik begrijp uw vraag niet helemaal. Vraagt u naar onze diensten, tarieven, werkgebied of beschikbaarheid?','Daar heb ik niet direct een antwoord op. U kunt voor specifieke vragen altijd bellen: +31 6 29 22 93 95.']
 };
-
-function pickRandom(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
+function pickRandom(a){return a[Math.floor(Math.random()*a.length)];}
+function detecteerOnderwerp(tekst){
+  const t=tekst.toLowerCase();
+  if(/^(hallo|hoi|hey|hi|goedendag|goedemorgen|goedemiddag|goedenavond|dag|goed|morgen|middag|avond)[.!?]?\s*$/.test(t.trim()))return'begroeting';
+  const c=/contact|offerte|bel|mail|formulier|interesse|inschakelen|aanvragen|afspraak/.test(t);
+  const r=/tarief|prijs|kosten|uur|btw|bedrag|rekening|betalen/.test(t);
+  const b=/beschikbaar|wanneer|vrij|planning|agenda|starten|datum|hoe snel/.test(t);
+  const d=/dienst|werk|wat doe|installat|storing|onderhoud|monteur|project|td|technisch/.test(t);
+  const g=/gebied|locatie|waar|regio|provincie|amsterdam|noord.holland|alkmaar|haarlem|zaandam/.test(t);
+  if(c)serieuzeInteresse++;if(r)serieuzeInteresse++;if(b)serieuzeInteresse++;
+  if(serieuzeInteresse>=2){serieuzeInteresse=0;return'interesse';}
+  if(c)return'contact';if(r)return'tarief';if(b)return'beschikbaar';if(d)return'diensten';if(g)return'werkgebied';
+  return'onbekend';
 }
-
-function detecteerOnderwerp(tekst) {
-  const t = tekst.toLowerCase();
-  const isBegroet  = /^(hallo|hoi|hey|hi|goedendag|goedemorgen|goedemiddag|goedenavond|dag|goed|morgen|middag|avond)[.!?]?\s*$/.test(t.trim());
-  const isContact  = /contact|offerte|bel|mail|formulier|interesse|inschakelen|aanvragen|afspraak/.test(t);
-  const isTarief   = /tarief|prijs|kosten|uur|btw|bedrag|rekening|betalen/.test(t);
-  const isBeschik  = /beschikbaar|wanneer|vrij|planning|agenda|starten|datum|hoe snel/.test(t);
-  const isDienst   = /dienst|werk|wat doe|installat|storing|onderhoud|monteur|project|td|technisch/.test(t);
-  const isGebied   = /gebied|locatie|waar|regio|provincie|amsterdam|noord.holland|alkmaar|haarlem|zaandam/.test(t);
-
-  if (isBegroet)  return 'begroeting';
-  if (isContact) serieuzeInteresse++;
-  if (isTarief)  serieuzeInteresse++;
-  if (isBeschik) serieuzeInteresse++;
-
-  if (serieuzeInteresse >= 2) { serieuzeInteresse = 0; return 'interesse'; }
-  if (isContact)  return 'contact';
-  if (isTarief)   return 'tarief';
-  if (isBeschik)  return 'beschikbaar';
-  if (isDienst)   return 'diensten';
-  if (isGebied)   return 'werkgebied';
-  return 'onbekend';
+function voegChatToe(rol,tekst){const d=document.createElement('div');d.className='chat-bericht '+rol;d.textContent=tekst;document.getElementById('chat-berichten').appendChild(d);scrollChatOnder();}
+function scrollChatOnder(){const e=document.getElementById('chat-berichten');e.scrollTop=e.scrollHeight;}
+function antwoordMetDelay(tekst,delay){
+  chatBezig=true;document.getElementById('chat-stuur').disabled=true;
+  setTimeout(()=>{
+    const t=document.createElement('div');t.className='chat-typing';t.id='chat-typing-indicator';t.innerHTML='<span></span><span></span><span></span>';
+    document.getElementById('chat-berichten').appendChild(t);scrollChatOnder();
+    setTimeout(()=>{const i=document.getElementById('chat-typing-indicator');if(i)i.remove();voegChatToe('assistent',tekst);chatBezig=false;document.getElementById('chat-stuur').disabled=false;document.getElementById('chat-input').focus();},900+Math.random()*400);
+  },delay||0);
 }
-
-function voegChatToe(rol, tekst) {
-  const div = document.createElement('div');
-  div.className = 'chat-bericht ' + rol;
-  div.textContent = tekst;
-  document.getElementById('chat-berichten').appendChild(div);
-  scrollChatOnder();
-  return div;
+function toggleChat(){
+  chatOpen=!chatOpen;
+  document.getElementById('chat-venster').style.display=chatOpen?'flex':'none';
+  document.getElementById('chat-badge').style.display='none';
+  if(chatOpen){const b=document.getElementById('chat-berichten');if(b.children.length===0)antwoordMetDelay('Goedendag! Ik ben de assistent van JM Mechanica. Kan ik u ergens mee helpen?',300);else document.getElementById('chat-input').focus();}
 }
-
-function scrollChatOnder() {
-  const el = document.getElementById('chat-berichten');
-  el.scrollTop = el.scrollHeight;
+function verstuurChat(){
+  if(chatBezig)return;const i=document.getElementById('chat-input');const t=i.value.trim();if(!t)return;
+  i.value='';i.style.height='auto';voegChatToe('gebruiker',t);
+  antwoordMetDelay(pickRandom(ANTWOORDEN[detecteerOnderwerp(t)]));
 }
+setTimeout(()=>{if(!chatOpen)toggleChat();},8000);
 
-function antwoordMetDelay(tekst, delay) {
-  chatBezig = true;
-  document.getElementById('chat-stuur').disabled = true;
-
-  setTimeout(() => {
-    const typing = document.createElement('div');
-    typing.className = 'chat-typing';
-    typing.id = 'chat-typing-indicator';
-    typing.innerHTML = '<span></span><span></span><span></span>';
-    document.getElementById('chat-berichten').appendChild(typing);
-    scrollChatOnder();
-
-    setTimeout(() => {
-      const t = document.getElementById('chat-typing-indicator');
-      if (t) t.remove();
-      voegChatToe('assistent', tekst);
-      chatBezig = false;
-      document.getElementById('chat-stuur').disabled = false;
-      document.getElementById('chat-input').focus();
-    }, 900 + Math.random() * 400);
-  }, delay || 0);
-}
-
-function toggleChat() {
-  chatOpen = !chatOpen;
-  document.getElementById('chat-venster').style.display = chatOpen ? 'flex' : 'none';
-  document.getElementById('chat-badge').style.display = 'none';
-  if (chatOpen) {
-    const berichten = document.getElementById('chat-berichten');
-    if (berichten.children.length === 0) {
-      antwoordMetDelay('Goedendag! Ik ben de assistent van JM Mechanica. Kan ik u ergens mee helpen?', 300);
-    } else {
-      document.getElementById('chat-input').focus();
-    }
-  }
-}
-
-function verstuurChat() {
-  if (chatBezig) return;
-  const input = document.getElementById('chat-input');
-  const tekst = input.value.trim();
-  if (!tekst) return;
-
-  input.value = '';
-  input.style.height = 'auto';
-  voegChatToe('gebruiker', tekst);
-
-  const onderwerp = detecteerOnderwerp(tekst);
-  antwoordMetDelay(pickRandom(ANTWOORDEN[onderwerp]));
-}
-
-// Auto-open na 8 seconden
-setTimeout(() => {
-  if (!chatOpen) toggleChat();
-}, 8000);
-</script>
-
-<script>
-function verstuurFormulier(e) {
-  e.preventDefault();
-  const form = document.getElementById('contact-form');
-  const data = new FormData(form);
-
-  fetch('/', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams(data).toString()
-  })
-  .then(() => {
-    form.style.display = 'none';
-    document.getElementById('succes-melding').style.display = 'block';
-  })
-  .catch(() => {
-    alert('Er ging iets mis. Probeer het opnieuw of bel direct.');
-  });
+function verstuurFormulier(e){
+  e.preventDefault();const form=document.getElementById('contact-form');const data=new FormData(form);
+  fetch('/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(data).toString()})
+  .then(()=>{form.style.display='none';document.getElementById('succes-melding').style.display='block';})
+  .catch(()=>alert('Er ging iets mis. Probeer het opnieuw of bel direct.'));
 }
 </script>
-
 </body>
 </html>
