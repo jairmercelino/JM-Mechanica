@@ -529,53 +529,310 @@ tailwind.config = {
 <script>
 function toggleMenu() { document.getElementById('mobile-menu').classList.toggle('hidden'); }
 
-let chatOpen=false, chatBezig=false, serieuzeInteresse=0;
-const ANTWOORDEN={
-  diensten:['JM Mechanica verzorgt storing en onderhoud aan bedrijfsinstallaties, ondersteunt uw technische dienst en is inzetbaar voor projecten. Heeft u een specifiek type klus in gedachten?','Wij bieden allround monteursdiensten: storingsoplossing, preventief onderhoud en TD-ondersteuning. Voor welk type installatie heeft u ondersteuning nodig?','Van storingsdiagnose tot technische projectondersteuning — JM Mechanica is breed inzetbaar. Waar kan ik u meer over vertellen?'],
-  tarief:['Het uurtarief is €77,50 excl. btw. Reisuren worden doorberekend. Bij langdurige opdrachten is overleg mogelijk.','Wij hanteren €77,50 per uur excl. btw. Voor langdurige of terugkerende opdrachten kijken we graag samen naar de mogelijkheden.','Het tarief bedraagt €77,50 per uur excl. btw, inclusief reistijd. Langdurig project? Dan is er ruimte voor overleg.'],
-  werkgebied:['JM Mechanica is actief in heel Noord-Holland. Buiten Noord-Holland in overleg, met name voor kortere periodes.','Ons werkgebied is Noord-Holland. Daarbuiten kijken we graag of inzet haalbaar is — altijd in overleg.','Primair actief in Noord-Holland, maar ook buiten de regio inzetbaar voor kortlopende opdrachten. In welke regio heeft u de opdracht?'],
-  beschikbaar:['Jair is beschikbaar voor losse klussen naast zijn vaste opdracht — op vrije dagen en buiten roostertijden. Wanneer zou u iemand nodig hebben?','Er is beschikbaarheid op vrije dagen en buiten vaste roostertijden. Heeft u een idee van de gewenste startdatum?','Losse klussen zijn welkom. De beschikbaarheid hangt af van het rooster, maar er is regelmatig ruimte.'],
-  contact:['U kunt Jair bereiken via het contactformulier op deze pagina of direct bellen op +31 6 29 22 93 95.','Neem contact op via het formulier hieronder, of bel direct: +31 6 29 22 93 95. Jair reageert zo snel mogelijk.','Wilt u het contactformulier invullen of liever direct bellen op +31 6 29 22 93 95?'],
-  interesse:['Dat klinkt als een concrete opdracht! Wilt u het contactformulier invullen of liever direct bellen op +31 6 29 22 93 95?','Goed om te horen dat u serieus interesse heeft. De snelste weg is even bellen: +31 6 29 22 93 95.','Dan stel ik voor dat u direct contact opneemt met Jair — bel +31 6 29 22 93 95 of gebruik het formulier onderaan de pagina.'],
-  begroeting:['Goedendag! Waar kan ik u mee helpen? U kunt vragen stellen over onze diensten, tarieven, werkgebied of beschikbaarheid.','Hallo! Fijn dat u contact opneemt met JM Mechanica. Waarmee kan ik u van dienst zijn?','Goedendag! Ik help u graag verder. Heeft u een vraag over onze diensten, het tarief of de beschikbaarheid?'],
-  onbekend:['Dat is een goede vraag. Kunt u iets meer vertellen over wat u zoekt? Dan kan ik u beter helpen.','Ik begrijp uw vraag niet helemaal. Vraagt u naar onze diensten, tarieven, werkgebied of beschikbaarheid?','Daar heb ik niet direct een antwoord op. U kunt voor specifieke vragen altijd bellen: +31 6 29 22 93 95.']
+let chatOpen=false, chatBezig=false;
+
+// ── CONVERSATION STATE ──
+const chat = {
+  score: 0,
+  besproken: new Set(),
+  geschiedenis: [],
+  leadVerstuurd: false,
+  naam: null,
+  email: null,
+  telefoon: null,
+  bedrijf: null,
+  dienst: null,
+  locatie: null,
+  formulierAangeboden: false
 };
-function pickRandom(a){return a[Math.floor(Math.random()*a.length)];}
-function detecteerOnderwerp(tekst){
-  const t=tekst.toLowerCase();
-  if(/^(hallo|hoi|hey|hi|goedendag|goedemorgen|goedemiddag|goedenavond|dag|goed|morgen|middag|avond)[.!?]?\s*$/.test(t.trim()))return'begroeting';
-  const c=/contact|offerte|bel|mail|formulier|interesse|inschakelen|aanvragen|afspraak/.test(t);
-  const r=/tarief|prijs|kosten|uur|btw|bedrag|rekening|betalen/.test(t);
-  const b=/beschikbaar|wanneer|vrij|planning|agenda|starten|datum|hoe snel/.test(t);
-  const d=/dienst|werk|wat doe|installat|storing|onderhoud|monteur|project|td|technisch/.test(t);
-  const g=/gebied|locatie|waar|regio|provincie|amsterdam|noord.holland|alkmaar|haarlem|zaandam/.test(t);
-  if(c)serieuzeInteresse++;if(r)serieuzeInteresse++;if(b)serieuzeInteresse++;
-  if(serieuzeInteresse>=2){serieuzeInteresse=0;return'interesse';}
-  if(c)return'contact';if(r)return'tarief';if(b)return'beschikbaar';if(d)return'diensten';if(g)return'werkgebied';
-  return'onbekend';
+
+// ── RESPONSE POOL (per topic, meerdere varianten) ──
+const ANTWOORDEN = {
+  diensten: [
+    'JM Mechanica biedt drie kerndiensten: storingsoplossing, preventief onderhoud en TD-ondersteuning. Heeft u een specifiek type installatie in gedachten?',
+    'Wij zijn breed inzetbaar — van acute storingen tot complete projectbegeleiding. Waar zoekt u ondersteuning voor?',
+    'Van PLC-diagnose tot mechanische reparaties en projectinstallaties — JM Mechanica is uw allround partner. Welk type werk heeft u in gedachten?'
+  ],
+  tarief: [
+    'Het uurtarief is €77,50 excl. btw. Reisuren worden doorberekend. Bij langdurige opdrachten is overleg over het tarief mogelijk.',
+    'Wij hanteren €77,50 per uur excl. btw. Voor terugkerende opdrachten kijken we graag samen naar de mogelijkheden.',
+    'Het tarief bedraagt €77,50 per uur exclusief btw. Bij een langdurig project is er ruimte voor maatwerkafspraken.'
+  ],
+  werkgebied: [
+    'JM Mechanica is gevestigd in Zaandam en actief in heel Noord-Holland — Amsterdam, Alkmaar, Haarlem en omgeving. Buiten de regio in overleg.',
+    'Ons werkgebied is primair Noord-Holland. Daarbuiten kijken we of inzet haalbaar is. In welke regio zit uw bedrijf?',
+    'Vanuit Zaandam bedienen we heel Noord-Holland. Voor opdrachten daarbuiten is overleg mogelijk.'
+  ],
+  beschikbaar: [
+    'Jair is beschikbaar voor losse klussen op vrije dagen en buiten vaste roostertijden. Wanneer zou u iemand nodig hebben?',
+    'Er is regelmatig beschikbaarheid naast de vaste opdracht. Heeft u een idee van de gewenste periode of startdatum?',
+    'Losse klussen en korte projecten zijn welkom. De planning hangt af van het rooster — vertel me meer over uw tijdlijn.'
+  ],
+  contact: [
+    'U kunt Jair bereiken via het contactformulier op deze pagina, of direct bellen op +31 6 29 22 93 95.',
+    'De snelste weg is bellen: +31 6 29 22 93 95. Of vul het formulier hieronder in — Jair reageert dezelfde dag.',
+    'Mail naar info@jmmechanica.nl, bel +31 6 29 22 93 95, of gebruik het formulier onderaan deze pagina.'
+  ],
+  begroeting: [
+    'Goedendag! Waar kan ik u mee helpen? U kunt vragen stellen over onze diensten, tarieven, werkgebied of beschikbaarheid.',
+    'Hallo! Fijn dat u contact opneemt met JM Mechanica. Waarmee kan ik u van dienst zijn?',
+    'Welkom! Ik help u graag verder. Heeft u een vraag over onze diensten, het tarief of de beschikbaarheid?'
+  ],
+  certificering: [
+    'Jair is VCA-VOL gecertificeerd en heeft ruime ervaring met mechanische, elektrotechnische en pneumatisch/hydraulische installaties.',
+    'JM Mechanica werkt volgens VCA-VOL normen. Daarnaast heeft Jair ervaring als projectleider en met diverse industriële systemen.'
+  ],
+  ervaring: [
+    'Jair heeft meer dan 15 jaar ervaring als allround monteur in de industrie, van voedselverwerking tot zware machinebouw.',
+    'Met 15+ jaar ervaring in industriële omgevingen kent Jair de uitdagingen van productieomgevingen door en door.'
+  ],
+  onbekend: [
+    'Dat is een goede vraag. Kunt u iets meer vertellen over wat u zoekt? Dan kan ik u beter helpen.',
+    'Ik begrijp uw vraag niet helemaal. Vraagt u naar onze diensten, tarieven, werkgebied of beschikbaarheid?',
+    'Daar heb ik niet direct een antwoord op, maar Jair zeker wel. Bel +31 6 29 22 93 95 of stel een andere vraag.'
+  ]
+};
+
+function pickRandom(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
 }
-function voegChatToe(rol,tekst){const d=document.createElement('div');d.className='chat-bericht '+rol;d.textContent=tekst;document.getElementById('chat-berichten').appendChild(d);scrollChatOnder();}
-function scrollChatOnder(){const e=document.getElementById('chat-berichten');e.scrollTop=e.scrollHeight;}
-function antwoordMetDelay(tekst,delay){
-  chatBezig=true;document.getElementById('chat-stuur').disabled=true;
-  setTimeout(()=>{
-    const t=document.createElement('div');t.className='chat-typing';t.id='chat-typing-indicator';t.innerHTML='<span></span><span></span><span></span>';
-    document.getElementById('chat-berichten').appendChild(t);scrollChatOnder();
-    setTimeout(()=>{const i=document.getElementById('chat-typing-indicator');if(i)i.remove();voegChatToe('assistent',tekst);chatBezig=false;document.getElementById('chat-stuur').disabled=false;document.getElementById('chat-input').focus();},900+Math.random()*400);
-  },delay||0);
+
+// ── TOPIC DETECTION ──
+function detecteerOnderwerp(tekst) {
+  const t = tekst.toLowerCase().trim();
+
+  // Begroeting
+  if (/^(hallo|hoi|hey|hi|goedendag|goedemorgen|goedemiddag|goedenavond|dag|goed|morgen|middag|avond)[.!?]?\s*$/i.test(t)) return 'begroeting';
+
+  // Detect naam, email, telefoon uit bericht
+  const naamMatch = t.match(/(?:ik\s+ben|mijn\s+naam\s+is|naam\s*[:\-]?\s*)([a-zA-ZÀ-ÿ\s]{2,30})/i);
+  if (naamMatch) {
+    chat.naam = naamMatch[1].trim().replace(/^(ik\s+ben|mijn\s+naam\s+is)\s*/i, '');
+    if (chat.naam.length > 1) { chat.score += 2; chat.besproken.add('naam'); }
+  }
+  const emailMatch = t.match(/[\w.+-]+@[\w-]+\.[\w.]+/);
+  if (emailMatch) { chat.email = emailMatch[0]; chat.score += 3; chat.besproken.add('email'); }
+  const telMatch = t.match(/(?:0[1-9][\s\-]?(?:\d[\s\-]?){7,9}|\+31[\s\-]?\d[\s\-]?(?:\d[\s\-]?){7,8})/);
+  if (telMatch) { chat.telefoon = telMatch[0].replace(/[\s\-]/g, ''); chat.score += 3; chat.besproken.add('telefoon'); }
+  const bedrijfMatch = t.match(/(?:bedrijf|firma|werk\s+bij|werk\s+voor|van\s+(?:bedrijf|firma)?)\s*[:\-]?\s*([a-zA-ZÀ-ÿ0-9\s&.]{2,40})/i);
+  if (bedrijfMatch && !bedrijfMatch[1].match(/^(een|het|de|mijn|uw)$/i)) {
+    chat.bedrijf = bedrijfMatch[1].trim();
+  }
+
+  // Topic detection met scoring
+  const topics = [];
+  if (/tarief|prijs|kosten|uur|btw|bedrag|rekening|betalen|wat kost|hoeveel/.test(t)) topics.push('tarief');
+  if (/beschikbaar|wanneer|vrij|planning|agenda|starten|datum|hoe snel|inzetbaar|capaciteit/.test(t)) topics.push('beschikbaar');
+  if (/dienst|werk|wat doe|installat|storing|onderhoud|monteur|project|td|technisch|reparati|preventief/.test(t)) topics.push('diensten');
+  if (/gebied|locatie|waar|regio|provincie|amsterdam|noord.holland|alkmaar|haarlem|zaandam|almere|utrecht/.test(t)) topics.push('werkgebied');
+  if (/contact|offerte|bel|formulier|inschakelen|aanvragen|afspraak|gesprek/.test(t)) topics.push('contact');
+  if (/vca|certificat|gecertificeerd|diploma|veiligheid|kwalificati/.test(t)) topics.push('certificering');
+  if (/ervaring|jaar|achtergrond|cv|portfolio|referenti/.test(t)) topics.push('ervaring');
+  if (/mail|email|e-mail|info@/.test(t) && !emailMatch) topics.push('contact');
+
+  // Detect specific service interest
+  if (/storing/.test(t)) chat.dienst = 'Storingen & Onderhoud';
+  if (/td|technische dienst/.test(t)) chat.dienst = 'TD Ondersteuning';
+  if (/project|installat/.test(t)) chat.dienst = 'Projectwerk';
+
+  // Detect location
+  const locMatch = t.match(/(?:in|bij|regio|omgeving)\s+([\wÀ-ÿ\s-]{2,25})/i);
+  if (locMatch) { chat.locatie = locMatch[1].trim(); chat.besproken.add('locatie'); }
+
+  // Score updates
+  topics.forEach(tp => {
+    if (tp === 'tarief' && !chat.besproken.has('tarief')) { chat.score += 1; chat.besproken.add('tarief'); }
+    if (tp === 'beschikbaar' && !chat.besproken.has('beschikbaar')) { chat.score += 1; chat.besproken.add('beschikbaar'); }
+    if (tp === 'werkgebied' && !chat.besproken.has('werkgebied')) { chat.score += 1; chat.besproken.add('locatie'); }
+    if ((tp === 'diensten' || tp === 'certificering' || tp === 'ervaring') && !chat.besproken.has('dienst')) { chat.score += 1; chat.besproken.add('dienst'); }
+  });
+
+  if (topics.length === 0) return 'onbekend';
+  // Return first topic not yet discussed, or first topic
+  const nieuw = topics.find(tp => !chat.besproken.has('antw_' + tp));
+  return nieuw || topics[0];
 }
-function toggleChat(){
-  chatOpen=!chatOpen;
-  document.getElementById('chat-venster').style.display=chatOpen?'flex':'none';
-  document.getElementById('chat-badge').style.display='none';
-  if(chatOpen){const b=document.getElementById('chat-berichten');if(b.children.length===0)antwoordMetDelay('Goedendag! Ik ben de assistent van JM Mechanica. Kan ik u ergens mee helpen?',300);else document.getElementById('chat-input').focus();}
+
+// ── SMART RESPONSE BUILDER ──
+function bouwAntwoord(onderwerp, gebruikerTekst) {
+  chat.geschiedenis.push({ rol: 'gebruiker', tekst: gebruikerTekst, onderwerp });
+  chat.besproken.add('antw_' + onderwerp);
+
+  let antwoord = pickRandom(ANTWOORDEN[onderwerp] || ANTWOORDEN.onbekend);
+
+  // Context-aware follow-ups
+  if (onderwerp === 'tarief' && chat.besproken.has('antw_diensten')) {
+    antwoord += ' Dit tarief geldt voor alle genoemde diensten.';
+  }
+  if (onderwerp === 'beschikbaar' && chat.dienst) {
+    antwoord += ` Voor ${chat.dienst.toLowerCase()} is er doorgaans goede beschikbaarheid.`;
+  }
+  if (onderwerp === 'werkgebied' && chat.locatie) {
+    antwoord += ` ${chat.locatie} valt binnen ons bereik.`;
+  }
+  if (chat.naam && !chat.besproken.has('naam_bevestigd')) {
+    antwoord = `Leuk kennis te maken, ${chat.naam}! ` + antwoord;
+    chat.besproken.add('naam_bevestigd');
+  }
+
+  // Lead qualification check
+  if (chat.score >= 3 && !chat.leadVerstuurd && !chat.formulierAangeboden) {
+    chat.formulierAangeboden = true;
+    setTimeout(() => {
+      antwoordMetDelay('Op basis van ons gesprek denk ik dat Jair u goed kan helpen. Wilt u dat ik uw gegevens doorstuur zodat hij vandaag nog contact opneemt? Ik kan het contactformulier alvast voor u invullen, of u kunt direct bellen op +31 6 29 22 93 95.', 0);
+      setTimeout(() => toonLeadKnoppen(), 2200);
+    }, 2000);
+  }
+
+  // Auto-send lead notification if contact info given
+  if ((chat.email || chat.telefoon) && !chat.leadVerstuurd) {
+    verstuurLeadNotificatie();
+  }
+
+  chat.geschiedenis.push({ rol: 'assistent', tekst: antwoord, onderwerp });
+  return antwoord;
 }
-function verstuurChat(){
-  if(chatBezig)return;const i=document.getElementById('chat-input');const t=i.value.trim();if(!t)return;
-  i.value='';i.style.height='auto';voegChatToe('gebruiker',t);
-  antwoordMetDelay(pickRandom(ANTWOORDEN[detecteerOnderwerp(t)]));
+
+// ── LEAD BUTTONS ──
+function toonLeadKnoppen() {
+  const container = document.createElement('div');
+  container.className = 'chat-bericht assistent';
+  container.style.cssText = 'display:flex;flex-direction:column;gap:8px;';
+  container.innerHTML = `
+    <button onclick="vulFormulierIn()" style="background:#f97316;color:#fff;border:none;padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Formulier invullen</button>
+    <button onclick="window.location.href='tel:+31629229395'" style="background:#022448;color:#fff;border:none;padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Bel +31 6 29 22 93 95</button>
+  `;
+  document.getElementById('chat-berichten').appendChild(container);
+  scrollChatOnder();
 }
-setTimeout(()=>{if(!chatOpen)toggleChat();},8000);
+
+// ── AUTO-FILL CONTACT FORM ──
+function vulFormulierIn() {
+  const section = document.getElementById('contact');
+  if (section) section.scrollIntoView({ behavior: 'smooth' });
+
+  setTimeout(() => {
+    const f = document.getElementById('contact-form');
+    if (!f) return;
+    if (chat.naam) f.querySelector('[name=naam]').value = chat.naam;
+    if (chat.email) f.querySelector('[name=email]').value = chat.email;
+    if (chat.bedrijf) f.querySelector('[name=bedrijf]').value = chat.bedrijf;
+    if (chat.dienst) {
+      const sel = f.querySelector('[name=type]');
+      for (let i = 0; i < sel.options.length; i++) {
+        if (sel.options[i].text.includes(chat.dienst.split(' ')[0])) { sel.selectedIndex = i; break; }
+      }
+    }
+    // Bouw samenvatting voor omschrijving
+    const samenvatting = chat.geschiedenis
+      .filter(m => m.rol === 'gebruiker')
+      .map(m => m.tekst)
+      .join(' | ');
+    if (samenvatting) f.querySelector('[name=omschrijving]').value = 'Via chatbot: ' + samenvatting;
+
+    antwoordMetDelay('Het formulier is ingevuld met de gegevens uit ons gesprek. Controleer de velden en klik op Versturen!', 0);
+  }, 600);
+
+  // Close chat
+  chatOpen = false;
+  document.getElementById('chat-venster').style.display = 'none';
+}
+
+// ── LEAD NOTIFICATION ──
+function verstuurLeadNotificatie() {
+  if (chat.leadVerstuurd) return;
+  chat.leadVerstuurd = true;
+
+  const samenvatting = chat.geschiedenis.map(m =>
+    (m.rol === 'gebruiker' ? 'Klant: ' : 'Bot: ') + m.tekst
+  ).join('\n');
+
+  const leadData = {
+    naam: chat.naam || 'Onbekend',
+    email: chat.email || '-',
+    telefoon: chat.telefoon || '-',
+    bedrijf: chat.bedrijf || '-',
+    dienst: chat.dienst || '-',
+    locatie: chat.locatie || '-',
+    score: chat.score,
+    gesprek: samenvatting
+  };
+
+  // Send lead via mailto (works everywhere, opens email client as fallback)
+  const onderwerp = encodeURIComponent(`JM Mechanica Lead (score ${chat.score}) — ${leadData.naam}`);
+  const body = encodeURIComponent(
+    `Nieuwe lead via chatbot\n\nNaam: ${leadData.naam}\nEmail: ${leadData.email}\nTelefoon: ${leadData.telefoon}\nBedrijf: ${leadData.bedrijf}\nDienst: ${leadData.dienst}\nLocatie: ${leadData.locatie}\nScore: ${leadData.score}\n\nGesprek:\n${leadData.gesprek}`
+  );
+  // Hidden iframe mailto to avoid page redirect
+  const a = document.createElement('a');
+  a.href = `mailto:info@jmmechanica.nl?subject=${onderwerp}&body=${body}`;
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => a.remove(), 100);
+}
+
+// ── CORE CHAT FUNCTIONS ──
+function voegChatToe(rol, tekst) {
+  const d = document.createElement('div');
+  d.className = 'chat-bericht ' + rol;
+  // Support links in assistant messages
+  if (rol === 'assistent') {
+    d.innerHTML = tekst.replace(/((\+31|0)\s?\d[\s\-]?(\d[\s\-]?){7,8})/g, '<a href="tel:$1" style="color:#f97316;font-weight:700;text-decoration:none;">$1</a>');
+  } else {
+    d.textContent = tekst;
+  }
+  document.getElementById('chat-berichten').appendChild(d);
+  scrollChatOnder();
+}
+function scrollChatOnder() { const e = document.getElementById('chat-berichten'); e.scrollTop = e.scrollHeight; }
+
+function antwoordMetDelay(tekst, delay) {
+  chatBezig = true;
+  document.getElementById('chat-stuur').disabled = true;
+  const typingDelay = 1000 + Math.random() * 800;
+  setTimeout(() => {
+    const t = document.createElement('div');
+    t.className = 'chat-typing';
+    t.id = 'chat-typing-indicator';
+    t.innerHTML = '<span></span><span></span><span></span>';
+    document.getElementById('chat-berichten').appendChild(t);
+    scrollChatOnder();
+    setTimeout(() => {
+      const i = document.getElementById('chat-typing-indicator');
+      if (i) i.remove();
+      voegChatToe('assistent', tekst);
+      chatBezig = false;
+      document.getElementById('chat-stuur').disabled = false;
+      document.getElementById('chat-input').focus();
+    }, typingDelay);
+  }, delay || 0);
+}
+
+function toggleChat() {
+  chatOpen = !chatOpen;
+  document.getElementById('chat-venster').style.display = chatOpen ? 'flex' : 'none';
+  document.getElementById('chat-badge').style.display = 'none';
+  if (chatOpen) {
+    const b = document.getElementById('chat-berichten');
+    if (b.children.length === 0) antwoordMetDelay('Goedendag! Ik ben de assistent van JM Mechanica. Stel gerust uw vraag over onze diensten, tarieven of beschikbaarheid.', 300);
+    else document.getElementById('chat-input').focus();
+  }
+}
+
+function verstuurChat() {
+  if (chatBezig) return;
+  const i = document.getElementById('chat-input');
+  const t = i.value.trim();
+  if (!t) return;
+  i.value = '';
+  i.style.height = 'auto';
+  voegChatToe('gebruiker', t);
+  const onderwerp = detecteerOnderwerp(t);
+  const antwoord = bouwAntwoord(onderwerp, t);
+  antwoordMetDelay(antwoord);
+}
+setTimeout(() => { if (!chatOpen) toggleChat(); }, 8000);
 
 function verstuurFormulier(e){
   e.preventDefault();const form=document.getElementById('contact-form');const data=new FormData(form);
