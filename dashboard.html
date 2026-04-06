@@ -186,6 +186,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         <div class="form-groep"><label>Datum</label><input type="date" id="inp-datum" /></div>
         <div class="form-groep"><label>Start</label><input type="time" id="inp-start" value="07:00" /></div>
         <div class="form-groep"><label>Einde</label><input type="time" id="inp-einde" value="15:30" /></div>
+        <div class="form-groep"><label>Pauze (minuten)</label><input type="number" id="inp-pauze" value="30" min="0" max="120" step="5" /></div>
         <div class="form-groep">
           <label>Opdrachtgever</label>
           <div style="display:flex;gap:8px;">
@@ -480,6 +481,9 @@ function toggleKlok() {
     document.getElementById('klok-status-tekst').textContent = `Ingeklokt sinds ${ts}`;
   } else {
     document.getElementById('inp-einde').value = new Date().toTimeString().slice(0,5);
+    const pauze = prompt('Hoeveel minuten pauze gehad?', '30');
+    if (pauze === null) return; // Geannuleerd
+    document.getElementById('inp-pauze').value = parseInt(pauze) || 0;
     document.getElementById('inklok-btn').textContent = 'Inklokkken';
     document.getElementById('inklok-btn').classList.remove('actief');
     document.getElementById('klok-status-tekst').textContent = 'Niet ingeklokt';
@@ -521,10 +525,11 @@ function renderWeek() {
       lijst.appendChild(div);
     } else {
       du.forEach((u,idx)=>{
-        const uren=uVerschil(u.start,u.einde); totU+=uren; if(idx===0) dGew++;
+        const bruto=uVerschil(u.start,u.einde), pauzeU=(u.pauze||0)/60, uren=bruto-pauzeU; totU+=uren; if(idx===0) dGew++;
+        const pauzeInfo=u.pauze?` <span style="font-size:10px;color:#aaa;">(${u.pauze}m pauze)</span>`:'';
         const div=document.createElement('div');
         div.className=`dag-rij${isVandaag?' vandaag':''}`;
-        div.innerHTML=`<span class="dag-naam">${idx===0?dagKort(dag):''}</span><span class="dag-datum">${idx===0?fmtDNL(dag):''}</span><span class="dag-klant">${u.klant||'—'}</span><span class="dag-uren">${fmtU(uren)}</span><button class="dag-del" onclick="verwijder('${u.id}')">&#10005;</button>`;
+        div.innerHTML=`<span class="dag-naam">${idx===0?dagKort(dag):''}</span><span class="dag-datum">${idx===0?fmtDNL(dag):''}</span><span class="dag-klant">${u.klant||'—'}${pauzeInfo}</span><span class="dag-uren">${fmtU(uren)}</span><button class="dag-del" onclick="verwijder('${u.id}')">&#10005;</button>`;
         lijst.appendChild(div);
       });
     }
@@ -539,9 +544,10 @@ function renderWeek() {
 
 function voegToe() {
   const datum=document.getElementById('inp-datum').value, start=document.getElementById('inp-start').value, einde=document.getElementById('inp-einde').value, klant=document.getElementById('inp-klant').value;
+  const pauze=parseInt(document.getElementById('inp-pauze').value)||0;
   if(!datum||!start||!einde){alert('Vul datum, start en eindtijd in.');return;}
   if(uVerschil(start,einde)<=0){alert('Eindtijd moet na starttijd zijn.');return;}
-  alleUren.push({id:Date.now().toString(),datum,start,einde,klant}); slaOp(); renderWeek();
+  alleUren.push({id:Date.now().toString(),datum,start,einde,pauze,klant}); slaOp(); renderWeek();
   document.getElementById('inp-klant').value='';
   toonPagina('uren', document.querySelectorAll('.nav-item')[1]);
 }
@@ -553,21 +559,21 @@ function kopieerOverzicht() {
   for(let i=0;i<5;i++) {
     const dag=new Date(huidigeMaandag); dag.setDate(dag.getDate()+i);
     const du=alleUren.filter(u=>u.datum===fmtD(dag));
-    if(du.length>0) du.forEach(u=>{txt+=`${dagLang(dag).padEnd(12)}${fmtDNL(dag).padEnd(10)}${(u.klant||'').padEnd(20)}${u.start}–${u.einde}  ${fmtU(uVerschil(u.start,u.einde))}u\n`;});
+    if(du.length>0) du.forEach(u=>{const netto=uVerschil(u.start,u.einde)-(u.pauze||0)/60; const pz=u.pauze?` (${u.pauze}m pauze)`:''; txt+=`${dagLang(dag).padEnd(12)}${fmtDNL(dag).padEnd(10)}${(u.klant||'').padEnd(20)}${u.start}–${u.einde}${pz}  ${fmtU(netto)}u\n`;});
     else txt+=`${dagLang(dag).padEnd(12)}${fmtDNL(dag)}  —\n`;
   }
-  const totU=alleUren.filter(u=>{const d=new Date(u.datum),ma=new Date(huidigeMaandag),vr=new Date(huidigeMaandag);vr.setDate(vr.getDate()+4);return d>=ma&&d<=vr;}).reduce((s,u)=>s+uVerschil(u.start,u.einde),0);
+  const totU=alleUren.filter(u=>{const d=new Date(u.datum),ma=new Date(huidigeMaandag),vr=new Date(huidigeMaandag);vr.setDate(vr.getDate()+4);return d>=ma&&d<=vr;}).reduce((s,u)=>s+uVerschil(u.start,u.einde)-(u.pauze||0)/60,0);
   txt+=`\nTOTAAL: ${fmtU(totU)} uur`;
   navigator.clipboard.writeText(txt).then(()=>alert('Gekopieerd! Plak dit bij het detacheringsbureau.')).catch(()=>alert('Kopiëren mislukt. Probeer opnieuw.'));
 }
 
 function downloadCSV() {
-  const wn=weekNr(huidigeMaandag); let csv='Dag,Datum,Opdrachtgever,Start,Einde,Uren\n';
+  const wn=weekNr(huidigeMaandag); let csv='Dag,Datum,Opdrachtgever,Start,Einde,Pauze (min),Netto uren\n';
   for(let i=0;i<7;i++) {
     const dag=new Date(huidigeMaandag); dag.setDate(dag.getDate()+i);
     const du=alleUren.filter(u=>u.datum===fmtD(dag));
-    if(du.length>0) du.forEach(u=>{csv+=`${dagLang(dag)},${fmtD(dag)},"${u.klant||''}",,${u.start},${u.einde},${fmtU(uVerschil(u.start,u.einde))}\n`;});
-    else csv+=`${dagLang(dag)},${fmtD(dag)},,,,\n`;
+    if(du.length>0) du.forEach(u=>{const netto=uVerschil(u.start,u.einde)-(u.pauze||0)/60; csv+=`${dagLang(dag)},${fmtD(dag)},"${u.klant||''}",${u.start},${u.einde},${u.pauze||0},${fmtU(netto)}\n`;});
+    else csv+=`${dagLang(dag)},${fmtD(dag)},,,,,\n`;
   }
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
   a.download=`JM_week${wn}_uren.csv`; a.click();
