@@ -4,8 +4,8 @@
   "description": "Privé dashboard voor JM Mechanica — uren, rooster en facturen",
   "start_url": "/dashboard.html",
   "display": "standalone",
-  "background_color": "#1a4a2e",
-  "theme_color": "#1a4a2e",
+  "background_color": "#022448",
+  "theme_color": "#022448",
   "orientation": "portrait",
   "icons": [
     {
