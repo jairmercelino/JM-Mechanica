@@ -407,8 +407,8 @@ function uitloggen() { localStorage.removeItem('jm_in'); location.reload(); }
 if (localStorage.getItem('jm_in')==='1') {
   document.getElementById('login-scherm').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
-  init();
-  setTimeout(initLocatie, 500);
+  // Defer init until full script is parsed
+  setTimeout(() => { init(); initLocatie(); }, 0);
 }
 
 // iOS installeer banner
@@ -657,11 +657,12 @@ function laadFacturen() {
 
 function updateFacturenUI() {
   const items=facturen[actKw];
-  document.getElementById('kw-titel').textContent=kwTitels[actKw];
+  const kwTitelEl=document.getElementById('kw-titel');
   const lijst=document.getElementById('factuur-lijst');
   const dlBtn=document.getElementById('dl-btn');
-  dlBtn.textContent=`Download ${actKw} ZIP voor boekhouder`;
-  dlBtn.disabled=items.length===0;
+  if(kwTitelEl) kwTitelEl.textContent=kwTitels[actKw];
+  if(dlBtn) { dlBtn.textContent=`Download ${actKw} ZIP voor boekhouder`; dlBtn.disabled=items.length===0; }
+  if(!lijst) return;
   if(items.length===0) { lijst.innerHTML=`<div class="leeg-state">Nog geen facturen in ${actKw}</div>`; return; }
   lijst.innerHTML=items.map(f=>`
     <div class="factuur-item">
