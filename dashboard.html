@@ -132,6 +132,36 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 #installeer-banner { display: none; background: var(--navy-licht); border: 1.5px solid var(--navy-border); border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
 #installeer-banner p { font-size: 13px; color: var(--navy); font-weight: 600; margin-bottom: 6px; }
 #installeer-banner small { font-size: 12px; color: #666; line-height: 1.5; display: block; }
+
+/* ── LEADS ── */
+.lead-card { background: #fff; border: 1.5px solid #e0e0e0; border-radius: 14px; padding: 1rem; margin-bottom: 10px; display: flex; gap: 12px; align-items: flex-start; transition: border-color 0.2s; }
+.lead-card:hover { border-color: var(--navy-border); }
+.lead-card.geliked { border-color: #22c55e; background: #f0fdf4; }
+.lead-card.afgewezen { opacity: 0.4; display: none; }
+.lead-logo { width: 52px; height: 52px; border-radius: 10px; background: var(--navy-licht); flex-shrink: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.lead-logo img { width: 100%; height: 100%; object-fit: contain; }
+.lead-info { flex: 1; min-width: 0; }
+.lead-naam { font-size: 14px; font-weight: 700; color: #111; margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lead-snippet { font-size: 12px; color: #666; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 6px; }
+.lead-url { font-size: 11px; color: var(--navy-mid); text-decoration: none; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lead-url:hover { text-decoration: underline; }
+.lead-acties { display: flex; gap: 6px; flex-shrink: 0; align-self: center; }
+.lead-btn { width: 38px; height: 38px; border-radius: 10px; border: 1.5px solid #e0e0e0; background: #fff; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+.lead-btn.like:hover, .lead-btn.like.actief { background: #dcfce7; border-color: #22c55e; }
+.lead-btn.dislike:hover, .lead-btn.dislike.actief { background: #fef2f2; border-color: #ef4444; }
+.lead-agent-status { background: var(--navy); border-radius: 14px; padding: 1.25rem; text-align: center; margin-bottom: 1rem; }
+.lead-agent-tekst { font-size: 12px; color: #7ba3cc; margin-bottom: 10px; }
+.lead-agent-btn { background: var(--oranje); color: #fff; border: none; padding: 14px 32px; border-radius: 99px; font-size: 15px; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.05em; }
+.lead-agent-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.lead-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 1rem; }
+.lead-filter-tabs { display: flex; gap: 6px; margin-bottom: 1rem; flex-wrap: wrap; }
+.lead-filter-tab { background: var(--navy-licht); color: var(--navy); border: 1.5px solid var(--navy-border); padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.lead-filter-tab.active { background: var(--oranje); color: #fff; border-color: var(--oranje); }
+.lead-setup { background: var(--navy-licht); border: 1.5px solid var(--navy-border); border-radius: 14px; padding: 1.25rem; margin-bottom: 1rem; }
+.lead-setup p { font-size: 13px; color: var(--navy); font-weight: 600; margin-bottom: 8px; }
+.lead-setup ol { font-size: 12px; color: #555; line-height: 1.8; padding-left: 1.2rem; margin-bottom: 12px; }
+.lead-setup code { background: rgba(0,0,0,0.06); padding: 2px 6px; border-radius: 4px; font-size: 11px; }
+.toon-afgewezen-btn { background: none; border: 1px dashed #ccc; color: #aaa; font-size: 12px; padding: 10px; width: 100%; border-radius: 10px; cursor: pointer; font-family: inherit; margin-top: 4px; }
 </style>
 </head>
 <body>
@@ -358,6 +388,80 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       </div>
     </div>
 
+    <!-- LEADS PAGINA -->
+    <div class="pagina" id="pagina-leads">
+      <div style="height:1rem;"></div>
+
+      <!-- SETUP (verborgen als API geconfigureerd) -->
+      <div class="lead-setup" id="lead-setup">
+        <p>🔑 Google Custom Search instellen</p>
+        <ol>
+          <li>Ga naar <strong>console.cloud.google.com</strong> → API's → Custom Search JSON API inschakelen</li>
+          <li>Maak een API Key aan onder Inloggegevens</li>
+          <li>Ga naar <strong>programmablesearchengine.google.com</strong> → Maak nieuwe zoekmachine (zoek op hele web)</li>
+          <li>Kopieer de Search Engine ID (cx)</li>
+        </ol>
+        <div class="form-groep"><label>API Key</label><input type="text" id="lead-api-key" placeholder="AIza..." /></div>
+        <div class="form-groep"><label>Search Engine ID (cx)</label><input type="text" id="lead-cse-id" placeholder="a1b2c3..." /></div>
+        <button class="actie-btn" onclick="slaLeadConfigOp()">Opslaan & Activeren</button>
+        <p style="font-size:11px;color:#888;margin-top:10px;font-weight:400;">Gratis: 100 zoekopdrachten per dag. Je kunt ook zonder API key handmatig leads toevoegen.</p>
+      </div>
+
+      <!-- AGENT CONTROLS -->
+      <div class="lead-agent-status">
+        <div class="lead-agent-tekst" id="lead-agent-tekst">Agent klaar om te zoeken</div>
+        <button class="lead-agent-btn" id="lead-zoek-btn" onclick="leadAgentZoek()">🔍 Zoek klanten</button>
+        <div style="font-size:11px;color:#7ba3cc;margin-top:10px;" id="lead-queries-resterend"></div>
+      </div>
+
+      <!-- METRICS -->
+      <div class="lead-metrics">
+        <div class="metric"><div class="metric-label">Gevonden</div><div class="metric-value" id="lm-gevonden">0</div></div>
+        <div class="metric"><div class="metric-label">Interessant</div><div class="metric-value" id="lm-liked" style="color:#22c55e;">0</div></div>
+        <div class="metric"><div class="metric-label">Agent score</div><div class="metric-value" id="lm-score">0</div></div>
+      </div>
+
+      <!-- FILTER TABS -->
+      <div class="lead-filter-tabs">
+        <button class="lead-filter-tab active" onclick="filterLeads('alle',this)">Alle</button>
+        <button class="lead-filter-tab" onclick="filterLeads('liked',this)">⭐ Interessant</button>
+        <button class="lead-filter-tab" onclick="filterLeads('nieuw',this)">Nieuw</button>
+        <button class="lead-filter-tab" onclick="filterLeads('afgewezen',this)">Verborgen</button>
+      </div>
+
+      <!-- LEAD LIJST -->
+      <div id="lead-lijst">
+        <div class="leeg-state">Nog geen leads. Tik op "Zoek klanten" om te starten.</div>
+      </div>
+
+      <!-- HANDMATIG TOEVOEGEN -->
+      <div class="card" style="margin-top:1rem;">
+        <div class="card-titel">+ Handmatig lead toevoegen</div>
+        <div class="form-groep"><label>Bedrijfsnaam</label><input type="text" id="lead-hand-naam" placeholder="Bedrijf B.V." /></div>
+        <div class="form-groep"><label>Website URL</label><input type="url" id="lead-hand-url" placeholder="https://..." /></div>
+        <div class="form-groep"><label>Omschrijving (optioneel)</label><input type="text" id="lead-hand-desc" placeholder="Wat doen ze?" /></div>
+        <button class="actie-btn" onclick="voegHandmatigLeadToe()">+ Toevoegen</button>
+      </div>
+
+      <!-- SLIM ZOEKEN ZONDER API -->
+      <div class="card">
+        <div class="card-titel">🔍 Slim zoeken via Google</div>
+        <p style="font-size:12px;color:#666;margin-bottom:10px;line-height:1.5;">Open een slimme zoekopdracht in Google. De agent kiest de beste zoekterm op basis van je voorkeuren.</p>
+        <button class="actie-btn grijs" onclick="openSlimGoogleZoek()" style="font-size:13px;">🌐 Open in Google</button>
+      </div>
+
+      <!-- AGENT INSTELLINGEN -->
+      <div class="card">
+        <div class="card-titel">⚙️ Agent instellingen</div>
+        <div class="form-groep">
+          <label>Zoek focus (optioneel)</label>
+          <input type="text" id="lead-extra-keyword" placeholder="bv. koelinstallatie, bakkerij..." />
+          <p style="font-size:11px;color:#888;margin-top:4px;">Extra keyword dat de agent meeneemt in zoekopdrachten</p>
+        </div>
+        <button class="actie-btn grijs" onclick="resetLeadAgent()" style="font-size:12px;">🗑️ Agent geheugen wissen</button>
+      </div>
+    </div>
+
   </div>
 
   <div class="bottom-nav">
@@ -376,6 +480,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <button class="nav-item" onclick="toonPagina('facturen',this)">
       <span class="nav-icon">&#128196;</span>
       <span>Facturen</span>
+    </button>
+    <button class="nav-item" onclick="toonPagina('leads',this)">
+      <span class="nav-icon">&#127981;</span>
+      <span>Leads</span>
     </button>
   </div>
 </div>
@@ -427,6 +535,7 @@ function toonPagina(naam, btn) {
   if (naam==='uren') renderWeek();
   if (naam==='facturen') laadKostenAutomatisch();
   if (naam==='rooster') renderKalender();
+  if (naam==='leads') initLeads();
 }
 
 // ── KLOK ──
@@ -1348,6 +1457,373 @@ document.addEventListener('visibilitychange', () => {
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(() => {});
 }
+
+// ══════════════════════════════════════════════
+// ── LEAD AGENT ──
+// ══════════════════════════════════════════════
+
+const LEAD_QUERIES = [
+  // Industrie & productie
+  '"mechanisch onderhoud" bedrijf nederland',
+  '"industrieel onderhoud" zzp inhuur monteur',
+  '"storing productielijn" onderhoud',
+  '"machinepark" onderhoud uitbesteden',
+  '"preventief onderhoud" machines bedrijf',
+  '"technisch onderhoud" fabriek nederland',
+  // Voeding & zuivel
+  '"voedingsindustrie" mechanisch onderhoud',
+  '"zuivelfabriek" onderhoud monteur',
+  '"slachterij" technisch onderhoud',
+  '"bakkerij" machine onderhoud industrieel',
+  // MKB & klein
+  '"mkb" technisch onderhoud uitbesteden',
+  '"installatiebedrijf" monteur gezocht',
+  '"klein bedrijf" machine reparatie',
+  '"productie bedrijf" onderhoud zzp',
+  // Logistiek & overig
+  '"koelinstallatie" onderhoud monteur',
+  '"landbouwmachines" reparatie onderhoud',
+  '"warehouse" technisch onderhoud nederland',
+  '"drukkerij" machine onderhoud',
+  '"metaalbedrijf" onderhoud monteur',
+  '"kunststof" productie onderhoud',
+  '"farmaceutisch" technisch onderhoud',
+  '"brouwerij" machine onderhoud',
+  '"houtverwerking" onderhoud machines',
+  '"scheepswerf" mechanisch onderhoud',
+];
+
+// Lead Agent state
+let leadConfig = JSON.parse(localStorage.getItem('jm_lead_config') || JSON.stringify({
+  apiKey: 'AIzaSyAM48uGnbdjMn4unW6R4EVC8ueDcEDHLCM',
+  cseId: '55ca75ab176604574'
+}));
+let leadData   = JSON.parse(localStorage.getItem('jm_leads') || '[]');
+let leadAgent  = JSON.parse(localStorage.getItem('jm_lead_agent') || JSON.stringify({
+  queryScores: {},      // { query: score }
+  likedKeywords: [],    // veelvoorkomende woorden uit gelikete leads
+  blockedDomains: [],   // afgewezen domeinen
+  zoekIndex: 0,         // huidige positie in query lijst
+  totaalZoekacties: 0
+}));
+
+function slaLeadConfigOp() {
+  const key = document.getElementById('lead-api-key').value.trim();
+  const cx  = document.getElementById('lead-cse-id').value.trim();
+  if (!key || !cx) { alert('Vul zowel API Key als Search Engine ID in.'); return; }
+  leadConfig = { apiKey: key, cseId: cx };
+  localStorage.setItem('jm_lead_config', JSON.stringify(leadConfig));
+  document.getElementById('lead-setup').style.display = 'none';
+  alert('API configuratie opgeslagen!');
+}
+
+function initLeads() {
+  // Toon/verberg setup
+  if (leadConfig.apiKey && leadConfig.cseId) {
+    document.getElementById('lead-setup').style.display = 'none';
+  } else {
+    document.getElementById('lead-api-key').value = leadConfig.apiKey || '';
+    document.getElementById('lead-cse-id').value  = leadConfig.cseId || '';
+  }
+  renderLeads('alle');
+  updateLeadMetrics();
+}
+
+// ── Slim query kiezen ──
+function kiesBesteQuery() {
+  const extra = (document.getElementById('lead-extra-keyword') || {}).value || '';
+  const scores = leadAgent.queryScores;
+
+  // Bouw lijst met alle queries + gegenereerde queries
+  let queryPool = [...LEAD_QUERIES];
+
+  // Voeg gegenereerde queries toe op basis van gelikete keywords
+  if (leadAgent.likedKeywords.length >= 3) {
+    const topKeywords = telKeywords(leadAgent.likedKeywords).slice(0, 5);
+    topKeywords.forEach(kw => {
+      queryPool.push(`"${kw}" onderhoud monteur nederland`);
+      queryPool.push(`"${kw}" technisch onderhoud bedrijf`);
+    });
+  }
+
+  // Sorteer op score (hoogste eerst), onbekende queries krijgen score 0
+  queryPool.sort((a, b) => (scores[b] || 0) - (scores[a] || 0));
+
+  // Kies top query die niet recent is gebruikt, of roteer
+  let query = queryPool[leadAgent.zoekIndex % queryPool.length];
+  leadAgent.zoekIndex++;
+
+  // Voeg extra keyword toe als opgegeven
+  if (extra) query += ' ' + extra;
+
+  return query;
+}
+
+function telKeywords(arr) {
+  const freq = {};
+  arr.forEach(w => { freq[w] = (freq[w] || 0) + 1; });
+  return Object.entries(freq)
+    .sort((a, b) => b[1] - a[1])
+    .map(e => e[0]);
+}
+
+// ── Google Custom Search API ──
+async function zoekViaCSE(query) {
+  const url = `https://www.googleapis.com/customsearch/v1?key=${leadConfig.apiKey}&cx=${leadConfig.cseId}&q=${encodeURIComponent(query)}&num=10&lr=lang_nl&gl=nl`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || `API fout ${res.status}`);
+  }
+  const data = await res.json();
+  return (data.items || []).map(item => ({
+    titel: item.title || '',
+    snippet: item.snippet || '',
+    url: item.link || '',
+    domein: nieuwDomein(item.link || ''),
+    afbeelding: item.pagemap?.cse_image?.[0]?.src || null,
+  }));
+}
+
+function nieuwDomein(url) {
+  try { return new URL(url).hostname.replace('www.', ''); } catch { return ''; }
+}
+
+// ── Hoofd zoekfunctie ──
+async function leadAgentZoek() {
+  const btn = document.getElementById('lead-zoek-btn');
+  const tekst = document.getElementById('lead-agent-tekst');
+
+  if (!leadConfig.apiKey || !leadConfig.cseId) {
+    alert('Stel eerst je Google Custom Search API in (bovenaan de pagina).');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Zoeken...';
+  tekst.textContent = 'Agent zoekt potentiële klanten...';
+
+  try {
+    const query = kiesBesteQuery();
+    tekst.textContent = `Zoekt: "${query.substring(0, 50)}..."`;
+
+    const resultaten = await zoekViaCSE(query);
+    let nieuw = 0;
+
+    resultaten.forEach(r => {
+      // Skip geblokkeerde domeinen
+      if (leadAgent.blockedDomains.includes(r.domein)) return;
+      // Skip duplicaten
+      if (leadData.some(l => l.domein === r.domein)) return;
+
+      leadData.push({
+        id: Date.now().toString() + Math.random().toString(36).slice(2, 6),
+        titel: r.titel,
+        snippet: r.snippet,
+        url: r.url,
+        domein: r.domein,
+        afbeelding: r.afbeelding,
+        bronQuery: query,
+        status: 'nieuw',    // nieuw | liked | afgewezen
+        datum: new Date().toISOString().split('T')[0],
+      });
+      nieuw++;
+    });
+
+    leadAgent.totaalZoekacties++;
+    slaLeadData();
+
+    tekst.textContent = `${nieuw} nieuwe leads gevonden! (${leadData.length} totaal)`;
+    btn.textContent = '🔍 Zoek meer klanten';
+    btn.disabled = false;
+
+    renderLeads(huidigeLeadFilter);
+    updateLeadMetrics();
+    updateQueryResterend();
+
+  } catch (e) {
+    tekst.textContent = `Fout: ${e.message}`;
+    btn.textContent = '🔍 Opnieuw proberen';
+    btn.disabled = false;
+  }
+}
+
+// ── Like / Dislike ──
+function likeLead(id) {
+  const lead = leadData.find(l => l.id === id);
+  if (!lead) return;
+
+  if (lead.status === 'liked') {
+    lead.status = 'nieuw'; // Toggle uit
+  } else {
+    lead.status = 'liked';
+    // Leer van deze like
+    const q = lead.bronQuery;
+    if (q) leadAgent.queryScores[q] = (leadAgent.queryScores[q] || 0) + 1;
+    // Extraheer keywords uit titel
+    const woorden = lead.titel.toLowerCase()
+      .replace(/[^a-zà-ÿ\s]/g, '').split(/\s+/)
+      .filter(w => w.length > 3 && !stopwoorden.includes(w));
+    leadAgent.likedKeywords.push(...woorden);
+  }
+  slaLeadData();
+  renderLeads(huidigeLeadFilter);
+  updateLeadMetrics();
+}
+
+function dislikeLead(id) {
+  const lead = leadData.find(l => l.id === id);
+  if (!lead) return;
+
+  if (lead.status === 'afgewezen') {
+    lead.status = 'nieuw'; // Toggle uit
+  } else {
+    lead.status = 'afgewezen';
+    // Leer: verlaag query score
+    const q = lead.bronQuery;
+    if (q) leadAgent.queryScores[q] = (leadAgent.queryScores[q] || 0) - 1;
+    // Blokkeer domein niet meteen (alleen bij meerdere dislikes)
+    const afgewezenVanDomein = leadData.filter(l => l.domein === lead.domein && l.status === 'afgewezen').length;
+    if (afgewezenVanDomein >= 2) {
+      leadAgent.blockedDomains.push(lead.domein);
+    }
+  }
+  slaLeadData();
+  renderLeads(huidigeLeadFilter);
+  updateLeadMetrics();
+}
+
+const stopwoorden = ['deze','voor','maar','niet','worden','hebben','zijn','naar','over','door','alle','meer','ook','kan','aan','het','een','van','dat','met','nog','werd','wordt','hun','haar','ons','onze','uit','bij','als','dan','wat','wie','hoe','onderwerp','bedrijf','bedrijven','onderhoud','technisch','mechanisch','nederland'];
+
+// ── Render ──
+let huidigeLeadFilter = 'alle';
+
+function filterLeads(filter, btn) {
+  huidigeLeadFilter = filter;
+  document.querySelectorAll('.lead-filter-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderLeads(filter);
+}
+
+function renderLeads(filter) {
+  const lijst = document.getElementById('lead-lijst');
+  let items = [...leadData];
+
+  if (filter === 'liked')     items = items.filter(l => l.status === 'liked');
+  if (filter === 'nieuw')     items = items.filter(l => l.status === 'nieuw');
+  if (filter === 'afgewezen') items = items.filter(l => l.status === 'afgewezen');
+  if (filter === 'alle')      items = items.filter(l => l.status !== 'afgewezen');
+
+  if (items.length === 0) {
+    const msg = filter === 'alle' ? 'Nog geen leads. Tik op "Zoek klanten" om te starten.'
+              : filter === 'liked' ? 'Nog geen leads als interessant gemarkeerd.'
+              : filter === 'afgewezen' ? 'Geen verborgen leads.'
+              : 'Geen nieuwe leads.';
+    lijst.innerHTML = `<div class="leeg-state">${msg}</div>`;
+    return;
+  }
+
+  // Liked bovenaan, dan op datum (nieuwste eerst)
+  items.sort((a, b) => {
+    if (a.status === 'liked' && b.status !== 'liked') return -1;
+    if (b.status === 'liked' && a.status !== 'liked') return 1;
+    return (b.datum || '').localeCompare(a.datum || '');
+  });
+
+  lijst.innerHTML = items.map(l => {
+    const faviconUrl = `https://www.google.com/s2/favicons?domain=${l.domein}&sz=64`;
+    const imgSrc = l.afbeelding || faviconUrl;
+    const isLiked = l.status === 'liked';
+    const isAfgewezen = l.status === 'afgewezen';
+    return `
+    <div class="lead-card${isLiked ? ' geliked' : ''}${isAfgewezen ? ' afgewezen' : ''}">
+      <div class="lead-logo">
+        <img src="${faviconUrl}" alt="" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22><rect fill=%22%23e8f0fa%22 width=%2240%22 height=%2240%22/><text x=%2220%22 y=%2226%22 text-anchor=%22middle%22 font-size=%2218%22>🏭</text></svg>'" />
+      </div>
+      <div class="lead-info">
+        <div class="lead-naam">${escHTML(l.titel)}</div>
+        <div class="lead-snippet">${escHTML(l.snippet)}</div>
+        <a class="lead-url" href="${escHTML(l.url)}" target="_blank" rel="noopener">🔗 ${escHTML(l.domein)}</a>
+      </div>
+      <div class="lead-acties">
+        <button class="lead-btn like${isLiked ? ' actief' : ''}" onclick="event.stopPropagation();likeLead('${l.id}')" title="Interessant">⭐</button>
+        <button class="lead-btn dislike${isAfgewezen ? ' actief' : ''}" onclick="event.stopPropagation();dislikeLead('${l.id}')" title="Niet relevant">❌</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function escHTML(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function updateLeadMetrics() {
+  document.getElementById('lm-gevonden').textContent = leadData.length;
+  document.getElementById('lm-liked').textContent = leadData.filter(l => l.status === 'liked').length;
+  // Agent score = gemiddelde query score
+  const scores = Object.values(leadAgent.queryScores);
+  const gem = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length * 10) / 10 : 0;
+  document.getElementById('lm-score').textContent = gem > 0 ? `+${gem}` : gem;
+}
+
+function updateQueryResterend() {
+  const el = document.getElementById('lead-queries-resterend');
+  if (el) el.textContent = `Zoekacties vandaag: ${leadAgent.totaalZoekacties} / 100`;
+}
+
+// ── Handmatig toevoegen ──
+function voegHandmatigLeadToe() {
+  const naam = document.getElementById('lead-hand-naam').value.trim();
+  const url  = document.getElementById('lead-hand-url').value.trim();
+  const desc = document.getElementById('lead-hand-desc').value.trim();
+  if (!naam) { alert('Vul een bedrijfsnaam in.'); return; }
+
+  let volledigeUrl = url;
+  if (url && !url.startsWith('http')) volledigeUrl = 'https://' + url;
+
+  leadData.push({
+    id: Date.now().toString() + Math.random().toString(36).slice(2, 6),
+    titel: naam,
+    snippet: desc || '',
+    url: volledigeUrl || '',
+    domein: volledigeUrl ? nieuwDomein(volledigeUrl) : '',
+    afbeelding: null,
+    bronQuery: 'handmatig',
+    status: 'nieuw',
+    datum: new Date().toISOString().split('T')[0],
+  });
+
+  slaLeadData();
+  renderLeads(huidigeLeadFilter);
+  updateLeadMetrics();
+
+  document.getElementById('lead-hand-naam').value = '';
+  document.getElementById('lead-hand-url').value = '';
+  document.getElementById('lead-hand-desc').value = '';
+}
+
+// ── Slim Google zoeken (fallback) ──
+function openSlimGoogleZoek() {
+  const query = kiesBesteQuery();
+  window.open(`https://www.google.nl/search?q=${encodeURIComponent(query)}`, '_blank');
+}
+
+// ── Reset ──
+function resetLeadAgent() {
+  if (!confirm('Weet je zeker dat je het agent geheugen wilt wissen? Leads blijven bewaard.')) return;
+  leadAgent = { queryScores: {}, likedKeywords: [], blockedDomains: [], zoekIndex: 0, totaalZoekacties: 0 };
+  localStorage.setItem('jm_lead_agent', JSON.stringify(leadAgent));
+  updateLeadMetrics();
+  alert('Agent geheugen gewist. De agent begint opnieuw met leren.');
+}
+
+// ── Opslaan ──
+function slaLeadData() {
+  localStorage.setItem('jm_leads', JSON.stringify(leadData));
+  localStorage.setItem('jm_lead_agent', JSON.stringify(leadAgent));
+}
+
 </script>
 </body>
 </html>
