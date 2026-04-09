@@ -220,7 +220,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         <div class="form-groep">
           <label>Opdrachtgever</label>
           <div style="display:flex;gap:8px;">
-            <input type="text" id="inp-klant" placeholder="Typ of selecteer..." autocomplete="off" style="flex:1;" oninput="filterOpdrachtgevers(this.value)" />
+            <input type="text" id="inp-klant" placeholder="Typ of selecteer..." autocomplete="off" style="flex:1;" oninput="filterOpdrachtgevers(this.value)" onfocus="renderOpdrachtgevers(this.value)" />
             <button onclick="slaOpdrachtgeverOp()" style="background:var(--oranje);color:#fff;border:none;border-radius:10px;padding:0 12px;font-size:18px;cursor:pointer;">+</button>
           </div>
           <div id="opdrachtgever-lijst" style="margin-top:6px;"></div>
@@ -560,6 +560,7 @@ function init() {
   herstelKlok();
   startKlokDisplay();
   renderWeek();
+  renderOpdrachtgevers('');
   renderRooster();
   renderKalender();
   updateRoosterSelect();
@@ -638,7 +639,7 @@ function renderWeek() {
         const pauzeInfo=u.pauze?` <span style="font-size:10px;color:#aaa;">(${u.pauze}m pauze)</span>`:'';
         const div=document.createElement('div');
         div.className=`dag-rij${isVandaag?' vandaag':''}`;
-        div.innerHTML=`<span class="dag-naam">${idx===0?dagKort(dag):''}</span><span class="dag-datum">${idx===0?fmtDNL(dag):''}</span><span class="dag-klant">${u.klant||'—'}${pauzeInfo}</span><span class="dag-uren">${fmtU(uren)}</span><button class="dag-del" onclick="verwijder('${u.id}')">&#10005;</button>`;
+        div.innerHTML=`<span class="dag-naam">${idx===0?dagKort(dag):''}</span><span class="dag-datum">${idx===0?fmtDNL(dag):''}</span><span class="dag-klant">${u.start}–${u.einde} ${u.klant||'—'}${pauzeInfo}</span><span class="dag-uren">${fmtU(uren)}</span><button class="dag-del" onclick="verwijder('${u.id}')">&#10005;</button>`;
         lijst.appendChild(div);
       });
     }
@@ -1224,21 +1225,26 @@ function filterOpdrachtgevers(zoek) {
 function renderOpdrachtgevers(zoek) {
   const lijst = document.getElementById('opdrachtgever-lijst');
   if (!lijst) return;
-  const gefilterd = opdrachtgevers.filter(o => o.toLowerCase().includes(zoek.toLowerCase()));
-  if (!zoek && gefilterd.length === 0) { lijst.innerHTML = ''; return; }
-  lijst.innerHTML = gefilterd.map(o => `
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--navy-licht);border-radius:8px;margin-bottom:4px;">
-      <span style="font-size:13px;font-weight:600;color:var(--navy);cursor:pointer;" onclick="kiesOpdrachtgever('${o}')">${o}</span>
-      <button onclick="verwijderOpdrachtgever('${o}')" style="background:none;border:none;color:#aaa;font-size:16px;cursor:pointer;">✕</button>
-    </div>`).join('');
+  const gefilterd = opdrachtgevers.filter(o => o.toLowerCase().includes((zoek||'').toLowerCase()));
+  if (gefilterd.length === 0) { lijst.innerHTML = ''; return; }
+  lijst.innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:6px;">' + gefilterd.map(o => {
+    const escaped = o.replace(/'/g, "\\'");
+    return `<button type="button" onclick="kiesOpdrachtgever('${escaped}')"
+      ontouchstart="this._lp=setTimeout(()=>{this._held=true;verwijderOpdrachtgever('${escaped}')},600)"
+      ontouchend="clearTimeout(this._lp);this._held=false"
+      ontouchmove="clearTimeout(this._lp)"
+      oncontextmenu="event.preventDefault();verwijderOpdrachtgever('${escaped}')"
+      style="background:var(--navy-licht);border:1.5px solid var(--navy-border);border-radius:99px;padding:8px 14px;font-size:13px;font-weight:600;color:var(--navy);cursor:pointer;font-family:inherit;-webkit-user-select:none;user-select:none;">${o}</button>`;
+  }).join('') + '</div>';
 }
 
 function kiesOpdrachtgever(naam) {
   document.getElementById('inp-klant').value = naam;
-  document.getElementById('opdrachtgever-lijst').innerHTML = '';
+  renderOpdrachtgevers('');
 }
 
 function verwijderOpdrachtgever(naam) {
+  if (!confirm(`'${naam}' verwijderen als opdrachtgever?`)) return;
   opdrachtgevers = opdrachtgevers.filter(o => o !== naam);
   localStorage.setItem('jm_opdrachtgevers', JSON.stringify(opdrachtgevers));
   renderOpdrachtgevers('');
