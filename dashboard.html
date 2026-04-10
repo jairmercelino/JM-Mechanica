@@ -1931,10 +1931,8 @@ function openInEmail(id) {
   // Kopieer alles naar klembord
   const volledig = `Aan: ${to}\nOnderwerp: ${subject}\n\n${body}`;
   navigator.clipboard.writeText(volledig).then(() => {
-    alert('E-mail gekopieerd! Plak in je Hostnet webmail.\n\nAan: ' + (to || '(vul e-mail in bij contactgegevens)'));
+    alert('E-mail gekopieerd naar klembord!\nOpen je webmail en plak de tekst.');
   });
-  // Open Hostnet webmail
-  window.open('https://appsuite.hostnet.nl/appsuite/#!!&app=io.ox/mail&folder=default0/INBOX', '_blank');
 }
 
 function markeerVerstuurd(id) {
@@ -2050,7 +2048,7 @@ function renderLeads(filter) {
           <p id="le-body-${l.id}">${escHTML(body)}</p>
         </div>
         <div class="lead-email-acties">
-          <button class="primary" onclick="openInEmail('${l.id}')">📧 Kopieer & open webmail</button>
+          <button class="primary" onclick="openInEmail('${l.id}')">📧 Kopieer e-mail</button>
           <button onclick="kopieerEmail('${l.id}')">📋 Kopieer</button>
           <button onclick="markeerVerstuurd('${l.id}')">✅ Verstuurd</button>
           ${isFollowup ? `<button onclick="toonEmail('${l.id}',true)">🔄 Follow-up mail</button>` : ''}
