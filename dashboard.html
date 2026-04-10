@@ -1871,63 +1871,87 @@ function slaContactOp(id) {
 }
 
 // ── E-mail template genereren ──
-function genereerEmail(lead) {
-  const bedrijf = lead.titel.replace(/\s*[-–|].*/g, '').trim();
-  const beschikbaar = getBeschikbaarheidTekst();
-  const contactNaam = lead.contactNaam ? `Beste ${lead.contactNaam}` : 'Geachte heer/mevrouw';
+function genereerEmail(lead, isFollowUp) {
+  const bedrijf = lead.titel.replace(/\s*[-–|:].*/g, '').replace(/\s+(BV|B\.V\.|NV|VOF)\.?$/i, '').trim();
+  const contactNaam = lead.contactNaam ? `Beste ${lead.contactNaam}` : 'Goedendag';
 
-  const subject = `Mechanisch onderhoud — ${bedrijf}`;
-  const body = `${contactNaam},
+  if (isFollowUp) {
+    const beschikbaar = getBeschikbaarheidTekst();
+    const subject = `Re: Samenwerking ${bedrijf}`;
+    const body = `${contactNaam},
 
-Mijn naam is Jair Mercelino, eigenaar van JM Mechanica. Ik ben een allround monteur gespecialiseerd in mechanisch onderhoud, storingen en revisiewerkzaamheden in de industrie.
+Vorige week stuurde ik u een bericht over mogelijke samenwerking. Ik snap dat het druk is, daarom nog even kort.
 
-Ik zag dat ${bedrijf} actief is in de regio en ik denk dat ik van waarde kan zijn voor uw technische afdeling. Of het nu gaat om preventief onderhoud, het oplossen van storingen of het ondersteunen van uw technische dienst — ik sta klaar.
+Mocht u behoefte hebben aan extra handen voor onderhoud of storingen, dan spring ik graag bij. ${beschikbaar}
 
-Wat ik bied:
-- Mechanisch onderhoud & revisie
-- Storingsdiagnose & reparatie
-- Flexibele inzet als ZZP'er (kort of lang project)
+Mag ik u bellen om de mogelijkheden te bespreken?
 
-${beschikbaar}
-
-Ik kom graag vrijblijvend langs voor een kennismaking. Heeft u interesse?
-
-Met vriendelijke groet,
+Groet,
 Jair Mercelino
 JM Mechanica
-Tel: 06-XXXXXXXX
-Web: jmmechanica.nl`;
+info@jmmechanica.nl
+jmmechanica.nl`;
+    return { subject, body };
+  }
+
+  const subject = `Samenwerking ${bedrijf}`;
+  const body = `${contactNaam},
+
+Ik ben Jair Mercelino van JM Mechanica. Als ZZP monteur werk ik voor verschillende bedrijven in de regio met mechanisch onderhoud, storingen en revisie.
+
+Ik kwam ${bedrijf} tegen en dacht: misschien kan ik iets voor jullie betekenen. Denk aan het bijspringen bij de technische dienst, een storingsklus of periodiek onderhoud.
+
+Meer info op jmmechanica.nl — of ik hoor graag of er een mogelijkheid is om kennis te maken.
+
+Groet,
+Jair Mercelino
+JM Mechanica
+info@jmmechanica.nl
+jmmechanica.nl`;
 
   return { subject, body };
 }
 
-function toonEmail(id) {
+function toonEmail(id, isFollowUp) {
   const lead = leadData.find(l => l.id === id);
   if (!lead) return;
-  const { subject, body } = genereerEmail(lead);
+  const { subject, body } = genereerEmail(lead, isFollowUp);
   const emailEl = document.getElementById('le-body-' + id);
   const subjectEl = document.getElementById('le-subject-' + id);
   if (emailEl) emailEl.textContent = body;
   if (subjectEl) subjectEl.textContent = subject;
 }
 
-function openInGmail(id) {
+function openInEmail(id) {
   const lead = leadData.find(l => l.id === id);
   if (!lead) return;
-  const { subject, body } = genereerEmail(lead);
+  const isFollowUp = lead.status === 'followup' || lead.status === 'benaderd';
+  const { subject, body } = genereerEmail(lead, isFollowUp);
   const to = lead.contactEmail || '';
-  const url = `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(to)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  // mailto opent de standaard mailclient (info@jmmechanica.nl als afzender)
+  const url = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   window.open(url, '_blank');
-  // Zet status op benaderd
+}
+
+function markeerVerstuurd(id) {
+  const lead = leadData.find(l => l.id === id);
+  if (!lead) return;
   if (lead.status === 'liked' || lead.status === 'nieuw') {
     zetLeadStatus(id, 'benaderd');
+  } else if (lead.status === 'followup') {
+    lead.datumBenaderd = new Date().toISOString().split('T')[0];
+    lead.status = 'benaderd';
+    slaLeadData();
+    renderLeads(huidigeLeadFilter);
+    updateLeadMetrics();
   }
 }
 
 function kopieerEmail(id) {
   const lead = leadData.find(l => l.id === id);
   if (!lead) return;
-  const { subject, body } = genereerEmail(lead);
+  const isFollowUp = lead.status === 'followup' || lead.status === 'benaderd';
+  const { subject, body } = genereerEmail(lead, isFollowUp);
   navigator.clipboard.writeText(`Onderwerp: ${subject}\n\n${body}`).then(() => {
     alert('E-mail gekopieerd naar klembord!');
   });
@@ -1977,8 +2001,8 @@ function renderLeads(filter) {
     const isAfgewezen = l.status === 'afgewezen';
     const statusClass = l.status || 'nieuw';
     const statusLabel = PIPELINE_LABELS[l.status] || 'Nieuw';
-    const { subject, body } = genereerEmail(l);
     const isFollowup = l.status === 'followup';
+    const { subject, body } = genereerEmail(l, isFollowup);
 
     return `
     <div class="lead-card ${statusClass}${isAfgewezen ? ' afgewezen' : ''}" id="lead-${l.id}" onclick="toggleLeadDetail('${l.id}')">
@@ -2022,9 +2046,10 @@ function renderLeads(filter) {
           <p id="le-body-${l.id}">${escHTML(body)}</p>
         </div>
         <div class="lead-email-acties">
-          <button class="primary" onclick="openInGmail('${l.id}')">📧 Open in Gmail</button>
+          <button class="primary" onclick="openInEmail('${l.id}')">📧 Open in mailclient</button>
           <button onclick="kopieerEmail('${l.id}')">📋 Kopieer</button>
-          <button onclick="toonEmail('${l.id}')">🔄 Vernieuw template</button>
+          <button onclick="markeerVerstuurd('${l.id}')">✅ Verstuurd</button>
+          ${isFollowup ? `<button onclick="toonEmail('${l.id}',true)">🔄 Follow-up mail</button>` : ''}
         </div>
 
         <!-- Notities -->
