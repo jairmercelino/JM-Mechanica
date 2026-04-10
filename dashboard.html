@@ -1462,6 +1462,13 @@ document.addEventListener('visibilitychange', () => {
 // Service Worker registreren voor PWA + push notificaties
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(() => {});
+  // Ontvang inklok-actie vanuit SW notificatie-klik
+  navigator.serviceWorker.addEventListener('message', e => {
+    if (e.data && e.data.type === 'inklok-actie') {
+      if (e.data.actie === 'in' && !inklokTijd) toggleKlok();
+      if (e.data.actie === 'uit' && inklokTijd) toggleKlok();
+    }
+  });
 }
 
 // ══════════════════════════════════════════════

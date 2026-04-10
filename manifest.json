@@ -3,10 +3,13 @@
   "short_name": "JM Mechanica",
   "description": "Privé dashboard voor JM Mechanica — uren, rooster en facturen",
   "start_url": "/dashboard.html",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#022448",
   "theme_color": "#022448",
   "orientation": "portrait",
+  "categories": ["business", "productivity"],
+  "lang": "nl",
   "icons": [
     {
       "src": "icon-192.png",
