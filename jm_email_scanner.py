@@ -544,12 +544,12 @@ def main():
         json.dump(alle, f, ensure_ascii=False, indent=2)
     print(f"\nOpgeslagen als: jm_scan_resultaat.json")
 
-    # Open Finder map met facturen
-    if os.path.exists(MAPPEN_PAD):
-        os.system(f'open "{MAPPEN_PAD}"')
-
-    if os.path.exists(DASHBOARD_PAD):
-        webbrowser.open(f"file://{DASHBOARD_PAD}")
+    # In CI-modus (GitHub Actions) geen Finder/browser openen
+    if not os.environ.get('CI'):
+        if os.path.exists(MAPPEN_PAD):
+            os.system(f'open "{MAPPEN_PAD}"')
+        if os.path.exists(DASHBOARD_PAD):
+            webbrowser.open(f"file://{DASHBOARD_PAD}")
 
     print("Klaar!\n")
 

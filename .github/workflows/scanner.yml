@@ -1,0 +1,39 @@
+name: Email Scanner
+
+on:
+  schedule:
+    # Elke dag om 07:00 Nederlandse tijd (05:00 UTC)
+    - cron: '0 5 * * *'
+  workflow_dispatch: # Handmatig starten via GitHub
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Installeer dependencies
+        run: pip install pypdf
+
+      - name: Maak config van secrets
+        run: |
+          cat > jm_config.json << 'PYEOF'
+          ${{ secrets.JM_CONFIG_JSON }}
+          PYEOF
+
+      - name: Draai scanner
+        run: python3 jm_email_scanner.py
+        env:
+          CI: true
+
+      - name: Commit resultaten
+        run: |
+          git config user.name "JM Scanner Bot"
+          git config user.email "scanner@jmmechanica.nl"
+          git add jm_scan_resultaat.json
+          git diff --cached --quiet || git commit -m "Auto-scan: $(date +'%d-%m-%Y %H:%M')"
+          git push
