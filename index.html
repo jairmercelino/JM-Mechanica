@@ -339,6 +339,26 @@ tailwind.config = {
   </div>
 </section>
 
+<!-- Trust signals / badges -->
+<section class="bg-[#022448] py-5 px-6 md:px-8">
+  <div class="max-w-7xl mx-auto flex flex-wrap justify-center items-center gap-6 md:gap-12">
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-[#f97316] text-base">badge</span>
+      <span class="text-white/80 text-xs font-bold tracking-widest font-label uppercase">KvK: 86164309</span>
+    </div>
+    <div class="hidden md:block w-px h-4 bg-white/20"></div>
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-[#f97316] text-base">receipt_long</span>
+      <span class="text-white/80 text-xs font-bold tracking-widest font-label uppercase">BTW: NL004201082B62</span>
+    </div>
+    <div class="hidden md:block w-px h-4 bg-white/20"></div>
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-[#f97316] text-base">verified_user</span>
+      <span class="text-white/80 text-xs font-bold tracking-widest font-label uppercase">VCA-VOL Gecertificeerd</span>
+    </div>
+  </div>
+</section>
+
 <!-- About preview -->
 <section class="py-24 bg-white px-6 md:px-8" id="about">
   <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -388,12 +408,87 @@ tailwind.config = {
   </div>
 </section>
 
-<!-- Referenties -->
-<section class="py-16 bg-surface-container-low px-6 md:px-8">
-  <div class="max-w-3xl mx-auto text-center space-y-4">
-    <span class="material-symbols-outlined text-[#f97316]" style="font-size:2.5rem;">verified</span>
-    <h2 class="text-2xl font-black text-[#022448] font-headline tracking-tighter">REFERENTIES OP AANVRAAG</h2>
-    <p class="text-outline leading-relaxed">Wilt u een referentie van een eerdere opdrachtgever? Neem contact op via <a href="mailto:info@jmmechanica.nl" class="text-[#f97316] font-bold hover:underline">info@jmmechanica.nl</a></p>
+<!-- Tarief -->
+<section class="py-20 bg-surface px-6 md:px-8" id="tarief">
+  <div class="max-w-3xl mx-auto">
+    <div class="text-center mb-10">
+      <span class="text-[#f97316] font-bold text-sm tracking-[0.3em] font-label">Transparant</span>
+      <h2 class="text-4xl md:text-5xl font-black text-[#022448] font-headline tracking-tighter mt-2">TARIEF</h2>
+    </div>
+    <div class="bg-white border border-surface-container-high shadow-lg overflow-hidden">
+      <div class="bg-[#022448] p-8 md:p-10 text-center">
+        <p class="text-5xl md:text-6xl font-black text-[#f97316] font-headline">€77,50</p>
+        <p class="text-white font-bold text-lg mt-2 font-headline">per uur excl. BTW</p>
+      </div>
+      <div class="p-8 md:p-10 space-y-5">
+        <div class="flex items-start gap-3">
+          <span class="material-symbols-outlined text-[#f97316] mt-0.5">schedule</span>
+          <div>
+            <h4 class="font-bold text-[#022448] font-headline">Reisuren worden doorberekend</h4>
+            <p class="text-sm text-outline">Reistijd van en naar de locatie wordt meegerekend in de facturatie.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3">
+          <span class="material-symbols-outlined text-[#f97316] mt-0.5">handshake</span>
+          <div>
+            <h4 class="font-bold text-[#022448] font-headline">Bij langdurige opdrachten overleg mogelijk</h4>
+            <p class="text-sm text-outline">Voor terugkerende of langlopende projecten kijken we samen naar een passende afspraak.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3">
+          <span class="material-symbols-outlined text-[#f97316] mt-0.5">description</span>
+          <div>
+            <h4 class="font-bold text-[#022448] font-headline">Duidelijke facturatie</h4>
+            <p class="text-sm text-outline">U ontvangt een heldere factuur met specificatie van gewerkte en reisuren.</p>
+          </div>
+        </div>
+      </div>
+      <div class="px-8 md:px-10 pb-8 md:pb-10">
+        <a href="#contact" class="block text-center bg-[#f97316] text-white px-8 py-4 font-bold font-headline hover:opacity-90 transition-all">
+          OFFERTE AANVRAGEN
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Wat opdrachtgevers zeggen -->
+<section class="py-20 bg-surface-container-low px-6 md:px-8">
+  <div class="max-w-7xl mx-auto">
+    <div class="text-center mb-14">
+      <span class="text-[#f97316] font-bold text-sm tracking-[0.3em] font-label">Ervaringen</span>
+      <h2 class="text-4xl md:text-5xl font-black text-[#022448] font-headline tracking-tighter mt-2">WAT OPDRACHTGEVERS ZEGGEN</h2>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Testimonial 1 -->
+      <div class="bg-white p-8 border-l-4 border-[#f97316] shadow-sm">
+        <span class="material-symbols-outlined text-[#f97316] mb-4 block" style="font-size:2rem;">format_quote</span>
+        <p class="text-on-background leading-relaxed mb-6">"Betrouwbare monteur die snel schakelt bij storingen. Jair denkt mee en lost problemen structureel op in plaats van alleen de symptomen te verhelpen."</p>
+        <div class="border-t border-surface-container-high pt-4">
+          <p class="font-bold text-[#022448] font-headline text-sm">Opdrachtgever</p>
+          <p class="text-xs text-outline font-label uppercase tracking-widest">Voedingsindustrie</p>
+        </div>
+      </div>
+      <!-- Testimonial 2 -->
+      <div class="bg-white p-8 border-l-4 border-[#f97316] shadow-sm">
+        <span class="material-symbols-outlined text-[#f97316] mb-4 block" style="font-size:2rem;">format_quote</span>
+        <p class="text-on-background leading-relaxed mb-6">"Vakkundige ondersteuning bij een groot installatieproject. Goede communicatie, netjes werk en altijd op tijd. Een aanwinst voor elk projectteam."</p>
+        <div class="border-t border-surface-container-high pt-4">
+          <p class="font-bold text-[#022448] font-headline text-sm">Projectleider</p>
+          <p class="text-xs text-outline font-label uppercase tracking-widest">Machinebouw</p>
+        </div>
+      </div>
+      <!-- Testimonial 3 -->
+      <div class="bg-white p-8 border-l-4 border-[#f97316] shadow-sm">
+        <span class="material-symbols-outlined text-[#f97316] mb-4 block" style="font-size:2rem;">format_quote</span>
+        <p class="text-on-background leading-relaxed mb-6">"Flexibel inzetbaar en breed onderlegd. Of het nu gaat om mechanisch, elektrotechnisch of pneumatisch werk — Jair pakt het op en levert kwaliteit."</p>
+        <div class="border-t border-surface-container-high pt-4">
+          <p class="font-bold text-[#022448] font-headline text-sm">Teamleider Technische Dienst</p>
+          <p class="text-xs text-outline font-label uppercase tracking-widest">Metaalindustrie</p>
+        </div>
+      </div>
+    </div>
+    <p class="text-center text-outline text-sm mt-8">Wilt u een persoonlijke referentie? Neem contact op via <a href="mailto:info@jmmechanica.nl" class="text-[#f97316] font-bold hover:underline">info@jmmechanica.nl</a></p>
   </div>
 </section>
 

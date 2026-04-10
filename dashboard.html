@@ -198,16 +198,17 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       </div>
 
       <!-- GPS LOCATIE MELDING -->
-      <div class="card" id="locatie-card" style="display:none;">
+      <div class="card" id="locatie-card">
         <div class="card-titel">📍 Locatie detectie — A-ware Almere</div>
         <div id="locatie-status" style="font-size:13px;color:#888;margin-bottom:10px;">Locatie wordt bepaald...</div>
+        <div id="locatie-laatst" style="font-size:11px;color:#aaa;margin-bottom:6px;"></div>
         <button class="actie-btn grijs" id="locatie-btn" onclick="startLocatie()" style="font-size:13px;">📍 Locatie inschakelen</button>
       </div>
 
       <div class="inklok-hero">
         <div class="inklok-tijd" id="klok-display">--:--</div>
         <div class="inklok-status" id="klok-status-tekst">Niet ingeklokt</div>
-        <button class="inklok-groot-btn" id="inklok-btn" onclick="toggleKlok()">Inklokkken</button>
+        <button class="inklok-groot-btn" id="inklok-btn" onclick="toggleKlok()">Inklokken</button>
         <div class="inklok-duur" id="inklok-duur"></div>
       </div>
 
@@ -594,7 +595,7 @@ function toggleKlok() {
     const pauze = prompt('Hoeveel minuten pauze gehad?', '30');
     if (pauze === null) return; // Geannuleerd
     document.getElementById('inp-pauze').value = parseInt(pauze) || 0;
-    document.getElementById('inklok-btn').textContent = 'Inklokkken';
+    document.getElementById('inklok-btn').textContent = 'Inklokken';
     document.getElementById('inklok-btn').classList.remove('actief');
     document.getElementById('klok-status-tekst').textContent = 'Niet ingeklokt';
     document.getElementById('inklok-duur').textContent = '';
@@ -1391,11 +1392,18 @@ function verwerkLocatie(pos) {
     statusEl.style.color = opLocatie ? '#022448' : '#888';
   }
 
+  // Laatst bekende locatie timestamp tonen
+  const laatstEl = document.getElementById('locatie-laatst');
+  if (laatstEl) {
+    const nu = new Date();
+    laatstEl.textContent = `Laatst bijgewerkt: ${nu.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
+  }
+
   // Aankomst detectie
   if (opLocatie && !wasOpLocatie && !inklokTijd) {
     stuurPushMelding(
       '📍 Aangekomen bij A-ware',
-      'Tik hier om in te klokkken',
+      'Tik hier om in te klokken',
       'in'
     );
     wasOpLocatie = true;
@@ -1405,7 +1413,7 @@ function verwerkLocatie(pos) {
   if (!opLocatie && wasOpLocatie && inklokTijd) {
     stuurPushMelding(
       '🚗 Je hebt A-ware verlaten',
-      'Tik hier om uit te klokkken',
+      'Tik hier om uit te klokken',
       'uit'
     );
     wasOpLocatie = false;
@@ -1430,13 +1438,20 @@ async function startLocatie() {
   const btn = document.getElementById('locatie-btn');
   if (btn) { btn.textContent = '📍 Locatie actief'; btn.disabled = true; btn.style.background = 'var(--oranje)'; btn.style.color = '#fff'; }
 
+  // Eerst snelle positiebepaling voor directe feedback
+  navigator.geolocation.getCurrentPosition(
+    verwerkLocatie,
+    () => {},
+    { enableHighAccuracy: false, maximumAge: 60000, timeout: 5000 }
+  );
+
   locatieWatcher = navigator.geolocation.watchPosition(
     verwerkLocatie,
     (err) => {
       const statusEl = document.getElementById('locatie-status');
       if (statusEl) statusEl.textContent = 'Locatie niet beschikbaar — geef toestemming in Instellingen';
     },
-    { enableHighAccuracy: true, maximumAge: 0, timeout: 30000 }
+    { enableHighAccuracy: true, maximumAge: 10000, timeout: 15000 }
   );
 
   localStorage.setItem('jm_locatie_actief', '1');
@@ -1444,7 +1459,6 @@ async function startLocatie() {
 
 // Start locatie automatisch als eerder ingeschakeld
 function initLocatie() {
-  document.getElementById('locatie-card').style.display = 'block';
   if (localStorage.getItem('jm_locatie_actief') === '1') {
     startLocatie();
   }
@@ -1452,7 +1466,15 @@ function initLocatie() {
 
 // Herstart locatie & push wanneer gebruiker terugkeert naar de app
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible' && localStorage.getItem('jm_in') === '1') {
+  if (document.visibilityState === 'visible') {
+    // Snelle positie-update zodra app weer zichtbaar is
+    if (localStorage.getItem('jm_locatie_actief') === '1') {
+      navigator.geolocation.getCurrentPosition(
+        verwerkLocatie,
+        () => {},
+        { enableHighAccuracy: false, maximumAge: 30000, timeout: 5000 }
+      );
+    }
     if (localStorage.getItem('jm_locatie_actief') === '1' && !locatieWatcher) {
       startLocatie();
     }
