@@ -395,17 +395,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- SETUP (verborgen als API geconfigureerd) -->
       <div class="lead-setup" id="lead-setup">
-        <p>🔑 Google Custom Search instellen</p>
-        <ol>
-          <li>Ga naar <strong>console.cloud.google.com</strong> → API's → Custom Search JSON API inschakelen</li>
-          <li>Maak een API Key aan onder Inloggegevens</li>
-          <li>Ga naar <strong>programmablesearchengine.google.com</strong> → Maak nieuwe zoekmachine (zoek op hele web)</li>
-          <li>Kopieer de Search Engine ID (cx)</li>
-        </ol>
-        <div class="form-groep"><label>API Key</label><input type="text" id="lead-api-key" placeholder="AIza..." /></div>
-        <div class="form-groep"><label>Search Engine ID (cx)</label><input type="text" id="lead-cse-id" placeholder="a1b2c3..." /></div>
+        <p>🔑 Lead Search Proxy instellen</p>
+        <p style="font-size:12px;color:#555;margin-bottom:12px;font-weight:400;">De Cloudflare Worker proxy is al geconfigureerd. Pas alleen aan als je een eigen proxy URL hebt.</p>
+        <div class="form-groep"><label>Proxy URL</label><input type="text" id="lead-proxy-url" placeholder="https://jm-lead-search.jairmercelino.workers.dev" /></div>
         <button class="actie-btn" onclick="slaLeadConfigOp()">Opslaan & Activeren</button>
-        <p style="font-size:11px;color:#888;margin-top:10px;font-weight:400;">Gratis: 100 zoekopdrachten per dag. Je kunt ook zonder API key handmatig leads toevoegen.</p>
+        <p style="font-size:11px;color:#888;margin-top:10px;font-weight:400;">Gratis: 100 zoekopdrachten per dag via Cloudflare Worker. Je kunt ook handmatig leads toevoegen.</p>
       </div>
 
       <!-- AGENT CONTROLS -->
@@ -1529,9 +1523,9 @@ const LEAD_QUERIES = [
 ];
 
 // Lead Agent state
+const LEAD_PROXY_URL = localStorage.getItem('jm_lead_proxy') || 'https://jm-lead-search.jwz-jjm.workers.dev';
 let leadConfig = JSON.parse(localStorage.getItem('jm_lead_config') || JSON.stringify({
-  apiKey: 'AIzaSyAM48uGnbdjMn4unW6R4EVC8ueDcEDHLCM',
-  cseId: '55ca75ab176604574'
+  proxyUrl: LEAD_PROXY_URL
 }));
 let leadData   = JSON.parse(localStorage.getItem('jm_leads') || '[]');
 let leadAgent  = JSON.parse(localStorage.getItem('jm_lead_agent') || JSON.stringify({
@@ -1543,22 +1537,22 @@ let leadAgent  = JSON.parse(localStorage.getItem('jm_lead_agent') || JSON.string
 }));
 
 function slaLeadConfigOp() {
-  const key = document.getElementById('lead-api-key').value.trim();
-  const cx  = document.getElementById('lead-cse-id').value.trim();
-  if (!key || !cx) { alert('Vul zowel API Key als Search Engine ID in.'); return; }
-  leadConfig = { apiKey: key, cseId: cx };
+  const url = document.getElementById('lead-proxy-url').value.trim();
+  if (!url) { alert('Vul de Worker URL in.'); return; }
+  leadConfig = { proxyUrl: url };
   localStorage.setItem('jm_lead_config', JSON.stringify(leadConfig));
+  localStorage.setItem('jm_lead_proxy', url);
   document.getElementById('lead-setup').style.display = 'none';
-  alert('API configuratie opgeslagen!');
+  alert('Proxy configuratie opgeslagen!');
 }
 
 function initLeads() {
   // Toon/verberg setup
-  if (leadConfig.apiKey && leadConfig.cseId) {
+  if (leadConfig.proxyUrl) {
     document.getElementById('lead-setup').style.display = 'none';
   } else {
-    document.getElementById('lead-api-key').value = leadConfig.apiKey || '';
-    document.getElementById('lead-cse-id').value  = leadConfig.cseId || '';
+    const el = document.getElementById('lead-proxy-url');
+    if (el) el.value = leadConfig.proxyUrl || LEAD_PROXY_URL;
   }
   renderLeads('alle');
   updateLeadMetrics();
@@ -1602,13 +1596,14 @@ function telKeywords(arr) {
     .map(e => e[0]);
 }
 
-// ── Google Custom Search API ──
+// ── Lead Search via Proxy ──
 async function zoekViaCSE(query) {
-  const url = `https://www.googleapis.com/customsearch/v1?key=${leadConfig.apiKey}&cx=${leadConfig.cseId}&q=${encodeURIComponent(query)}&num=10&lr=lang_nl&gl=nl`;
+  const proxyUrl = leadConfig.proxyUrl || LEAD_PROXY_URL;
+  const url = `${proxyUrl}?q=${encodeURIComponent(query)}`;
   const res = await fetch(url);
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err.error?.message || `API fout ${res.status}`);
+    throw new Error(err.error || `API fout ${res.status}`);
   }
   const data = await res.json();
   return (data.items || []).map(item => ({
@@ -1616,7 +1611,7 @@ async function zoekViaCSE(query) {
     snippet: item.snippet || '',
     url: item.link || '',
     domein: nieuwDomein(item.link || ''),
-    afbeelding: item.pagemap?.cse_image?.[0]?.src || null,
+    afbeelding: item.image || null,
   }));
 }
 
@@ -1629,8 +1624,8 @@ async function leadAgentZoek() {
   const btn = document.getElementById('lead-zoek-btn');
   const tekst = document.getElementById('lead-agent-tekst');
 
-  if (!leadConfig.apiKey || !leadConfig.cseId) {
-    alert('Stel eerst je Google Custom Search API in (bovenaan de pagina).');
+  if (!leadConfig.proxyUrl) {
+    alert('Stel eerst de Search Proxy URL in (bovenaan de pagina).');
     return;
   }
 
