@@ -1492,34 +1492,35 @@ if ('serviceWorker' in navigator) {
 // ══════════════════════════════════════════════
 
 const LEAD_QUERIES = [
-  // Industrie & productie
-  '"mechanisch onderhoud" bedrijf nederland',
-  '"industrieel onderhoud" zzp inhuur monteur',
-  '"storing productielijn" onderhoud',
-  '"machinepark" onderhoud uitbesteden',
-  '"preventief onderhoud" machines bedrijf',
-  '"technisch onderhoud" fabriek nederland',
-  // Voeding & zuivel
-  '"voedingsindustrie" mechanisch onderhoud',
-  '"zuivelfabriek" onderhoud monteur',
-  '"slachterij" technisch onderhoud',
-  '"bakkerij" machine onderhoud industrieel',
-  // MKB & klein
-  '"mkb" technisch onderhoud uitbesteden',
-  '"installatiebedrijf" monteur gezocht',
-  '"klein bedrijf" machine reparatie',
-  '"productie bedrijf" onderhoud zzp',
-  // Logistiek & overig
-  '"koelinstallatie" onderhoud monteur',
-  '"landbouwmachines" reparatie onderhoud',
-  '"warehouse" technisch onderhoud nederland',
-  '"drukkerij" machine onderhoud',
-  '"metaalbedrijf" onderhoud monteur',
-  '"kunststof" productie onderhoud',
-  '"farmaceutisch" technisch onderhoud',
-  '"brouwerij" machine onderhoud',
-  '"houtverwerking" onderhoud machines',
-  '"scheepswerf" mechanisch onderhoud',
+  // Voedingsindustrie — fabrieken die onderhoud nodig hebben
+  'voedselproductie bedrijf noord-holland',
+  'voedselfabriek zaanstreek',
+  'zuivelfabriek nederland productie',
+  'vleesverwerker fabriek noord-holland',
+  'bakkerij industrieel productie nederland',
+  'drankenproducent fabriek nederland',
+  'brouwerij productie nederland',
+  // Productie & industrie — potentiële klanten
+  'metaalbewerking fabriek noord-holland',
+  'kunststof productie bedrijf nederland',
+  'verpakkingsbedrijf fabriek zaandam',
+  'chemisch bedrijf productie noord-holland',
+  'farmaceutisch productie bedrijf nederland',
+  'papierfabriek nederland',
+  'houtverwerking fabriek noord-holland',
+  // Bedrijven met technische dienst / vacatures (= ze hebben monteurs nodig)
+  'vacature monteur technische dienst voedingsindustrie noord-holland',
+  'vacature onderhoudsmonteur fabriek zaanstreek',
+  'technische dienst vacature productie amsterdam',
+  // Logistiek & warehousing
+  'distributiecentrum noord-holland',
+  'koelhuis bedrijf zaanstreek',
+  'warehouse logistiek zaandam amsterdam',
+  // Specifieke industriegebieden
+  'bedrijventerrein zaandam industrie',
+  'industrieterrein westpoort amsterdam bedrijven',
+  'haven amsterdam industrie bedrijven',
+  'scheepswerf amsterdam noord-holland',
 ];
 
 // Lead Agent state
@@ -1570,8 +1571,8 @@ function kiesBesteQuery() {
   if (leadAgent.likedKeywords.length >= 3) {
     const topKeywords = telKeywords(leadAgent.likedKeywords).slice(0, 5);
     topKeywords.forEach(kw => {
-      queryPool.push(`"${kw}" onderhoud monteur nederland`);
-      queryPool.push(`"${kw}" technisch onderhoud bedrijf`);
+      queryPool.push(`"${kw}" fabriek productie noord-holland`);
+      queryPool.push(`"${kw}" bedrijf nederland vacature monteur`);
     });
   }
 
@@ -1640,7 +1641,12 @@ async function leadAgentZoek() {
     const resultaten = await zoekViaCSE(query);
     let nieuw = 0;
 
+    // Filter vacaturesites en concurrenten
+    const skipDomeinen = ['indeed.com','nl.indeed.com','linkedin.com','nl.linkedin.com','jooble.org','nl.jooble.org','nationalevacaturebank.nl','werkzoeken.nl','careerjet.nl','bebee.com','randstad.nl','tempo-team.nl','manpower.nl','yacht.nl','hays.nl','brunel.net'];
+
     resultaten.forEach(r => {
+      // Skip vacaturesites en concurrenten
+      if (skipDomeinen.some(d => r.domein.includes(d))) return;
       // Skip geblokkeerde domeinen
       if (leadAgent.blockedDomains.includes(r.domein)) return;
       // Skip duplicaten
