@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://jmmechanica.nl/sitemap.xml
+
+# Dashboard is prive
+Disallow: /dashboard.html
+Disallow: /jm_scan_resultaat.json
+Disallow: /jm_email_scanner.py
