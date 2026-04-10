@@ -1928,9 +1928,13 @@ function openInEmail(id) {
   const isFollowUp = lead.status === 'followup' || lead.status === 'benaderd';
   const { subject, body } = genereerEmail(lead, isFollowUp);
   const to = lead.contactEmail || '';
-  // mailto opent de standaard mailclient (info@jmmechanica.nl als afzender)
-  const url = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  window.open(url, '_blank');
+  // Kopieer alles naar klembord
+  const volledig = `Aan: ${to}\nOnderwerp: ${subject}\n\n${body}`;
+  navigator.clipboard.writeText(volledig).then(() => {
+    alert('E-mail gekopieerd! Plak in je Hostnet webmail.\n\nAan: ' + (to || '(vul e-mail in bij contactgegevens)'));
+  });
+  // Open Hostnet webmail
+  window.open('https://webmail.hostnet.nl', '_blank');
 }
 
 function markeerVerstuurd(id) {
@@ -2046,7 +2050,7 @@ function renderLeads(filter) {
           <p id="le-body-${l.id}">${escHTML(body)}</p>
         </div>
         <div class="lead-email-acties">
-          <button class="primary" onclick="openInEmail('${l.id}')">📧 Open in mailclient</button>
+          <button class="primary" onclick="openInEmail('${l.id}')">📧 Kopieer & open webmail</button>
           <button onclick="kopieerEmail('${l.id}')">📋 Kopieer</button>
           <button onclick="markeerVerstuurd('${l.id}')">✅ Verstuurd</button>
           ${isFollowup ? `<button onclick="toonEmail('${l.id}',true)">🔄 Follow-up mail</button>` : ''}
