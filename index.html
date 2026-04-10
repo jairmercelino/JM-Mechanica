@@ -701,21 +701,32 @@ function verstuurLeadNotificatie() {
     dienst: chat.dienst || '-',
     locatie: chat.locatie || '-',
     score: chat.score,
-    gesprek: samenvatting
+    gesprek: samenvatting,
+    bron: 'chatbot',
+    datum: new Date().toISOString()
   };
 
-  // Send lead via mailto (works everywhere, opens email client as fallback)
-  const onderwerp = encodeURIComponent(`JM Mechanica Lead (score ${chat.score}) — ${leadData.naam}`);
-  const body = encodeURIComponent(
-    `Nieuwe lead via chatbot\n\nNaam: ${leadData.naam}\nEmail: ${leadData.email}\nTelefoon: ${leadData.telefoon}\nBedrijf: ${leadData.bedrijf}\nDienst: ${leadData.dienst}\nLocatie: ${leadData.locatie}\nScore: ${leadData.score}\n\nGesprek:\n${leadData.gesprek}`
-  );
-  // Hidden iframe mailto to avoid page redirect
-  const a = document.createElement('a');
-  a.href = `mailto:info@jmmechanica.nl?subject=${onderwerp}&body=${body}`;
-  a.style.display = 'none';
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(() => a.remove(), 100);
+  // Opslaan in localStorage voor dashboard
+  const leads = JSON.parse(localStorage.getItem('jm_leads') || '[]');
+  leads.unshift(leadData);
+  localStorage.setItem('jm_leads', JSON.stringify(leads));
+
+  // Verstuur naar Formspree → email naar info@jmmechanica.nl
+  fetch('https://formspree.io/f/mlgoydqr', {
+    method: 'POST',
+    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      _subject: `Chatbot Lead (score ${leadData.score}) — ${leadData.naam}`,
+      naam: leadData.naam,
+      email: leadData.email,
+      telefoon: leadData.telefoon,
+      bedrijf: leadData.bedrijf,
+      dienst: leadData.dienst,
+      locatie: leadData.locatie,
+      score: leadData.score,
+      gesprek: samenvatting
+    })
+  }).catch(() => {});
 }
 
 // ── CORE CHAT FUNCTIONS ──
@@ -785,8 +796,8 @@ function verstuurChat() {
 
 function verstuurFormulier(e){
   e.preventDefault();const form=document.getElementById('contact-form');const data=new FormData(form);
-  fetch('/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(data).toString()})
-  .then(()=>{form.style.display='none';document.getElementById('succes-melding').style.display='block';})
+  fetch('https://formspree.io/f/mlgoydqr',{method:'POST',headers:{'Accept':'application/json'},body:data})
+  .then(r=>{if(r.ok){form.style.display='none';document.getElementById('succes-melding').style.display='block';}else{throw new Error();}})
   .catch(()=>alert('Er ging iets mis. Probeer het opnieuw of bel direct.'));
 }
 </script>

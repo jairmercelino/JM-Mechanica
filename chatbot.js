@@ -160,10 +160,17 @@ function verstuurLeadNotificatie() {
   if (chat.leadVerstuurd) return;
   chat.leadVerstuurd = true;
   var samenvatting = chat.geschiedenis.map(function(m){ return (m.rol === 'gebruiker' ? 'Klant: ' : 'Bot: ') + m.tekst; }).join('\n');
-  var ld = { naam: chat.naam||'Onbekend', email: chat.email||'-', telefoon: chat.telefoon||'-', bedrijf: chat.bedrijf||'-', dienst: chat.dienst||'-', locatie: chat.locatie||'-', score: chat.score, gesprek: samenvatting };
-  var subj = encodeURIComponent('JM Mechanica Lead (score ' + chat.score + ') \u2014 ' + ld.naam);
-  var body = encodeURIComponent('Nieuwe lead via chatbot\n\nNaam: '+ld.naam+'\nEmail: '+ld.email+'\nTelefoon: '+ld.telefoon+'\nBedrijf: '+ld.bedrijf+'\nDienst: '+ld.dienst+'\nLocatie: '+ld.locatie+'\nScore: '+ld.score+'\n\nGesprek:\n'+ld.gesprek);
-  var a = document.createElement('a'); a.href = 'mailto:info@jmmechanica.nl?subject='+subj+'&body='+body; a.style.display='none'; document.body.appendChild(a); a.click(); setTimeout(function(){a.remove();},100);
+  var ld = { naam: chat.naam||'Onbekend', email: chat.email||'-', telefoon: chat.telefoon||'-', bedrijf: chat.bedrijf||'-', dienst: chat.dienst||'-', locatie: chat.locatie||'-', score: chat.score, gesprek: samenvatting, bron: 'chatbot', datum: new Date().toISOString() };
+
+  // Opslaan in localStorage voor dashboard
+  try { var leads = JSON.parse(localStorage.getItem('jm_leads') || '[]'); leads.unshift(ld); localStorage.setItem('jm_leads', JSON.stringify(leads)); } catch(e) {}
+
+  // Verstuur naar Formspree
+  fetch('https://formspree.io/f/mlgoydqr', {
+    method: 'POST',
+    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+    body: JSON.stringify({ _subject: 'Chatbot Lead (score ' + ld.score + ') — ' + ld.naam, naam: ld.naam, email: ld.email, telefoon: ld.telefoon, bedrijf: ld.bedrijf, dienst: ld.dienst, locatie: ld.locatie, score: ld.score, gesprek: samenvatting })
+  }).catch(function(){});
 }
 
 function voegChatToe(rol, tekst) {
