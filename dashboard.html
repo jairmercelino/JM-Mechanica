@@ -134,10 +134,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 #installeer-banner small { font-size: 12px; color: #666; line-height: 1.5; display: block; }
 
 /* ── LEADS ── */
-.lead-card { background: #fff; border: 1.5px solid #e0e0e0; border-radius: 14px; padding: 1rem; margin-bottom: 10px; display: flex; gap: 12px; align-items: flex-start; transition: border-color 0.2s; }
+.lead-card { background: #fff; border: 1.5px solid #e0e0e0; border-radius: 14px; padding: 1rem; margin-bottom: 10px; transition: border-color 0.2s; cursor: pointer; }
 .lead-card:hover { border-color: var(--navy-border); }
 .lead-card.geliked { border-color: #22c55e; background: #f0fdf4; }
+.lead-card.benaderd { border-color: #3b82f6; border-left: 4px solid #3b82f6; }
+.lead-card.reactie { border-color: #8b5cf6; border-left: 4px solid #8b5cf6; }
+.lead-card.afspraak { border-color: #f59e0b; border-left: 4px solid #f59e0b; }
+.lead-card.klant { border-color: #22c55e; border-left: 4px solid #22c55e; background: #f0fdf4; }
 .lead-card.afgewezen { opacity: 0.4; display: none; }
+.lead-top { display: flex; gap: 12px; align-items: flex-start; }
 .lead-logo { width: 52px; height: 52px; border-radius: 10px; background: var(--navy-licht); flex-shrink: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
 .lead-logo img { width: 100%; height: 100%; object-fit: contain; }
 .lead-info { flex: 1; min-width: 0; }
@@ -145,15 +150,42 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .lead-snippet { font-size: 12px; color: #666; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 6px; }
 .lead-url { font-size: 11px; color: var(--navy-mid); text-decoration: none; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .lead-url:hover { text-decoration: underline; }
+.lead-status-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 6px; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.03em; }
+.lead-status-badge.s-nieuw { background: #e0e7ff; color: #3730a3; }
+.lead-status-badge.s-interessant { background: #dcfce7; color: #166534; }
+.lead-status-badge.s-benaderd { background: #dbeafe; color: #1e40af; }
+.lead-status-badge.s-followup { background: #fef3c7; color: #92400e; }
+.lead-status-badge.s-reactie { background: #ede9fe; color: #5b21b6; }
+.lead-status-badge.s-afspraak { background: #fef3c7; color: #92400e; }
+.lead-status-badge.s-klant { background: #dcfce7; color: #166534; }
 .lead-acties { display: flex; gap: 6px; flex-shrink: 0; align-self: center; }
 .lead-btn { width: 38px; height: 38px; border-radius: 10px; border: 1.5px solid #e0e0e0; background: #fff; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
 .lead-btn.like:hover, .lead-btn.like.actief { background: #dcfce7; border-color: #22c55e; }
 .lead-btn.dislike:hover, .lead-btn.dislike.actief { background: #fef2f2; border-color: #ef4444; }
+/* Lead detail panel */
+.lead-detail { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid #e0e0e0; }
+.lead-card.open .lead-detail { display: block; }
+.lead-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.lead-detail-grid .form-groep { margin-bottom: 0; }
+.lead-detail-grid input, .lead-detail-grid select { font-size: 13px; padding: 8px 10px; }
+.lead-detail-grid label { font-size: 11px; }
+.lead-pipeline { display: flex; gap: 4px; margin-bottom: 12px; flex-wrap: wrap; }
+.lead-pipeline-stap { font-size: 10px; padding: 4px 8px; border-radius: 6px; cursor: pointer; border: 1px solid #e0e0e0; background: #f5f5f3; color: #888; font-weight: 600; font-family: inherit; }
+.lead-pipeline-stap.actief { background: var(--oranje); color: #fff; border-color: var(--oranje); }
+.lead-pipeline-stap:hover { border-color: var(--navy-border); }
+.lead-email-preview { background: #f9fafb; border: 1px solid #e0e0e0; border-radius: 10px; padding: 12px; margin-bottom: 10px; }
+.lead-email-preview p { font-size: 12px; color: #333; line-height: 1.6; white-space: pre-wrap; }
+.lead-email-subject { font-size: 12px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+.lead-email-acties { display: flex; gap: 6px; flex-wrap: wrap; }
+.lead-email-acties button { font-size: 11px; padding: 6px 12px; border-radius: 8px; border: 1px solid #e0e0e0; background: #fff; cursor: pointer; font-weight: 600; font-family: inherit; }
+.lead-email-acties button.primary { background: var(--oranje); color: #fff; border-color: var(--oranje); }
+.lead-notities { width: 100%; font-size: 12px; padding: 8px; border: 1px solid #e0e0e0; border-radius: 8px; min-height: 50px; resize: vertical; font-family: inherit; margin-bottom: 8px; }
+.lead-beschikbaarheid { background: var(--navy-licht); border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; font-size: 11px; color: var(--navy); }
 .lead-agent-status { background: var(--navy); border-radius: 14px; padding: 1.25rem; text-align: center; margin-bottom: 1rem; }
 .lead-agent-tekst { font-size: 12px; color: #7ba3cc; margin-bottom: 10px; }
 .lead-agent-btn { background: var(--oranje); color: #fff; border: none; padding: 14px 32px; border-radius: 99px; font-size: 15px; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.05em; }
 .lead-agent-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-.lead-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 1rem; }
+.lead-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 1rem; }
 .lead-filter-tabs { display: flex; gap: 6px; margin-bottom: 1rem; flex-wrap: wrap; }
 .lead-filter-tab { background: var(--navy-licht); color: var(--navy); border: 1.5px solid var(--navy-border); padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; }
 .lead-filter-tab.active { background: var(--oranje); color: #fff; border-color: var(--oranje); }
@@ -161,6 +193,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .lead-setup p { font-size: 13px; color: var(--navy); font-weight: 600; margin-bottom: 8px; }
 .lead-setup ol { font-size: 12px; color: #555; line-height: 1.8; padding-left: 1.2rem; margin-bottom: 12px; }
 .lead-setup code { background: rgba(0,0,0,0.06); padding: 2px 6px; border-radius: 4px; font-size: 11px; }
+.lead-week-info { background: var(--navy-licht); border: 1px solid var(--navy-border); border-radius: 10px; padding: 10px 12px; margin-bottom: 1rem; font-size: 12px; color: var(--navy); display: flex; justify-content: space-between; align-items: center; }
 .toon-afgewezen-btn { background: none; border: 1px dashed #ccc; color: #aaa; font-size: 12px; padding: 10px; width: 100%; border-radius: 10px; cursor: pointer; font-family: inherit; margin-top: 4px; }
 </style>
 </head>
@@ -409,17 +442,26 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         <div style="font-size:11px;color:#7ba3cc;margin-top:10px;" id="lead-queries-resterend"></div>
       </div>
 
+      <!-- WEKELIJKSE STATUS -->
+      <div class="lead-week-info">
+        <span id="lead-week-status">Laatste scan: nooit</span>
+        <span id="lead-beschikbaar-tekst"></span>
+      </div>
+
       <!-- METRICS -->
       <div class="lead-metrics">
         <div class="metric"><div class="metric-label">Gevonden</div><div class="metric-value" id="lm-gevonden">0</div></div>
         <div class="metric"><div class="metric-label">Interessant</div><div class="metric-value" id="lm-liked" style="color:#22c55e;">0</div></div>
-        <div class="metric"><div class="metric-label">Agent score</div><div class="metric-value" id="lm-score">0</div></div>
+        <div class="metric"><div class="metric-label">Benaderd</div><div class="metric-value" id="lm-benaderd" style="color:#3b82f6;">0</div></div>
+        <div class="metric"><div class="metric-label">Pipeline</div><div class="metric-value" id="lm-pipeline" style="color:var(--oranje);">0</div></div>
       </div>
 
       <!-- FILTER TABS -->
       <div class="lead-filter-tabs">
         <button class="lead-filter-tab active" onclick="filterLeads('alle',this)">Alle</button>
         <button class="lead-filter-tab" onclick="filterLeads('liked',this)">⭐ Interessant</button>
+        <button class="lead-filter-tab" onclick="filterLeads('benaderd',this)">📧 Benaderd</button>
+        <button class="lead-filter-tab" onclick="filterLeads('pipeline',this)">🔥 Pipeline</button>
         <button class="lead-filter-tab" onclick="filterLeads('nieuw',this)">Nieuw</button>
         <button class="lead-filter-tab" onclick="filterLeads('afgewezen',this)">Verborgen</button>
       </div>
@@ -1555,6 +1597,8 @@ function initLeads() {
     const el = document.getElementById('lead-proxy-url');
     if (el) el.value = leadConfig.proxyUrl || LEAD_PROXY_URL;
   }
+  // Check follow-ups (benaderd > 5 dagen)
+  checkFollowUps();
   renderLeads('alle');
   updateLeadMetrics();
 }
@@ -1660,13 +1704,15 @@ async function leadAgentZoek() {
         domein: r.domein,
         afbeelding: r.afbeelding,
         bronQuery: query,
-        status: 'nieuw',    // nieuw | liked | afgewezen
+        status: 'nieuw',
         datum: new Date().toISOString().split('T')[0],
+        contactNaam: '', contactFunctie: '', contactEmail: '', contactTelefoon: '', notities: '',
       });
       nieuw++;
     });
 
     leadAgent.totaalZoekacties++;
+    leadAgent.laatsteZoekDatum = new Date().toISOString().split('T')[0];
     slaLeadData();
 
     tekst.textContent = `${nieuw} nieuwe leads gevonden! (${leadData.length} totaal)`;
@@ -1741,6 +1787,165 @@ function filterLeads(filter, btn) {
   renderLeads(filter);
 }
 
+function escHTML(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Wekelijkse agent logica ──
+function updateWeekStatus() {
+  const el = document.getElementById('lead-week-status');
+  if (!el) return;
+  const laatste = leadAgent.laatsteZoekDatum;
+  if (!laatste) { el.textContent = 'Laatste scan: nooit'; return; }
+  const dagen = Math.floor((Date.now() - new Date(laatste).getTime()) / 86400000);
+  el.textContent = dagen === 0 ? 'Vandaag gezocht' : `${dagen} dag${dagen > 1 ? 'en' : ''} geleden gezocht`;
+  if (dagen >= 7) el.textContent += ' — tijd voor nieuwe scan!';
+}
+
+// ── Beschikbaarheid uit rooster ──
+function getBeschikbareDagen(aantalDagen) {
+  const vrij = [];
+  const nu = new Date(); nu.setHours(0,0,0,0);
+  for (let i = 1; i <= aantalDagen; i++) {
+    const d = new Date(nu); d.setDate(d.getDate() + i);
+    const dienst = getDienst(d);
+    if (!dienst) {
+      const dag = ['zo','ma','di','wo','do','vr','za'][d.getDay()];
+      vrij.push({ datum: fmtD(d), dag: dag, label: `${dag} ${d.getDate()}/${d.getMonth()+1}` });
+    }
+  }
+  return vrij;
+}
+
+function updateBeschikbaarheid() {
+  const el = document.getElementById('lead-beschikbaar-tekst');
+  if (!el) return;
+  const vrij = getBeschikbareDagen(14);
+  if (vrij.length === 0) { el.textContent = 'Geen vrije dagen komende 2 weken'; return; }
+  el.textContent = `Vrij: ${vrij.slice(0,3).map(v => v.label).join(', ')}`;
+}
+
+function getBeschikbaarheidTekst() {
+  const vrij = getBeschikbareDagen(21);
+  if (vrij.length === 0) return 'Neem contact op voor beschikbaarheid.';
+  const eersteDrie = vrij.slice(0, 3);
+  return `Ik ben o.a. beschikbaar op ${eersteDrie.map(v => v.label).join(', ')}.`;
+}
+
+// ── Pipeline status ──
+const PIPELINE_STAPPEN = ['nieuw','liked','benaderd','followup','reactie','afspraak','klant'];
+const PIPELINE_LABELS = { nieuw:'Nieuw', liked:'Interessant', benaderd:'Benaderd', followup:'Follow-up', reactie:'Reactie', afspraak:'Afspraak', klant:'Klant' };
+
+function zetLeadStatus(id, status) {
+  const lead = leadData.find(l => l.id === id);
+  if (!lead) return;
+  lead.status = status;
+  lead.laatsteActie = new Date().toISOString().split('T')[0];
+  if (status === 'benaderd' && !lead.datumBenaderd) lead.datumBenaderd = new Date().toISOString().split('T')[0];
+  slaLeadData();
+  renderLeads(huidigeLeadFilter);
+  updateLeadMetrics();
+}
+
+// ── Lead detail toggle ──
+function toggleLeadDetail(id) {
+  const el = document.getElementById('lead-' + id);
+  if (!el) return;
+  const wasOpen = el.classList.contains('open');
+  // Sluit alle
+  document.querySelectorAll('.lead-card.open').forEach(c => c.classList.remove('open'));
+  if (!wasOpen) el.classList.add('open');
+}
+
+// ── Contact opslaan ──
+function slaContactOp(id) {
+  const lead = leadData.find(l => l.id === id);
+  if (!lead) return;
+  lead.contactNaam = document.getElementById('lc-naam-' + id)?.value || '';
+  lead.contactFunctie = document.getElementById('lc-functie-' + id)?.value || '';
+  lead.contactEmail = document.getElementById('lc-email-' + id)?.value || '';
+  lead.contactTelefoon = document.getElementById('lc-tel-' + id)?.value || '';
+  lead.notities = document.getElementById('lc-notities-' + id)?.value || '';
+  slaLeadData();
+}
+
+// ── E-mail template genereren ──
+function genereerEmail(lead) {
+  const bedrijf = lead.titel.replace(/\s*[-–|].*/g, '').trim();
+  const beschikbaar = getBeschikbaarheidTekst();
+  const contactNaam = lead.contactNaam ? `Beste ${lead.contactNaam}` : 'Geachte heer/mevrouw';
+
+  const subject = `Mechanisch onderhoud — ${bedrijf}`;
+  const body = `${contactNaam},
+
+Mijn naam is Jair Mercelino, eigenaar van JM Mechanica. Ik ben een allround monteur gespecialiseerd in mechanisch onderhoud, storingen en revisiewerkzaamheden in de industrie.
+
+Ik zag dat ${bedrijf} actief is in de regio en ik denk dat ik van waarde kan zijn voor uw technische afdeling. Of het nu gaat om preventief onderhoud, het oplossen van storingen of het ondersteunen van uw technische dienst — ik sta klaar.
+
+Wat ik bied:
+- Mechanisch onderhoud & revisie
+- Storingsdiagnose & reparatie
+- Flexibele inzet als ZZP'er (kort of lang project)
+
+${beschikbaar}
+
+Ik kom graag vrijblijvend langs voor een kennismaking. Heeft u interesse?
+
+Met vriendelijke groet,
+Jair Mercelino
+JM Mechanica
+Tel: 06-XXXXXXXX
+Web: jmmechanica.nl`;
+
+  return { subject, body };
+}
+
+function toonEmail(id) {
+  const lead = leadData.find(l => l.id === id);
+  if (!lead) return;
+  const { subject, body } = genereerEmail(lead);
+  const emailEl = document.getElementById('le-body-' + id);
+  const subjectEl = document.getElementById('le-subject-' + id);
+  if (emailEl) emailEl.textContent = body;
+  if (subjectEl) subjectEl.textContent = subject;
+}
+
+function openInGmail(id) {
+  const lead = leadData.find(l => l.id === id);
+  if (!lead) return;
+  const { subject, body } = genereerEmail(lead);
+  const to = lead.contactEmail || '';
+  const url = `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(to)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.open(url, '_blank');
+  // Zet status op benaderd
+  if (lead.status === 'liked' || lead.status === 'nieuw') {
+    zetLeadStatus(id, 'benaderd');
+  }
+}
+
+function kopieerEmail(id) {
+  const lead = leadData.find(l => l.id === id);
+  if (!lead) return;
+  const { subject, body } = genereerEmail(lead);
+  navigator.clipboard.writeText(`Onderwerp: ${subject}\n\n${body}`).then(() => {
+    alert('E-mail gekopieerd naar klembord!');
+  });
+}
+
+// ── Follow-up checker ──
+function checkFollowUps() {
+  const nu = new Date().toISOString().split('T')[0];
+  leadData.forEach(l => {
+    if (l.status === 'benaderd' && l.datumBenaderd) {
+      const dagen = Math.floor((new Date(nu) - new Date(l.datumBenaderd)) / 86400000);
+      if (dagen >= 5) l.status = 'followup';
+    }
+  });
+  slaLeadData();
+}
+
+// ── Render (uitgebreid met detail panel) ──
 function renderLeads(filter) {
   const lijst = document.getElementById('lead-lijst');
   let items = [...leadData];
@@ -1748,64 +1953,99 @@ function renderLeads(filter) {
   if (filter === 'liked')     items = items.filter(l => l.status === 'liked');
   if (filter === 'nieuw')     items = items.filter(l => l.status === 'nieuw');
   if (filter === 'afgewezen') items = items.filter(l => l.status === 'afgewezen');
+  if (filter === 'benaderd')  items = items.filter(l => l.status === 'benaderd' || l.status === 'followup');
+  if (filter === 'pipeline')  items = items.filter(l => ['reactie','afspraak','klant'].includes(l.status));
   if (filter === 'alle')      items = items.filter(l => l.status !== 'afgewezen');
 
   if (items.length === 0) {
-    const msg = filter === 'alle' ? 'Nog geen leads. Tik op "Zoek klanten" om te starten.'
-              : filter === 'liked' ? 'Nog geen leads als interessant gemarkeerd.'
-              : filter === 'afgewezen' ? 'Geen verborgen leads.'
-              : 'Geen nieuwe leads.';
-    lijst.innerHTML = `<div class="leeg-state">${msg}</div>`;
+    const msgs = { alle:'Nog geen leads. Tik op "Zoek klanten" om te starten.', liked:'Nog geen leads als interessant gemarkeerd.', benaderd:'Nog geen leads benaderd.', pipeline:'Geen leads in de pipeline.', afgewezen:'Geen verborgen leads.', nieuw:'Geen nieuwe leads.' };
+    lijst.innerHTML = `<div class="leeg-state">${msgs[filter] || msgs.alle}</div>`;
     return;
   }
 
-  // Liked bovenaan, dan op datum (nieuwste eerst)
+  // Sorteer: pipeline bovenaan, dan liked, dan op datum
+  const statusPrio = { klant:0, afspraak:1, reactie:2, followup:3, benaderd:4, liked:5, nieuw:6 };
   items.sort((a, b) => {
-    if (a.status === 'liked' && b.status !== 'liked') return -1;
-    if (b.status === 'liked' && a.status !== 'liked') return 1;
+    const pa = statusPrio[a.status] ?? 9, pb = statusPrio[b.status] ?? 9;
+    if (pa !== pb) return pa - pb;
     return (b.datum || '').localeCompare(a.datum || '');
   });
 
   lijst.innerHTML = items.map(l => {
     const faviconUrl = `https://www.google.com/s2/favicons?domain=${l.domein}&sz=64`;
-    const imgSrc = l.afbeelding || faviconUrl;
     const isLiked = l.status === 'liked';
     const isAfgewezen = l.status === 'afgewezen';
+    const statusClass = l.status || 'nieuw';
+    const statusLabel = PIPELINE_LABELS[l.status] || 'Nieuw';
+    const { subject, body } = genereerEmail(l);
+    const isFollowup = l.status === 'followup';
+
     return `
-    <div class="lead-card${isLiked ? ' geliked' : ''}${isAfgewezen ? ' afgewezen' : ''}">
-      <div class="lead-logo">
-        <img src="${faviconUrl}" alt="" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22><rect fill=%22%23e8f0fa%22 width=%2240%22 height=%2240%22/><text x=%2220%22 y=%2226%22 text-anchor=%22middle%22 font-size=%2218%22>🏭</text></svg>'" />
+    <div class="lead-card ${statusClass}${isAfgewezen ? ' afgewezen' : ''}" id="lead-${l.id}" onclick="toggleLeadDetail('${l.id}')">
+      <div class="lead-top">
+        <div class="lead-logo">
+          <img src="${faviconUrl}" alt="" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22><rect fill=%22%23e8f0fa%22 width=%2240%22 height=%2240%22/><text x=%2220%22 y=%2226%22 text-anchor=%22middle%22 font-size=%2218%22>🏭</text></svg>'" />
+        </div>
+        <div class="lead-info">
+          <div class="lead-naam">${escHTML(l.titel)}</div>
+          <div class="lead-snippet">${escHTML(l.snippet)}</div>
+          <a class="lead-url" href="${escHTML(l.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">🔗 ${escHTML(l.domein)}</a>
+          <span class="lead-status-badge s-${statusClass}">${isFollowup ? '⚠️ Follow-up!' : statusLabel}</span>
+        </div>
+        <div class="lead-acties">
+          <button class="lead-btn like${isLiked ? ' actief' : ''}" onclick="event.stopPropagation();likeLead('${l.id}')" title="Interessant">⭐</button>
+          <button class="lead-btn dislike${isAfgewezen ? ' actief' : ''}" onclick="event.stopPropagation();dislikeLead('${l.id}')" title="Niet relevant">❌</button>
+        </div>
       </div>
-      <div class="lead-info">
-        <div class="lead-naam">${escHTML(l.titel)}</div>
-        <div class="lead-snippet">${escHTML(l.snippet)}</div>
-        <a class="lead-url" href="${escHTML(l.url)}" target="_blank" rel="noopener">🔗 ${escHTML(l.domein)}</a>
-      </div>
-      <div class="lead-acties">
-        <button class="lead-btn like${isLiked ? ' actief' : ''}" onclick="event.stopPropagation();likeLead('${l.id}')" title="Interessant">⭐</button>
-        <button class="lead-btn dislike${isAfgewezen ? ' actief' : ''}" onclick="event.stopPropagation();dislikeLead('${l.id}')" title="Niet relevant">❌</button>
+
+      <!-- DETAIL PANEL -->
+      <div class="lead-detail" onclick="event.stopPropagation()">
+        <!-- Pipeline -->
+        <div class="lead-pipeline">
+          ${PIPELINE_STAPPEN.filter(s => s !== 'nieuw').map(s => `<button class="lead-pipeline-stap${l.status === s ? ' actief' : ''}" onclick="zetLeadStatus('${l.id}','${s}')">${PIPELINE_LABELS[s]}</button>`).join('')}
+        </div>
+
+        <!-- Beschikbaarheid -->
+        <div class="lead-beschikbaarheid" id="lb-${l.id}">📅 ${getBeschikbaarheidTekst()}</div>
+
+        <!-- Contact gegevens -->
+        <div class="lead-detail-grid">
+          <div class="form-groep"><label>Contactpersoon</label><input type="text" id="lc-naam-${l.id}" value="${escHTML(l.contactNaam || '')}" placeholder="Naam" onchange="slaContactOp('${l.id}')" /></div>
+          <div class="form-groep"><label>Functie</label><input type="text" id="lc-functie-${l.id}" value="${escHTML(l.contactFunctie || '')}" placeholder="TD-chef, plantmanager..." onchange="slaContactOp('${l.id}')" /></div>
+          <div class="form-groep"><label>E-mail</label><input type="email" id="lc-email-${l.id}" value="${escHTML(l.contactEmail || '')}" placeholder="info@..." onchange="slaContactOp('${l.id}')" /></div>
+          <div class="form-groep"><label>Telefoon</label><input type="tel" id="lc-tel-${l.id}" value="${escHTML(l.contactTelefoon || '')}" placeholder="06-..." onchange="slaContactOp('${l.id}')" /></div>
+        </div>
+
+        <!-- E-mail template -->
+        <div class="lead-email-preview">
+          <div class="lead-email-subject" id="le-subject-${l.id}">${escHTML(subject)}</div>
+          <p id="le-body-${l.id}">${escHTML(body)}</p>
+        </div>
+        <div class="lead-email-acties">
+          <button class="primary" onclick="openInGmail('${l.id}')">📧 Open in Gmail</button>
+          <button onclick="kopieerEmail('${l.id}')">📋 Kopieer</button>
+          <button onclick="toonEmail('${l.id}')">🔄 Vernieuw template</button>
+        </div>
+
+        <!-- Notities -->
+        <textarea class="lead-notities" id="lc-notities-${l.id}" placeholder="Notities..." onchange="slaContactOp('${l.id}')">${escHTML(l.notities || '')}</textarea>
       </div>
     </div>`;
   }).join('');
 }
 
-function escHTML(s) {
-  if (!s) return '';
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
 function updateLeadMetrics() {
   document.getElementById('lm-gevonden').textContent = leadData.length;
   document.getElementById('lm-liked').textContent = leadData.filter(l => l.status === 'liked').length;
-  // Agent score = gemiddelde query score
-  const scores = Object.values(leadAgent.queryScores);
-  const gem = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length * 10) / 10 : 0;
-  document.getElementById('lm-score').textContent = gem > 0 ? `+${gem}` : gem;
+  document.getElementById('lm-benaderd').textContent = leadData.filter(l => l.status === 'benaderd' || l.status === 'followup').length;
+  document.getElementById('lm-pipeline').textContent = leadData.filter(l => ['reactie','afspraak','klant'].includes(l.status)).length;
+  updateWeekStatus();
+  updateBeschikbaarheid();
 }
 
 function updateQueryResterend() {
   const el = document.getElementById('lead-queries-resterend');
-  if (el) el.textContent = `Zoekacties vandaag: ${leadAgent.totaalZoekacties} / 100`;
+  if (el) el.textContent = `Zoekacties: ${leadAgent.totaalZoekacties} (wekelijks)`;
 }
 
 // ── Handmatig toevoegen ──
@@ -1828,6 +2068,7 @@ function voegHandmatigLeadToe() {
     bronQuery: 'handmatig',
     status: 'nieuw',
     datum: new Date().toISOString().split('T')[0],
+    contactNaam: '', contactFunctie: '', contactEmail: '', contactTelefoon: '', notities: '',
   });
 
   slaLeadData();
@@ -1848,7 +2089,7 @@ function openSlimGoogleZoek() {
 // ── Reset ──
 function resetLeadAgent() {
   if (!confirm('Weet je zeker dat je het agent geheugen wilt wissen? Leads blijven bewaard.')) return;
-  leadAgent = { queryScores: {}, likedKeywords: [], blockedDomains: [], zoekIndex: 0, totaalZoekacties: 0 };
+  leadAgent = { queryScores: {}, likedKeywords: [], blockedDomains: [], zoekIndex: 0, totaalZoekacties: 0, laatsteZoekDatum: null };
   localStorage.setItem('jm_lead_agent', JSON.stringify(leadAgent));
   updateLeadMetrics();
   alert('Agent geheugen gewist. De agent begint opnieuw met leren.');
