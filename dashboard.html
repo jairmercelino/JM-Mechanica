@@ -103,6 +103,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 /* ── EXPORT ── */
 .export-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.export-btns .exp-btn-breed { grid-column: 1 / -1; }
 .exp-btn { background: var(--navy-licht); color: var(--navy); border: 1.5px solid var(--navy-border); padding: 12px 8px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; text-align: center; font-family: inherit; }
 
 /* ── FACTUREN ── */
@@ -248,9 +249,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div class="card">
         <div class="card-titel">Handmatig toevoegen</div>
         <div class="form-groep"><label>Datum</label><input type="date" id="inp-datum" /></div>
-        <div class="form-groep"><label>Start</label><input type="time" id="inp-start" value="07:00" /></div>
+        <div class="form-groep"><label>Start</label><input type="time" id="inp-start" value="07:00" onchange="detectDienst()" /></div>
         <div class="form-groep"><label>Einde</label><input type="time" id="inp-einde" value="15:30" /></div>
         <div class="form-groep"><label>Pauze (minuten)</label><input type="number" id="inp-pauze" value="30" min="0" max="120" step="5" /></div>
+        <div id="dienst-info" style="font-size:11px;color:var(--oranje);margin:-4px 0 6px;display:none;"></div>
         <div class="form-groep">
           <label>Opdrachtgever</label>
           <div style="display:flex;gap:8px;">
@@ -359,9 +361,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div class="card">
         <div class="card-titel">Exporteren</div>
         <div class="export-btns">
-          <button class="exp-btn" onclick="kopieerOverzicht()">&#128203; Kopieer voor bureau</button>
+          <button class="exp-btn" onclick="kopieerOverzicht()">&#128203; Kopieer overzicht</button>
           <button class="exp-btn" onclick="downloadCSV()">&#128229; Download CSV</button>
-          <button class="exp-btn" onclick="openCertos()" style="background:var(--oranje);color:#fff;">&#128640; Doorsturen naar Certos</button>
+          <button class="exp-btn exp-btn-breed" onclick="genereerCertosPDF()" style="background:var(--oranje);color:#fff;">&#128196; Urenstaat genereren (Certos)</button>
+          <button class="exp-btn exp-btn-breed" onclick="openCertos()">&#128640; Open Certos uren-invoer</button>
         </div>
       </div>
     </div>
@@ -655,7 +658,7 @@ function fmtD(d) { return d.toISOString().split('T')[0]; }
 function fmtDNL(d) { return d.toLocaleDateString('nl-NL',{day:'numeric',month:'short'}); }
 function dagKort(d) { return ['Zo','Ma','Di','Wo','Do','Vr','Za'][d.getDay()]; }
 function dagLang(d) { return ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'][d.getDay()]; }
-function uVerschil(s,e) { const[sh,sm]=s.split(':').map(Number),[eh,em]=e.split(':').map(Number); return((eh*60+em)-(sh*60+sm))/60; }
+function uVerschil(s,e) { const[sh,sm]=s.split(':').map(Number),[eh,em]=e.split(':').map(Number); let diff=(eh*60+em)-(sh*60+sm); if(diff<=0) diff+=24*60; return diff/60; }
 function fmtU(u) { const h=Math.floor(u),m=Math.round((u-h)*60); return`${h}:${m.toString().padStart(2,'0')}`; }
 function weekNr(d) { const dt=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())); dt.setUTCDate(dt.getUTCDate()+4-(dt.getUTCDay()||7)); return Math.ceil((((dt-new Date(Date.UTC(dt.getUTCFullYear(),0,1)))/86400000)+1)/7); }
 function slaOp() { localStorage.setItem('jm_uren',JSON.stringify(alleUren)); }
@@ -696,13 +699,32 @@ function renderWeek() {
   document.getElementById('m-gem').textContent=dGew>0?fmtU(totU/dGew):'0:00';
 }
 
+// A-ware pauzetijden per dienst
+function getPauzeTijden(startTijd) {
+  const [h] = startTijd.split(':').map(Number);
+  if (h >= 5 && h < 14) return { pauzeStart: '12:00', pauzeEind: '12:30', dienst: 'Dagdienst' };
+  if (h >= 14 && h < 21) return { pauzeStart: '18:00', pauzeEind: '18:30', dienst: 'Middagdienst' };
+  return { pauzeStart: '00:00', pauzeEind: '00:30', dienst: 'Nachtdienst' };
+}
+
+function detectDienst() {
+  const start = document.getElementById('inp-start').value;
+  if (!start) return;
+  const info = getPauzeTijden(start);
+  const el = document.getElementById('dienst-info');
+  el.textContent = `${info.dienst} — pauze ${info.pauzeStart}–${info.pauzeEind}`;
+  el.style.display = 'block';
+  document.getElementById('inp-pauze').value = 30;
+}
+
 function voegToe() {
   const datum=document.getElementById('inp-datum').value, start=document.getElementById('inp-start').value, einde=document.getElementById('inp-einde').value, klant=document.getElementById('inp-klant').value;
   const pauze=parseInt(document.getElementById('inp-pauze').value)||0;
   if(!datum||!start||!einde){alert('Vul datum, start en eindtijd in.');return;}
-  if(uVerschil(start,einde)<=0){alert('Eindtijd moet na starttijd zijn.');return;}
-  alleUren.push({id:Date.now().toString(),datum,start,einde,pauze,klant}); slaOp(); renderWeek();
+  const pt = getPauzeTijden(start);
+  alleUren.push({id:Date.now().toString(),datum,start,einde,pauze,klant,pauzeStart:pt.pauzeStart,pauzeEind:pt.pauzeEind,dienst:pt.dienst}); slaOp(); renderWeek();
   document.getElementById('inp-klant').value='';
+  document.getElementById('dienst-info').style.display='none';
   toonPagina('uren', document.querySelectorAll('.nav-item')[1]);
 }
 
@@ -734,23 +756,117 @@ function downloadCSV() {
 }
 
 function openCertos() {
-  // Kopieer eerst het overzicht naar klembord
-  const wn = weekNr(huidigeMaandag);
-  let txt = `Week ${wn} uren:\n`;
-  for (let i = 0; i < 5; i++) {
-    const dag = new Date(huidigeMaandag); dag.setDate(dag.getDate() + i);
-    const du = alleUren.filter(u => u.datum === fmtD(dag));
-    if (du.length > 0) du.forEach(u => {
-      const netto = uVerschil(u.start, u.einde) - (u.pauze || 0) / 60;
-      txt += `${dagKort(dag)} ${fmtDNL(dag)}: ${u.start}–${u.einde} (${u.pauze || 0}m pauze) = ${fmtU(netto)}u\n`;
-    });
-  }
-  navigator.clipboard.writeText(txt).catch(() => {});
-
-  // Open Certos op de maandag van de huidige week
   const ma = new Date(huidigeMaandag);
   const url = `https://certos.my.site.com/Candidate/s/uren-invoeren?year=${ma.getFullYear()}&month=${ma.getMonth() + 1}&day=${ma.getDate()}&view=week&businessUnitId=a092o00004CMrsFAAT`;
   window.open(url, '_blank');
+}
+
+function genereerCertosPDF() {
+  const wn = weekNr(huidigeMaandag);
+  const ma = new Date(huidigeMaandag);
+  const vr = new Date(ma); vr.setDate(vr.getDate() + 4);
+
+  // PDF genereren via canvas
+  const w = 595, h = 842; // A4
+  const canvas = document.createElement('canvas');
+  canvas.width = w * 2; canvas.height = h * 2;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(2, 2);
+
+  // Achtergrond
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, w, h);
+
+  // Header
+  ctx.fillStyle = '#022448';
+  ctx.fillRect(0, 0, w, 80);
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 22px system-ui, sans-serif';
+  ctx.fillText('Urenstaat — JM Mechanica', 30, 35);
+  ctx.font = '13px system-ui, sans-serif';
+  ctx.fillText(`Week ${wn} | ${fmtDNL(ma)} t/m ${fmtDNL(vr)} ${ma.getFullYear()}`, 30, 58);
+  ctx.fillText('A-ware Almere — Wittevrouwen 2', 30, 73);
+
+  // Tabel header
+  let y = 110;
+  ctx.fillStyle = '#f0f4f8';
+  ctx.fillRect(20, y - 4, w - 40, 26);
+  ctx.fillStyle = '#022448';
+  ctx.font = 'bold 11px system-ui, sans-serif';
+  const kolommen = ['Dag', 'Datum', 'Start', 'Einde', 'Pauze', 'Pauze tijd', 'Netto'];
+  const kx = [30, 100, 185, 250, 315, 385, 500];
+  kolommen.forEach((k, i) => ctx.fillText(k, kx[i], y + 13));
+  y += 32;
+
+  // Rijen
+  ctx.font = '12px system-ui, sans-serif';
+  let totaal = 0;
+  for (let i = 0; i < 7; i++) {
+    const dag = new Date(ma); dag.setDate(dag.getDate() + i);
+    const du = alleUren.filter(u => u.datum === fmtD(dag));
+
+    if (i % 2 === 0) {
+      ctx.fillStyle = '#fafbfc';
+      ctx.fillRect(20, y - 4, w - 40, du.length > 0 ? du.length * 24 : 24);
+    }
+
+    if (du.length === 0) {
+      ctx.fillStyle = '#ccc';
+      ctx.fillText(dagLang(dag), kx[0], y + 12);
+      ctx.fillText(fmtDNL(dag), kx[1], y + 12);
+      ctx.fillText('—', kx[2], y + 12);
+      y += 24;
+    } else {
+      du.forEach((u, idx) => {
+        ctx.fillStyle = '#333';
+        if (idx === 0) {
+          ctx.font = 'bold 12px system-ui, sans-serif';
+          ctx.fillText(dagLang(dag), kx[0], y + 12);
+          ctx.fillText(fmtDNL(dag), kx[1], y + 12);
+          ctx.font = '12px system-ui, sans-serif';
+        }
+        ctx.fillText(u.start, kx[2], y + 12);
+        ctx.fillText(u.einde, kx[3], y + 12);
+        ctx.fillText(`${u.pauze || 0} min`, kx[4], y + 12);
+        const ps = u.pauzeStart || getPauzeTijden(u.start).pauzeStart;
+        const pe = u.pauzeEind || getPauzeTijden(u.start).pauzeEind;
+        ctx.fillText(`${ps}–${pe}`, kx[5], y + 12);
+        const netto = uVerschil(u.start, u.einde) - (u.pauze || 0) / 60;
+        totaal += netto;
+        ctx.font = 'bold 12px system-ui, sans-serif';
+        ctx.fillText(fmtU(netto) + 'u', kx[6], y + 12);
+        ctx.font = '12px system-ui, sans-serif';
+        y += 24;
+      });
+    }
+  }
+
+  // Totaal rij
+  y += 8;
+  ctx.fillStyle = '#022448';
+  ctx.fillRect(20, y, w - 40, 2);
+  y += 14;
+  ctx.font = 'bold 14px system-ui, sans-serif';
+  ctx.fillText('TOTAAL', kx[0], y + 12);
+  ctx.fillText(fmtU(totaal) + ' uur', kx[6], y + 12);
+
+  // Footer
+  y += 40;
+  ctx.font = '10px system-ui, sans-serif';
+  ctx.fillStyle = '#999';
+  ctx.fillText('JM Mechanica | KvK 86164309 | BTW NL004201082B62 | info@jmmechanica.nl', 30, y);
+  ctx.fillText(`Gegenereerd: ${new Date().toLocaleDateString('nl-NL')} ${new Date().toLocaleTimeString('nl-NL', {hour:'2-digit',minute:'2-digit'})}`, 30, y + 16);
+
+  // Download als afbeelding (universeel, werkt op alle telefoons)
+  canvas.toBlob(blob => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `JM_urenstaat_week${wn}.png`;
+    a.click();
+    URL.revokeObjectURL(url);
+    alert('Urenstaat gedownload! Upload dit bestand naar Certos.');
+  }, 'image/png');
 }
 
 // ── FACTUREN ──
