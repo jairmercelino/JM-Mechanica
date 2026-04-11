@@ -325,7 +325,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         <div class="card-titel">⚙️ Rooster instellingen</div>
         <div class="form-groep">
           <label>Startdatum patroon</label>
-          <input type="date" id="rooster-startdatum" value="2026-04-06" onchange="slaRoosterInstellingenOp()" />
+          <input type="date" id="rooster-startdatum" value="2026-04-05" onchange="slaRoosterInstellingenOp()" />
         </div>
         <div class="form-groep">
           <label>Patroon interval</label>
@@ -1263,7 +1263,7 @@ function renderKostenLijst(lijstId, cardId, items) {
 const DIENST_PATROON = ['D','D','M','M','N','N',null,null,null,null];
 const DIENST_TIJDEN = { D: {start:'05:30',einde:'13:30'}, M: {start:'13:30',einde:'21:30'}, N: {start:'21:30',einde:'05:30'} };
 
-let roosterInstellingen = JSON.parse(localStorage.getItem('jm_rooster_inst') || '{"startdatum":"2026-04-06","interval":10}');
+let roosterInstellingen = JSON.parse(localStorage.getItem('jm_rooster_inst') || '{"startdatum":"2026-04-05","interval":10}');
 let roosterAanpassingen = JSON.parse(localStorage.getItem('jm_rooster_aanp') || '{}');
 let huidigeMaand = new Date();
 huidigeMaand.setDate(1);
