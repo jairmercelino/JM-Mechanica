@@ -363,6 +363,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         <div class="export-btns">
           <button class="exp-btn" onclick="kopieerOverzicht()">&#128203; Kopieer overzicht</button>
           <button class="exp-btn" onclick="downloadCSV()">&#128229; Download CSV</button>
+          <button class="exp-btn exp-btn-breed" onclick="roosterNaarUren()" style="background:var(--navy);color:#fff;">&#128197; Rooster overnemen in uren</button>
           <button class="exp-btn exp-btn-breed" onclick="genereerCertosPDF()" style="background:var(--oranje);color:#fff;">&#128196; Urenstaat genereren (Certos)</button>
           <button class="exp-btn exp-btn-breed" onclick="openCertos()">&#128640; Open Certos uren-invoer</button>
         </div>
@@ -729,6 +730,39 @@ function voegToe() {
 }
 
 function verwijder(id) { alleUren=alleUren.filter(u=>u.id!==id); slaOp(); renderWeek(); }
+
+function roosterNaarUren() {
+  let toegevoegd = 0;
+  for (let i = 0; i < 7; i++) {
+    const dag = new Date(huidigeMaandag); dag.setDate(dag.getDate() + i);
+    const ds = fmtD(dag);
+    const dienst = getDienst(dag);
+    if (!dienst) continue;
+    // Check of er al uren zijn voor deze dag
+    if (alleUren.some(u => u.datum === ds)) continue;
+    const tijden = DIENST_TIJDEN[dienst];
+    if (!tijden) continue;
+    const pt = getPauzeTijden(tijden.start);
+    alleUren.push({
+      id: Date.now().toString() + i,
+      datum: ds,
+      start: tijden.start,
+      einde: tijden.einde,
+      pauze: 30,
+      klant: 'A-ware',
+      pauzeStart: pt.pauzeStart,
+      pauzeEind: pt.pauzeEind,
+      dienst: pt.dienst
+    });
+    toegevoegd++;
+  }
+  if (toegevoegd > 0) {
+    slaOp(); renderWeek();
+    alert(`${toegevoegd} dienst(en) overgenomen uit rooster.`);
+  } else {
+    alert('Geen nieuwe diensten om over te nemen — week is al ingevuld of geen diensten gepland.');
+  }
+}
 
 function kopieerOverzicht() {
   const wn=weekNr(huidigeMaandag); let txt=`UREN OVERZICHT — JM Mechanica\nWeek ${wn}\n${' '.repeat(40)}\n`;
@@ -1261,7 +1295,7 @@ function renderKostenLijst(lijstId, cardId, items) {
 
 // ── ROOSTER KALENDER ──
 const DIENST_PATROON = ['D','D','M','M','N','N',null,null,null,null];
-const DIENST_TIJDEN = { D: {start:'05:30',einde:'13:30'}, M: {start:'13:30',einde:'21:30'}, N: {start:'21:30',einde:'05:30'} };
+const DIENST_TIJDEN = { D: {start:'05:30',einde:'14:00'}, M: {start:'13:30',einde:'22:00'}, N: {start:'21:30',einde:'06:00'} };
 
 let roosterInstellingen = JSON.parse(localStorage.getItem('jm_rooster_inst') || '{"startdatum":"2026-04-05","interval":10}');
 let roosterAanpassingen = JSON.parse(localStorage.getItem('jm_rooster_aanp') || '{}');
@@ -1290,7 +1324,7 @@ function passDienstAan(datumStr) {
     : getDienstVanPatroon(datumStr);
   
   const keuze = prompt(
-    `Dienst voor ${datumStr}:\n\nD = Dag (05:30–13:30)\nM = Middag (13:30–21:30)\nN = Nacht (21:30–05:30)\nV = Vrij\n\nHuidige: ${huidig || 'Vrij'}\nTyp D, M, N of V (leeg = reset naar patroon):`,
+    `Dienst voor ${datumStr}:\n\nD = Dag (05:30–14:00)\nM = Middag (13:30–22:00)\nN = Nacht (21:30–06:00)\nV = Vrij\n\nHuidige: ${huidig || 'Vrij'}\nTyp D, M, N of V (leeg = reset naar patroon):`,
     huidig || 'V'
   );
   
