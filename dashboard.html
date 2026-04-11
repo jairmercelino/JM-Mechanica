@@ -654,7 +654,7 @@ function toggleKlok(autoUitklok) {
 // ── UREN ──
 let huidigeMaandag = getMaandag(new Date());
 function getMaandag(d) { const dag=new Date(d),dow=dag.getDay(),diff=dow===0?-6:1-dow; dag.setDate(dag.getDate()+diff); dag.setHours(0,0,0,0); return dag; }
-function fmtD(d) { return d.toISOString().split('T')[0]; }
+function fmtD(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 function fmtDNL(d) { return d.toLocaleDateString('nl-NL',{day:'numeric',month:'short'}); }
 function dagKort(d) { return ['Zo','Ma','Di','Wo','Do','Vr','Za'][d.getDay()]; }
 function dagLang(d) { return ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'][d.getDay()]; }
