@@ -4,3 +4,7 @@ compatibility_date = "2024-01-01"
 
 [vars]
 ALLOWED_ORIGIN = "https://jmmechanica.nl"
+
+[[kv_namespaces]]
+binding = "JM_DATA"
+id = "PLACEHOLDER_KV_ID"

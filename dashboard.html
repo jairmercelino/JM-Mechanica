@@ -368,6 +368,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
           <button class="exp-btn exp-btn-breed" onclick="openCertos()">&#128640; Open Certos uren-invoer</button>
         </div>
       </div>
+      <div class="card">
+        <div class="card-titel">&#128259; Cloud Sync</div>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+          <button class="exp-btn" onclick="syncVanCloud()" style="flex:1;">&#128259; Sync ophalen</button>
+          <button class="exp-btn" onclick="setSyncPin()" style="flex:1;">&#128272; PIN instellen</button>
+        </div>
+        <div id="sync-status" style="font-size:11px;color:#888;text-align:center;"></div>
+        </div>
+      </div>
     </div>
 
     <!-- FACTUREN PAGINA -->
@@ -608,6 +617,8 @@ function init() {
   updateRoosterSelect();
   renderOpdrachtgevers('');
   updateFacturenUI();
+  // Auto-sync bij openen als PIN is ingesteld
+  if (syncPin) syncVanCloud();
 }
 
 function startKlokDisplay() {
@@ -662,7 +673,74 @@ function dagLang(d) { return ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag
 function uVerschil(s,e) { const[sh,sm]=s.split(':').map(Number),[eh,em]=e.split(':').map(Number); let diff=(eh*60+em)-(sh*60+sm); if(diff<=0) diff+=24*60; return diff/60; }
 function fmtU(u) { const h=Math.floor(u),m=Math.round((u-h)*60); return`${h}:${m.toString().padStart(2,'0')}`; }
 function weekNr(d) { const dt=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())); dt.setUTCDate(dt.getUTCDate()+4-(dt.getUTCDay()||7)); return Math.ceil((((dt-new Date(Date.UTC(dt.getUTCFullYear(),0,1)))/86400000)+1)/7); }
-function slaOp() { localStorage.setItem('jm_uren',JSON.stringify(alleUren)); }
+function slaOp() { localStorage.setItem('jm_uren',JSON.stringify(alleUren)); syncNaarCloud(); }
+
+// ── CLOUD SYNC ──
+const SYNC_URL = 'https://jm-lead-search.jwz-jjm.workers.dev/sync';
+let syncPin = localStorage.getItem('jm_sync_pin') || '';
+
+function setSyncPin() {
+  const pin = prompt('Voer je 4-cijferige sync PIN in:', syncPin);
+  if (pin && /^\d{4}$/.test(pin)) {
+    syncPin = pin;
+    localStorage.setItem('jm_sync_pin', pin);
+    syncVanCloud();
+  } else if (pin !== null) {
+    alert('PIN moet 4 cijfers zijn.');
+  }
+}
+
+async function syncNaarCloud() {
+  if (!syncPin) return;
+  try {
+    await fetch(SYNC_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Sync-Pin': syncPin },
+      body: JSON.stringify({ uren: alleUren })
+    });
+    updateSyncStatus('Gesynct');
+  } catch (e) {
+    updateSyncStatus('Sync mislukt');
+  }
+}
+
+async function syncVanCloud() {
+  if (!syncPin) { setSyncPin(); return; }
+  try {
+    updateSyncStatus('Ophalen...');
+    const res = await fetch(`${SYNC_URL}?pin=${syncPin}`);
+    const data = await res.json();
+    if (data.error) { alert('Sync fout: ' + data.error); updateSyncStatus('Fout'); return; }
+    if (data.uren && data.uren.length > 0) {
+      // Merge: voeg ontbrekende uren toe op basis van ID
+      const bestaandeIds = new Set(alleUren.map(u => u.id));
+      let nieuw = 0;
+      data.uren.forEach(u => {
+        if (!bestaandeIds.has(u.id)) { alleUren.push(u); nieuw++; }
+      });
+      // Upload ook lokale uren die cloud niet heeft
+      localStorage.setItem('jm_uren', JSON.stringify(alleUren));
+      await fetch(SYNC_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Sync-Pin': syncPin },
+        body: JSON.stringify({ uren: alleUren })
+      });
+      renderWeek();
+      updateSyncStatus(`Gesynct (${nieuw} nieuw)`);
+    } else {
+      // Cloud is leeg, push lokaal naar cloud
+      await syncNaarCloud();
+      updateSyncStatus('Gesynct');
+    }
+  } catch (e) {
+    updateSyncStatus('Sync mislukt');
+  }
+}
+
+function updateSyncStatus(tekst) {
+  const el = document.getElementById('sync-status');
+  if (el) el.textContent = tekst;
+}
 
 function navigeerWeek(r) { huidigeMaandag=new Date(huidigeMaandag); huidigeMaandag.setDate(huidigeMaandag.getDate()+r*7); renderWeek(); }
 
@@ -1405,7 +1483,7 @@ function renderKalender() {
     let dienstHTML = '';
     if (dienst) {
       const t = DIENST_TIJDEN[dienst];
-      dienstHTML = `<div class="dienst-blok dienst-${dienst}" style="${isAangepast?'outline:2px solid #fff;':''}">${dienst}<br><span class="dienst-tijd">${t.start}</span></div>`;
+      dienstHTML = `<div class="dienst-blok dienst-${dienst}" style="${isAangepast?'outline:2px solid #fff;':''}">${dienst}<br><span class="dienst-tijd">${t.start}–${t.einde}</span></div>`;
     }
 
     cel.innerHTML = `<div class="rooster-dag-nr">${dag.getDate()}${isAangepast?'<span style="color:var(--navy);font-size:8px;">✎</span>':''}</div>${dienstHTML}`;

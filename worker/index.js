@@ -1,21 +1,24 @@
 /**
- * JM Mechanica — Lead Search Proxy
- * Cloudflare Worker die Serper.dev (Google Search) aanroept server-side.
- * API key blijft veilig als environment secret.
+ * JM Mechanica — Lead Search Proxy + Uren Sync
+ * Cloudflare Worker die Serper.dev (Google Search) aanroept server-side
+ * en uren-data synct via KV storage.
  *
  * Secrets (via wrangler secret put):
  *   SERPER_API_KEY — Serper.dev API key
+ *   SYNC_PIN — 4-cijferige PIN voor uren sync
+ *
+ * KV Namespace:
+ *   JM_DATA — opslag voor uren sync
  */
 
 export default {
   async fetch(request, env) {
-    // CORS
     const origin = request.headers.get('Origin') || '';
     const allowed = env.ALLOWED_ORIGIN || 'https://jmmechanica.nl';
     const corsHeaders = {
       'Access-Control-Allow-Origin': origin === 'http://localhost:3000' || origin.includes('jmmechanica') ? origin : allowed,
-      'Access-Control-Allow-Methods': 'GET, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, X-Sync-Pin',
       'Access-Control-Max-Age': '86400',
     };
 
@@ -23,11 +26,45 @@ export default {
       return new Response(null, { status: 204, headers: corsHeaders });
     }
 
+    const url = new URL(request.url);
+    const path = url.pathname;
+
+    // ── UREN SYNC ──
+    if (path === '/sync') {
+      // PIN check
+      const pin = request.headers.get('X-Sync-Pin') || url.searchParams.get('pin');
+      if (!pin || pin !== env.SYNC_PIN) {
+        return Response.json({ error: 'Ongeldige PIN' }, { status: 401, headers: corsHeaders });
+      }
+
+      if (!env.JM_DATA) {
+        return Response.json({ error: 'KV niet geconfigureerd' }, { status: 500, headers: corsHeaders });
+      }
+
+      // GET = ophalen
+      if (request.method === 'GET') {
+        const data = await env.JM_DATA.get('uren', 'json');
+        return Response.json({ uren: data || [], ts: Date.now() }, { headers: corsHeaders });
+      }
+
+      // POST = opslaan
+      if (request.method === 'POST') {
+        const body = await request.json();
+        if (!Array.isArray(body.uren)) {
+          return Response.json({ error: 'Ongeldige data' }, { status: 400, headers: corsHeaders });
+        }
+        await env.JM_DATA.put('uren', JSON.stringify(body.uren));
+        return Response.json({ ok: true, count: body.uren.length, ts: Date.now() }, { headers: corsHeaders });
+      }
+
+      return Response.json({ error: 'Alleen GET/POST' }, { status: 405, headers: corsHeaders });
+    }
+
+    // ── LEAD SEARCH (bestaand) ──
     if (request.method !== 'GET') {
       return Response.json({ error: 'Alleen GET requests' }, { status: 405, headers: corsHeaders });
     }
 
-    const url = new URL(request.url);
     const query = url.searchParams.get('q');
 
     if (!query) {
@@ -62,7 +99,6 @@ export default {
         );
       }
 
-      // Resultaten omzetten naar zelfde format als dashboard verwacht
       const items = (data.organic || []).map(item => ({
         title: item.title || '',
         snippet: item.snippet || '',
