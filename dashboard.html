@@ -361,6 +361,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         <div class="export-btns">
           <button class="exp-btn" onclick="kopieerOverzicht()">&#128203; Kopieer voor bureau</button>
           <button class="exp-btn" onclick="downloadCSV()">&#128229; Download CSV</button>
+          <button class="exp-btn" onclick="openCertos()" style="background:var(--oranje);color:#fff;">&#128640; Doorsturen naar Certos</button>
         </div>
       </div>
     </div>
@@ -554,7 +555,7 @@ if (localStorage.getItem('jm_in')==='1') {
   document.getElementById('login-scherm').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
   // Defer init until full script is parsed
-  setTimeout(() => { init(); initLocatie(); }, 0);
+  setTimeout(() => { init(); initLocatie(); verwerkUrlActie(); }, 0);
 }
 
 // iOS installeer banner
@@ -616,7 +617,7 @@ function startKlokDisplay() {
   }, 1000);
 }
 
-function toggleKlok() {
+function toggleKlok(autoUitklok) {
   if (!inklokTijd) {
     inklokTijd = new Date();
     localStorage.setItem('jm_clock_start', inklokTijd.getTime().toString());
@@ -628,9 +629,15 @@ function toggleKlok() {
     document.getElementById('klok-status-tekst').textContent = `Ingeklokt sinds ${ts}`;
   } else {
     document.getElementById('inp-einde').value = new Date().toTimeString().slice(0,5);
-    const pauze = prompt('Hoeveel minuten pauze gehad?', '30');
-    if (pauze === null) return; // Geannuleerd
-    document.getElementById('inp-pauze').value = parseInt(pauze) || 0;
+    let pauzeMin;
+    if (autoUitklok) {
+      pauzeMin = 30;
+    } else {
+      const pauze = prompt('Hoeveel minuten pauze gehad?', '30');
+      if (pauze === null) return;
+      pauzeMin = parseInt(pauze) || 0;
+    }
+    document.getElementById('inp-pauze').value = pauzeMin;
     document.getElementById('inklok-btn').textContent = 'Inklokken';
     document.getElementById('inklok-btn').classList.remove('actief');
     document.getElementById('klok-status-tekst').textContent = 'Niet ingeklokt';
@@ -724,6 +731,26 @@ function downloadCSV() {
   }
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
   a.download=`JM_week${wn}_uren.csv`; a.click();
+}
+
+function openCertos() {
+  // Kopieer eerst het overzicht naar klembord
+  const wn = weekNr(huidigeMaandag);
+  let txt = `Week ${wn} uren:\n`;
+  for (let i = 0; i < 5; i++) {
+    const dag = new Date(huidigeMaandag); dag.setDate(dag.getDate() + i);
+    const du = alleUren.filter(u => u.datum === fmtD(dag));
+    if (du.length > 0) du.forEach(u => {
+      const netto = uVerschil(u.start, u.einde) - (u.pauze || 0) / 60;
+      txt += `${dagKort(dag)} ${fmtDNL(dag)}: ${u.start}–${u.einde} (${u.pauze || 0}m pauze) = ${fmtU(netto)}u\n`;
+    });
+  }
+  navigator.clipboard.writeText(txt).catch(() => {});
+
+  // Open Certos op de maandag van de huidige week
+  const ma = new Date(huidigeMaandag);
+  const url = `https://certos.my.site.com/Candidate/s/uren-invoeren?year=${ma.getFullYear()}&month=${ma.getMonth() + 1}&day=${ma.getDate()}&view=week&businessUnitId=a092o00004CMrsFAAT`;
+  window.open(url, '_blank');
 }
 
 // ── FACTUREN ──
@@ -1359,6 +1386,28 @@ function renderRooster() {
   }).join('');
 }
 
+// ── iOS SHORTCUT URL-ACTIE ──
+function verwerkUrlActie() {
+  const params = new URLSearchParams(window.location.search);
+  const actie = params.get('actie');
+  if (!actie) return;
+
+  // Verwijder parameter uit URL zodat refresh niet opnieuw triggert
+  window.history.replaceState({}, '', window.location.pathname);
+
+  // Zorg dat inklok-pagina zichtbaar is
+  const inklokBtn = document.querySelector('.nav-item');
+  if (inklokBtn) toonPagina('inklok', inklokBtn);
+
+  if (actie === 'inklokken' && !inklokTijd) {
+    toggleKlok();
+    stuurPushMelding('✅ Ingeklokt', 'Automatisch ingeklokt via locatie', 'uit');
+  } else if (actie === 'uitklokken' && inklokTijd) {
+    toggleKlok(true);
+    stuurPushMelding('✅ Uitgeklokt', 'Automatisch uitgeklokt via locatie (30 min pauze)', 'in');
+  }
+}
+
 // ── GPS LOCATIE & PUSH MELDINGEN ──
 const WERK_LAT  = 52.3651;   // Wittevrouwen 2, Almere
 const WERK_LNG  = 5.2107;
@@ -1407,7 +1456,7 @@ function stuurPushMelding(titel, tekst, actie) {
     n.onclick = () => {
       window.focus();
       if (actie === 'in' && !inklokTijd) toggleKlok();
-      if (actie === 'uit' && inklokTijd) toggleKlok();
+      if (actie === 'uit' && inklokTijd) toggleKlok(true);
       n.close();
     };
   }
@@ -1524,7 +1573,7 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.addEventListener('message', e => {
     if (e.data && e.data.type === 'inklok-actie') {
       if (e.data.actie === 'in' && !inklokTijd) toggleKlok();
-      if (e.data.actie === 'uit' && inklokTijd) toggleKlok();
+      if (e.data.actie === 'uit' && inklokTijd) toggleKlok(true);
     }
   });
 }
