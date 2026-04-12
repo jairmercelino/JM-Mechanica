@@ -636,6 +636,7 @@ function toonPagina(naam, btn) {
   document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
   document.getElementById(`pagina-${naam}`).classList.add('actief');
   btn.classList.add('active');
+  sessionStorage.setItem('jm_tab', naam);
   if (naam==='uren') renderWeek();
   if (naam==='facturen') laadKostenAutomatisch();
   if (naam==='rooster') renderKalender();
@@ -672,6 +673,16 @@ function init() {
   updateFacturenUI();
   // Auto-sync bij openen als PIN is ingesteld
   if (syncPin) syncVanCloud();
+  // Herstel laatst geopende tab
+  const laatsteTab = sessionStorage.getItem('jm_tab');
+  if (laatsteTab) {
+    const tabNamen = ['klok','uren','facturen','rooster','leads'];
+    const idx = tabNamen.indexOf(laatsteTab);
+    if (idx >= 0) {
+      const btn = document.querySelectorAll('.nav-item')[idx];
+      if (btn) toonPagina(laatsteTab, btn);
+    }
+  }
 }
 
 function startKlokDisplay() {
