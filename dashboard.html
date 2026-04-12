@@ -2,7 +2,7 @@
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="JM Mechanica">
@@ -196,6 +196,42 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .lead-setup code { background: rgba(0,0,0,0.06); padding: 2px 6px; border-radius: 4px; font-size: 11px; }
 .lead-week-info { background: var(--navy-licht); border: 1px solid var(--navy-border); border-radius: 10px; padding: 10px 12px; margin-bottom: 1rem; font-size: 12px; color: var(--navy); display: flex; justify-content: space-between; align-items: center; }
 .toon-afgewezen-btn { background: none; border: 1px dashed #ccc; color: #aaa; font-size: 12px; padding: 10px; width: 100%; border-radius: 10px; cursor: pointer; font-family: inherit; margin-top: 4px; }
+
+/* ── MOBIEL RESPONSIVE ── */
+@media (max-width: 400px) {
+  .rooster-cel { min-height: 44px; padding: 3px; }
+  .rooster-dag-nr { font-size: 10px; }
+  .dienst-blok { font-size: 9px; padding: 1px 2px; }
+  .dienst-tijd { font-size: 7px; }
+  .metrics { grid-template-columns: repeat(3, 1fr); gap: 4px; }
+  .metric { padding: 0.5rem; }
+  .metric-value { font-size: 16px; }
+  .lead-metrics { grid-template-columns: repeat(2, 1fr); }
+  .lead-detail-grid { grid-template-columns: 1fr; }
+  .dag-klant { font-size: 11px; }
+  .dag-naam { width: 24px; font-size: 11px; }
+  .dag-datum { width: 38px; font-size: 10px; }
+  .export-btns { grid-template-columns: 1fr; }
+  .kw-tabs { grid-template-columns: repeat(2, 1fr); }
+  .lead-pipeline { gap: 3px; }
+  .lead-pipeline-stap { font-size: 9px; padding: 3px 6px; }
+  .inklok-tijd { font-size: 38px; }
+  .inklok-groot-btn { padding: 14px 30px; font-size: 14px; }
+}
+
+@media (max-width: 340px) {
+  .pagina { padding: 0.5rem; }
+  .card { padding: 0.75rem; }
+  .rooster-grid { gap: 1px; }
+  .rooster-cel { min-height: 38px; }
+}
+
+/* iPhone notch / Dynamic Island safe areas */
+@supports (padding: env(safe-area-inset-top)) {
+  .topbar { padding-top: env(safe-area-inset-top); }
+  .bottom-nav { padding-bottom: calc(env(safe-area-inset-bottom) + 8px); }
+  .content { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
+}
 </style>
 </head>
 <body>
@@ -540,7 +576,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 </div>
 
 <script>
-const WW_HASH = "01105d36818fd1b79e107e91aeacf9a150c24e586d9f6ce7acffb9262e554e9d";
+const AUTH_URL = 'https://jm-lead-search.jwz-jjm.workers.dev/auth';
 
 async function hashStr(s) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
@@ -550,11 +586,19 @@ async function hashStr(s) {
 async function login() {
   const ww = document.getElementById('ww-input').value;
   const h = await hashStr(ww);
-  if (h === WW_HASH) {
-    localStorage.setItem('jm_in','1');
-    document.getElementById('login-scherm').style.display = 'none';
-    document.getElementById('app').style.display = 'flex';
-    init();
+  try {
+    const res = await fetch(AUTH_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ hash: h })
+    });
+    const data = await res.json();
+    if (data.ok && data.token) {
+      localStorage.setItem('jm_in', '1');
+      localStorage.setItem('jm_token', data.token);
+      document.getElementById('login-scherm').style.display = 'none';
+      document.getElementById('app').style.display = 'flex';
+      init();
     initLocatie();
   } else {
     document.getElementById('login-fout').style.display = 'block';
@@ -565,10 +609,19 @@ async function login() {
 function uitloggen() { localStorage.removeItem('jm_in'); location.reload(); }
 
 if (localStorage.getItem('jm_in')==='1') {
-  document.getElementById('login-scherm').style.display = 'none';
-  document.getElementById('app').style.display = 'flex';
-  // Defer init until full script is parsed
-  setTimeout(() => { init(); initLocatie(); verwerkUrlActie(); }, 0);
+  const token = localStorage.getItem('jm_token');
+  if (token) {
+    // Verifieer sessie op achtergrond, start alvast op
+    document.getElementById('login-scherm').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    setTimeout(() => { init(); initLocatie(); verwerkUrlActie(); }, 0);
+    fetch(`${AUTH_URL}/check?token=${token}`).then(r => r.json()).then(d => {
+      if (!d.ok) { localStorage.removeItem('jm_in'); localStorage.removeItem('jm_token'); uitloggen(); }
+    }).catch(() => {}); // Offline = geen check, gewoon doorgaan
+  } else {
+    // Oude sessie zonder token, forceer opnieuw inloggen
+    localStorage.removeItem('jm_in');
+  }
 }
 
 // iOS installeer banner

@@ -6,6 +6,7 @@
  * Secrets (via wrangler secret put):
  *   SERPER_API_KEY — Serper.dev API key
  *   SYNC_PIN — 4-cijferige PIN voor uren sync
+ *   DASH_HASH — SHA-256 hash van dashboard wachtwoord
  *
  * KV Namespace:
  *   JM_DATA — opslag voor uren sync
@@ -18,7 +19,7 @@ export default {
     const corsHeaders = {
       'Access-Control-Allow-Origin': origin === 'http://localhost:3000' || origin.includes('jmmechanica') ? origin : allowed,
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, X-Sync-Pin',
+      'Access-Control-Allow-Headers': 'Content-Type, X-Sync-Pin, X-Auth-Hash',
       'Access-Control-Max-Age': '86400',
     };
 
@@ -58,6 +59,33 @@ export default {
       }
 
       return Response.json({ error: 'Alleen GET/POST' }, { status: 405, headers: corsHeaders });
+    }
+
+    // ── DASHBOARD LOGIN ──
+    if (path === '/auth' && request.method === 'POST') {
+      const body = await request.json();
+      if (!body.hash || !env.DASH_HASH) {
+        return Response.json({ ok: false }, { status: 401, headers: corsHeaders });
+      }
+      if (body.hash === env.DASH_HASH) {
+        // Genereer sessie token
+        const token = crypto.randomUUID();
+        if (env.JM_DATA) {
+          await env.JM_DATA.put(`session:${token}`, 'active', { expirationTtl: 86400 * 7 });
+        }
+        return Response.json({ ok: true, token }, { headers: corsHeaders });
+      }
+      return Response.json({ ok: false }, { status: 401, headers: corsHeaders });
+    }
+
+    // ── SESSIE CHECK ──
+    if (path === '/auth/check' && request.method === 'GET') {
+      const token = url.searchParams.get('token');
+      if (!token || !env.JM_DATA) {
+        return Response.json({ ok: false }, { status: 401, headers: corsHeaders });
+      }
+      const session = await env.JM_DATA.get(`session:${token}`);
+      return Response.json({ ok: session === 'active' }, { headers: corsHeaders });
     }
 
     // ── LEAD SEARCH (bestaand) ──
