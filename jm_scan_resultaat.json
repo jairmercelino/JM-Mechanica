@@ -294,6 +294,15 @@
   "Deels aftrekbaar": [],
   "Onbekende factuur": [
     {
+      "van": "Vodafone <mail@vodafone.nl>",
+      "onderwerp": "Je rekening van april 2026",
+      "datum": "Sat, 11 Apr 2026 10:07:03",
+      "bedrag": "€ 38,33",
+      "omschrijving": "Controleer zelf — voeg toe aan jm_config.json",
+      "heeft_pdf": true,
+      "inbox": "Gmail (prive)"
+    },
+    {
       "van": "\"ANWB Correspondentie\" <correspondentie@anwb.nl>",
       "onderwerp": "Factuur",
       "datum": "Mon, 6 Apr 2026 21:15:21 ",
