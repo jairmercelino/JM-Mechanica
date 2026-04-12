@@ -7,4 +7,4 @@ ALLOWED_ORIGIN = "https://jmmechanica.nl"
 
 [[kv_namespaces]]
 binding = "JM_DATA"
-id = "PLACEHOLDER_KV_ID"
+id = "b4181a5e95c645f390c60f1e55f4d3b2"
