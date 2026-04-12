@@ -17,6 +17,7 @@ import re
 import json
 import os
 import io
+import subprocess
 import webbrowser
 import shutil
 from email.header import decode_header
@@ -55,12 +56,42 @@ MAAND_MAP = {
 }
 
 
+def keychain_wachtwoord(account, service):
+    """Haal wachtwoord op uit macOS Keychain."""
+    try:
+        result = subprocess.run(
+            ['security', 'find-generic-password', '-a', account, '-s', service, '-w'],
+            capture_output=True, text=True, timeout=5
+        )
+        if result.returncode == 0:
+            return result.stdout.strip()
+    except Exception:
+        pass
+    return None
+
+
 def laad_config():
     if not os.path.exists(CONFIG_PAD):
         print(f"FOUT: jm_config.json niet gevonden in {SCRIPT_MAP}")
         exit(1)
     with open(CONFIG_PAD, 'r', encoding='utf-8') as f:
-        return json.load(f)
+        config = json.load(f)
+
+    # Op macOS: wachtwoorden uit Keychain halen als ze niet in config staan
+    is_ci = os.environ.get('CI') == 'true'
+    if not is_ci:
+        keychain_map = {
+            'jwz.jjm@gmail.com': 'jm-scanner-gmail',
+            'info@jmmechanica.nl': 'jm-scanner-hostnet',
+        }
+        for inbox in config.get('inboxen', []):
+            service = keychain_map.get(inbox['adres'])
+            if service:
+                ww = keychain_wachtwoord(inbox['adres'], service)
+                if ww:
+                    inbox['wachtwoord'] = ww
+
+    return config
 
 
 def datum_naar_kwartaal(datum_str):
