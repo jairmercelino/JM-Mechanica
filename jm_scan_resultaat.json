@@ -2,15 +2,6 @@
   "Inkomsten": [
     {
       "van": "Certos",
-      "onderwerp": "Certos heeft zojuist een bijdrage gepubliceerd",
-      "datum": "Mon, 6 Apr 2026 23:23:52 ",
-      "bedrag": "onbekend",
-      "omschrijving": "Inkomsten hoofdopdrachtgever",
-      "heeft_pdf": false,
-      "inbox": "Gmail (prive)"
-    },
-    {
-      "van": "Certos",
       "onderwerp": "Factuur Certos",
       "datum": "Thu, 9 Apr 2026 09:33:52 ",
       "bedrag": "€ 2.138,76",
@@ -219,6 +210,15 @@
   ],
   "100% aftrekbaar": [
     {
+      "van": "Shopify",
+      "onderwerp": "Birthday-Sale is LIVE! ",
+      "datum": "Mon, 13 Apr 2026 18:21:41",
+      "bedrag": "€ 42,50",
+      "omschrijving": "Webshop abonnement JM Styling",
+      "heeft_pdf": false,
+      "inbox": "Gmail (prive)"
+    },
+    {
       "van": "Alicia Insurance",
       "onderwerp": "De factuur van je verzekering staat klaar",
       "datum": "Wed, 25 Mar 2026 11:08:48",
@@ -298,15 +298,6 @@
       "onderwerp": "Je rekening van april 2026",
       "datum": "Sat, 11 Apr 2026 10:07:03",
       "bedrag": "€ 38,33",
-      "omschrijving": "Controleer zelf — voeg toe aan jm_config.json",
-      "heeft_pdf": true,
-      "inbox": "Gmail (prive)"
-    },
-    {
-      "van": "\"ANWB Correspondentie\" <correspondentie@anwb.nl>",
-      "onderwerp": "Factuur",
-      "datum": "Mon, 6 Apr 2026 21:15:21 ",
-      "bedrag": "€ 14,18",
       "omschrijving": "Controleer zelf — voeg toe aan jm_config.json",
       "heeft_pdf": true,
       "inbox": "Gmail (prive)"
