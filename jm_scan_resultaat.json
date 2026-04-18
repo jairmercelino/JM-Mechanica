@@ -2,6 +2,15 @@
   "Inkomsten": [
     {
       "van": "Certos",
+      "onderwerp": "Gefeliciteerd! Je inkoopfactuur staat klaar!",
+      "datum": "Fri, 17 Apr 2026 17:07:54",
+      "bedrag": "onbekend",
+      "omschrijving": "Inkomsten hoofdopdrachtgever",
+      "heeft_pdf": false,
+      "inbox": "Gmail (prive)"
+    },
+    {
+      "van": "Certos",
       "onderwerp": "Factuur Certos",
       "datum": "Thu, 9 Apr 2026 09:33:52 ",
       "bedrag": "€ 2.138,76",
@@ -302,6 +311,15 @@
   ],
   "Deels aftrekbaar": [],
   "Onbekende factuur": [
+    {
+      "van": "Rojda Gok <gokrojda@gmail.com>",
+      "onderwerp": "BTW aangifte 1e kw",
+      "datum": "Fri, 17 Apr 2026 20:09:55",
+      "bedrag": "€ 6,16",
+      "omschrijving": "Controleer zelf — voeg toe aan jm_config.json",
+      "heeft_pdf": true,
+      "inbox": "Gmail (prive)"
+    },
     {
       "van": "Vodafone <mail@vodafone.nl>",
       "onderwerp": "Je rekening van april 2026",
