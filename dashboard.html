@@ -599,8 +599,13 @@ async function login() {
       document.getElementById('login-scherm').style.display = 'none';
       document.getElementById('app').style.display = 'flex';
       init();
-    initLocatie();
-  } else {
+      initLocatie();
+    } else {
+      document.getElementById('login-fout').style.display = 'block';
+      document.getElementById('ww-input').value = '';
+    }
+  } catch (e) {
+    document.getElementById('login-fout').textContent = 'Verbindingsfout, probeer opnieuw';
     document.getElementById('login-fout').style.display = 'block';
     document.getElementById('ww-input').value = '';
   }
