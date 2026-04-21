@@ -170,7 +170,7 @@ Het systeem heeft **geen mechanisme** voor:
 - Er wordt niet geleerd van "klant geworden": `status=klant` leads hebben nergens verhoogd effect. Dat is wel het belangrijkste signaal (een klant is de ultieme positieve bevestiging).
 
 ### 4.7 Operationele limieten
-- **Zoekquota**: Serper gratis tier genoemd 2500/mnd (aanname, moet bevestigd). Per zoekactie 1 query = 10 resultaten. 1x per dag zoeken = 30/mnd — ruim binnen quota. Maar: agent kan gevoel van "veel zoeken" geven terwijl het rotatie is over 25 vaste queries.
+- **Zoekquota**: Serper gratis tier is een **eenmalige 2500 credits**, 6 maanden geldig — geen maandelijkse hernieuwing. Per zoekactie 1 query = 1 credit = 10 resultaten. Bij 1x/dag zoeken → ~180 queries in 6 mnd → ruim binnen. Intensiever (10+/dag) → tier binnen maanden op, dan betaald pakket nodig (~$50 voor 50k credits). Check huidig verbruik op serper.dev/dashboard.
 - **25 queries × 10 resultaten = theoretisch 250 unieke domeinen** in de hele historie. Veel van die 250 worden geskipt of geduplicateerd → realistisch misschien 80-150 bruikbare leads over alle queries heen. Daarna levert opnieuw zoeken niets op totdat Google zijn rankings verandert.
 
 ### 4.8 UI-verwarring

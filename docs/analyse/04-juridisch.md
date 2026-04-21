@@ -19,16 +19,19 @@ Je moet aan **beide** kanten voldoen. Tw is vaak de bindende voorwaarde omdat di
 ### 2.1 Hoofdregel
 Ongevraagde elektronische communicatie voor commerciële, ideële of charitatieve doeleinden is verboden zonder voorafgaande toestemming van de ontvanger (opt-in). [ACM](https://www.acm.nl/nl/verkoop-aan-consumenten/reclame-en-verleiden/spam-voorkomen-uw-reclame)
 
-### 2.2 Uitzondering 1 — rechtspersonen
-Voor rechtspersonen (BV, NV, stichting, vereniging, coöperatie) geldt een **soepeler regime**. Het is toegestaan een rechtspersoon ongevraagd te e-mailen **als**:
-1. Het gaat om een zakelijk, algemeen bekend gemaakt e-mailadres zoals `info@bedrijf.nl`; OF
-2. Er is een andere publiek kenbare aanduiding dat dit adres voor zakelijke berichten bedoeld is.
+### 2.2 Uitzondering 1 — rechtspersonen (nuance: grijs gebied)
+Voor e-mail richt art 11.7 lid 2 Tw zich expliciet op *"abonnees die natuurlijke personen zijn"*. Rechtspersonen (BV, NV, stichting, vereniging, coöperatie) vallen daar strikt genomen **niet** onder — dus voor hen is de hoofdregel (opt-in) niet automatisch van toepassing. De praktijkinterpretatie door ACM en veelgelezen bronnen:
 
-En ongeacht dit moet **elk** bericht aan een rechtspersoon bevatten:
-- Duidelijke identificatie van de afzender.
-- Een eenvoudige, gratis opt-out (afmeldmogelijkheid).
+1. Rechtspersoon e-mailen zonder opt-in is in principe mogelijk, **mits** je voldoet aan lid 5 (de afmeldmogelijkheid-eis).
+2. Per bericht moet sowieso aanwezig zijn:
+   - Duidelijke identificatie van de afzender.
+   - Een eenvoudige, gratis opt-out (afmeldmogelijkheid).
 
-Bron: [Rijksoverheid](https://www.rijksoverheid.nl/onderwerpen/telecommunicatie/vraag-en-antwoord/wat-doen-tegen-spam), [ACM B2B spam](https://www.acm.nl/nl/telecom/zakelijk-abonnement-voor-bellen-en-internet/spam).
+**Grijs gebied**: DDMA en ACM hanteren in richtlijnen vaak de extra voorwaarde dat het zakelijke e-mailadres publiekelijk bekend is gemaakt EN met expliciete mededeling dat het voor reclame gebruikt mag worden. Dit staat **niet letterlijk** in de wet voor e-mail (wel voor telemarketing na 2021). Voor de praktijk betekent dit:
+- `info@bedrijf.nl` dat op hun eigen site staat: zeer waarschijnlijk toegestaan met opt-out, maar niet zonder juridisch risico in een handhavingszaak.
+- Een persoonlijk zakelijk adres (`jan@bedrijf.nl`) zonder publieke advertisering: risicovoller.
+
+Bron: [Rijksoverheid](https://www.rijksoverheid.nl/onderwerpen/telecommunicatie/vraag-en-antwoord/wat-doen-tegen-spam), [ACM B2B spam](https://www.acm.nl/nl/telecom/zakelijk-abonnement-voor-bellen-en-internet/spam), [DDMA E-mail wetgeving](https://ddma.nl/legal/wetgeving/e-mail/). Omdat de formulering in de wet voor e-mail minder strikt is dan voor telefoon, is er interpretatieruimte — een advocaat kan hierin scherper adviseren dan deze analyse.
 
 ### 2.3 Uitzondering 2 — bestaande klantrelatie (soft opt-in)
 Tw 11.7 lid 4: als je het adres hebt gekregen in het kader van een verkoop en je verstuurt "soortgelijke" producten/diensten, mag je zonder opt-in mailen — mits elke mail een opt-out bevat.

@@ -25,7 +25,7 @@ Cumulatieve werkschatting staat onderaan.
 - **Hoe**:
   1. `.gitignore` toevoegen: `jm_scan_resultaat.json`, `Facturen/`.
   2. `git rm --cached jm_scan_resultaat.json` + commit.
-  3. GitHub history purge met `git filter-repo` of BFG (optioneel, arbeidsintensief; minimaal voor "nu niet meer").
+  3. **Belangrijk**: stap 1-2 halen het bestand uit toekomstige commits. De huidige + historische data (zie git log: elke "Auto-scan" commit bevat een snapshot) blijft in `.git/objects` en op GitHub zichtbaar via de history. Voor volledige verwijdering is `git filter-repo` of BFG nodig, gevolgd door `git push --force` én een GitHub-support-ticket om de geblobte objects echt weg te laten halen. Dat is serieus werk (2-3u inclusief risico op kapotte cloned repos), en voor **data die al openbaar is sinds april 2026** is het deels symbolisch (derden kunnen al gekopieerd hebben). Advies: minimaal stoppen met nieuwe commits, purge van history als nodig later.
   4. GitHub Action aanpassen: schrijf output naar een private Cloudflare R2-bucket of naar dashboard via Worker + KV (kleine JSON, past in KV).
   5. Dashboard `laadKostenAutomatisch()` aanpassen naar nieuwe bron.
 - **Werk**: 2-4u (de Worker/R2-route is iets meer).
@@ -182,7 +182,7 @@ Cumulatieve werkschatting staat onderaan.
   3. System prompt: "Schrijf een korte, persoonlijke, Nederlandstalige zakelijke mail..."
   4. Token-kosten: ~€0.001-0.003 per mail. 10/week = €0.10/mnd. Verwaarloosbaar.
 - **Werk**: 1,5 dag inclusief prompt-tuning op 10 real-world leads.
-- **Impact**: hoog — open rate 2-3x bij echte personalisatie (industry-benchmark).
+- **Impact**: potentieel hoog — industry-benchmarks (bv. Lemlist case studies) suggereren open rate 1,5-2,5x en reply rate 2-3x bij echte personalisatie. Deze benchmarks zijn van marketing-bedrijven; voor een eenmanszaak-monteur niet gegarandeerd. Meet je eigen resultaat over 20+ mails per arm.
 - **Risico**:
   - LLM kan hallucineren → altijd handmatig controleren voor verzenden.
   - AVG: LLM-provider is verwerker. OpenAI heeft EU-DPA; overleg vooraf.

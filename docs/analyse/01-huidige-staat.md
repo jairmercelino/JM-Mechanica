@@ -202,7 +202,7 @@ Eén worker, vier endpoints:
 |---|---|---|---|
 | **Cloudflare Workers** | Worker | auth, uren-sync, lead-proxy, session store | Gratis (100k req/dag) |
 | **Cloudflare KV** | Worker | `uren`, sessions | Gratis tier |
-| **Serper.dev** | Worker (`/?q=`) | Google-zoekresultaten | Gratis tier (~2500/maand, niet geverifieerd) |
+| **Serper.dev** | Worker (`/?q=`) | Google-zoekresultaten | Gratis: **eenmalig 2500 credits** (6 mnd geldig); betaald $50 voor 50k credits |
 | **Formspree** | public site | Inkomende contact-leads naar mailbox | Gratis 50 submissions/mnd |
 | **Google Drive API** | dashboard (facturen) | PDF-upload naar eigen Drive | Gratis (persoonlijk Drive-quota) |
 | **Google Favicons** | dashboard (lead cards) | Logo's voor leadkaarten | Gratis (ongedocumenteerd endpoint) |
@@ -218,7 +218,7 @@ Geen KvK API, geen CRM (HubSpot/Pipedrive/etc.), geen LinkedIn, geen SMTP-provid
 
 Deze zijn relevant maar heb ik niet kunnen toetsen zonder externe toegang:
 
-1. **Serper.dev-quota** — aangenomen gratis tier ~2500/mnd. Check op serper.dev nodig.
+1. **Serper.dev-quota** — gratis tier is een **eenmalig** 2500-credits-grant (6 mnd geldig), niet maandelijks. Huidig verbruik en of die al op is moet op serper.dev/dashboard bekeken worden.
 2. **Formspree-bestemming** — aangenomen dat submissies naar `info@jmmechanica.nl` gaan. Formspree-dashboard bevestigt dit maar repo toont het niet.
 3. **Google Drive FOLDER_ID** — aangenomen dat deze map nog bestaat en toegankelijk is.
 4. **GitHub Secret `JM_CONFIG_JSON`** — kunnen we niet zien; aangenomen dat die de volledige `jm_config.json` met wachtwoorden bevat (zoals de workflow suggereert).
