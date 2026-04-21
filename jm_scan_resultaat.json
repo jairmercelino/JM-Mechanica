@@ -12,6 +12,15 @@
     {
       "van": "Certos",
       "onderwerp": "Factuur Certos",
+      "datum": "Mon, 20 Apr 2026 12:38:36",
+      "bedrag": "€ 2.058,36",
+      "omschrijving": "Inkomsten hoofdopdrachtgever",
+      "heeft_pdf": true,
+      "inbox": "Hostnet (zakelijk)"
+    },
+    {
+      "van": "Certos",
+      "onderwerp": "Factuur Certos",
       "datum": "Thu, 9 Apr 2026 09:33:52 ",
       "bedrag": "€ 2.138,76",
       "omschrijving": "Inkomsten hoofdopdrachtgever",
