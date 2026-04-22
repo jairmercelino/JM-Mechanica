@@ -33,10 +33,14 @@ jobs:
         env:
           CI: true
 
-      - name: Commit resultaten
+      - name: Upload resultaat naar Worker
         run: |
-          git config user.name "JM Scanner Bot"
-          git config user.email "scanner@jmmechanica.nl"
-          git add jm_scan_resultaat.json
-          git diff --cached --quiet || git commit -m "Auto-scan: $(date +'%d-%m-%Y %H:%M')"
-          git push
+          if [ ! -f jm_scan_resultaat.json ]; then
+            echo "Geen resultaat om te uploaden"
+            exit 0
+          fi
+          curl -sS -X POST https://jm-lead-search.jwz-jjm.workers.dev/scan-result \
+            -H "Content-Type: application/json" \
+            -H "X-Scan-Token: ${{ secrets.SCAN_TOKEN }}" \
+            --data @jm_scan_resultaat.json \
+            --fail-with-body

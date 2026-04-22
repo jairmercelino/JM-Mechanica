@@ -1260,35 +1260,41 @@ async function uploadFactuurNaarDrive(bestandNaam, data, mimeType, kwartaal) {
   }
 }
 
-function laadKostenAutomatisch() {
-  // Laad van GitHub Pages (geen cache)
-  const url = 'https://jairmercelino.github.io/JM-Mechanica/jm_scan_resultaat.json?t=' + Date.now();
-  fetch(url)
-    .then(r => r.ok ? r.json() : null)
-    .then(data => { if(data) toonKosten(data); })
-    .catch(() => {
-      // Fallback naar zelfde domein
-      fetch('/jm_scan_resultaat.json?t=' + Date.now())
-        .then(r => r.ok ? r.json() : null)
-        .then(data => { if(data) toonKosten(data); })
-        .catch(() => {});
-    });
+const SCAN_URL = 'https://jm-lead-search.jwz-jjm.workers.dev/scan-result';
+
+async function laadKostenAutomatisch() {
+  const token = localStorage.getItem('jm_token');
+  if (!token) return;
+  try {
+    const res = await fetch(`${SCAN_URL}?token=${token}&t=${Date.now()}`);
+    if (!res.ok) return;
+    const payload = await res.json();
+    if (payload && payload.data) toonKosten(payload.data);
+  } catch (e) { /* offline of Worker down — stilzwijgend */ }
 }
 
 async function laadVanGoogleDrive() {
   const btn = document.querySelector('[onclick="laadVanGoogleDrive()"]');
   if(btn) { btn.textContent = '⏳ Ophalen...'; btn.disabled = true; }
+  const token = localStorage.getItem('jm_token');
+  if (!token) {
+    if(btn) { btn.textContent = '🔄 Vernieuwen'; btn.disabled = false; }
+    alert('Niet ingelogd.');
+    return;
+  }
   try {
-    const res = await fetch('/jm_scan_resultaat.json?t=' + Date.now());
+    const res = await fetch(`${SCAN_URL}?token=${token}&t=${Date.now()}`);
     if (res.ok) {
-      const data = await res.json();
-      toonKosten(data);
-      if(btn) { btn.textContent = '✅ Geladen!'; setTimeout(()=>{ btn.textContent='🔄 Vernieuwen'; btn.disabled=false; },2000); }
-      return;
+      const payload = await res.json();
+      if (payload && payload.data) {
+        toonKosten(payload.data);
+        if(btn) { btn.textContent = '✅ Geladen!'; setTimeout(()=>{ btn.textContent='🔄 Vernieuwen'; btn.disabled=false; },2000); }
+        return;
+      }
     }
   } catch(e) {}
   if(btn) { btn.textContent = '🔄 Vernieuwen'; btn.disabled = false; }
-  alert('Nog geen scan resultaten. Draai eerst de scanner op je Mac.');
+  alert('Nog geen scan resultaten. De scanner draait dagelijks om 07:00. Handmatig: GitHub → Actions → "Email Scanner" → Run workflow.');
 }
 
 // ── KOSTEN SCANNER IMPORT ──

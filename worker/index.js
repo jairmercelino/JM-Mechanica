@@ -1,15 +1,16 @@
 /**
- * JM Mechanica — Lead Search Proxy + Uren Sync
+ * JM Mechanica — Lead Search Proxy + Uren Sync + Scan Storage
  * Cloudflare Worker die Serper.dev (Google Search) aanroept server-side
- * en uren-data synct via KV storage.
+ * en uren-data + scanner-resultaten synct via KV storage.
  *
  * Secrets (via wrangler secret put):
  *   SERPER_API_KEY — Serper.dev API key
  *   SYNC_PIN — 4-cijferige PIN voor uren sync
  *   DASH_HASH — SHA-256 hash van dashboard wachtwoord
+ *   SCAN_TOKEN — random token voor GitHub Action om scan-resultaat te uploaden
  *
  * KV Namespace:
- *   JM_DATA — opslag voor uren sync
+ *   JM_DATA — opslag voor uren sync, sessies en scan-resultaat
  */
 
 export default {
@@ -19,7 +20,7 @@ export default {
     const corsHeaders = {
       'Access-Control-Allow-Origin': origin === 'http://localhost:3000' || origin.includes('jmmechanica') ? origin : allowed,
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, X-Sync-Pin, X-Auth-Hash',
+      'Access-Control-Allow-Headers': 'Content-Type, X-Sync-Pin, X-Auth-Hash, X-Scan-Token',
       'Access-Control-Max-Age': '86400',
     };
 
@@ -76,6 +77,40 @@ export default {
         return Response.json({ ok: true, token }, { headers: corsHeaders });
       }
       return Response.json({ ok: false }, { status: 401, headers: corsHeaders });
+    }
+
+    // ── SCAN RESULTAAT ──
+    if (path === '/scan-result') {
+      if (!env.JM_DATA) {
+        return Response.json({ error: 'KV niet geconfigureerd' }, { status: 500, headers: corsHeaders });
+      }
+
+      // POST = upload (vanuit GitHub Action) — vereist SCAN_TOKEN
+      if (request.method === 'POST') {
+        const token = request.headers.get('X-Scan-Token');
+        if (!token || token !== env.SCAN_TOKEN) {
+          return Response.json({ error: 'Ongeldige scan token' }, { status: 401, headers: corsHeaders });
+        }
+        const body = await request.json();
+        await env.JM_DATA.put('scan_result', JSON.stringify(body));
+        return Response.json({ ok: true, ts: Date.now() }, { headers: corsHeaders });
+      }
+
+      // GET = ophalen (vanuit dashboard) — vereist geldige sessie
+      if (request.method === 'GET') {
+        const sessionToken = url.searchParams.get('token');
+        if (!sessionToken) {
+          return Response.json({ error: 'Geen sessie token' }, { status: 401, headers: corsHeaders });
+        }
+        const session = await env.JM_DATA.get(`session:${sessionToken}`);
+        if (session !== 'active') {
+          return Response.json({ error: 'Ongeldige sessie' }, { status: 401, headers: corsHeaders });
+        }
+        const data = await env.JM_DATA.get('scan_result', 'json');
+        return Response.json({ data: data || null, ts: Date.now() }, { headers: corsHeaders });
+      }
+
+      return Response.json({ error: 'Alleen GET/POST' }, { status: 405, headers: corsHeaders });
     }
 
     // ── SESSIE CHECK ──
