@@ -314,6 +314,9 @@ tailwind.config = {
     <textarea id="chat-input" placeholder="Stel een vraag..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();verstuurChat();}" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,80)+'px'"></textarea>
     <button id="chat-stuur" onclick="verstuurChat()" title="Versturen">&#10148;</button>
   </div>
+  <div style="padding:6px 14px 10px;font-size:10px;color:#8898aa;text-align:center;background:#fff;border-top:1px solid #f0f3ff;">
+    Door te chatten gaat u akkoord met de <a href="privacy.html" target="_blank" style="color:#f97316;font-weight:600;text-decoration:underline;">privacyverklaring</a>.
+  </div>
 </div>
 
 <script>
