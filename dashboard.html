@@ -2220,6 +2220,8 @@ function genereerEmail(lead, isFollowUp) {
   const bedrijf = lead.titel.replace(/\s*[-–|:].*/g, '').replace(/\s+(BV|B\.V\.|NV|VOF)\.?$/i, '').trim();
   const contactNaam = lead.contactNaam ? `Beste ${lead.contactNaam}` : 'Goedendag';
 
+  const afmeldregel = `\n\n— \nGeen interesse? Antwoord kort met "stop" en ik staak het contact. Meer informatie over privacy: https://jmmechanica.nl/privacy.html`;
+
   if (isFollowUp) {
     const beschikbaar = getBeschikbaarheidTekst();
     const subject = `Re: Samenwerking ${bedrijf}`;
@@ -2235,7 +2237,7 @@ Groet,
 Jair Mercelino
 JM Mechanica
 info@jmmechanica.nl
-jmmechanica.nl`;
+jmmechanica.nl${afmeldregel}`;
     return { subject, body };
   }
 
@@ -2252,7 +2254,7 @@ Groet,
 Jair Mercelino
 JM Mechanica
 info@jmmechanica.nl
-jmmechanica.nl`;
+jmmechanica.nl${afmeldregel}`;
 
   return { subject, body };
 }
