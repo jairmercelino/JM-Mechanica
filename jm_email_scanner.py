@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 """
-JM Mechanica — E-mail scanner met PDF download
+JM Mechanica — E-mail scanner met PDF download naar Google Drive
 Scant beide inboxen, herkent facturen en slaat PDF bijlagen op
-in kwartaal mappen op je Mac. Geen handmatig werk nodig.
+in kwartaal mappen in je Drive-synced folder. Dashboard-status wordt
+geupload naar de Cloudflare Worker (KV).
 
 GEBRUIK:
-  Dubbelklik op START_SCANNER.command
+  Dubbelklik op Scanner.command (handmatig)
+  Of draait automatisch dagelijks via launchd (com.jmmechanica.scanner)
 
 INSTALLATIE (eenmalig):
   pip3 install pypdf --break-system-packages
+  Zie docs/SETUP_SCANNER.md voor Keychain + launchd setup
 """
 
 import imaplib
@@ -20,6 +23,8 @@ import io
 import subprocess
 import webbrowser
 import shutil
+import urllib.request
+import urllib.error
 from email.header import decode_header
 from datetime import datetime
 
@@ -27,11 +32,18 @@ SCRIPT_MAP    = os.path.dirname(os.path.abspath(__file__))
 CONFIG_PAD    = os.path.join(SCRIPT_MAP, 'jm_config.json')
 RESULTAAT_PAD = os.path.join(SCRIPT_MAP, 'jm_scan_resultaat.json')
 DASHBOARD_PAD = os.path.join(SCRIPT_MAP, 'jm_dashboard.html')
-MAPPEN_PAD    = os.path.join(SCRIPT_MAP, 'Facturen')
 
-# ── GITHUB INSTELLINGEN ──
-GITHUB_TOKEN = "GITHUB_TOKEN_HIER"
-GITHUB_REPO  = "jairmercelino/JM-Mechanica"
+# Standaard Drive-synced Facturen-folder (via Google Drive Desktop-app)
+FACTUREN_MAP_DEFAULT = os.path.expanduser(
+    '~/Library/CloudStorage/GoogleDrive-jwz.jjm@gmail.com/Mijn Drive/JM Mechanica/Facturen'
+)
+# Kan via jm_config.json overschreven worden met 'facturen_map'-key.
+# Wordt uiteindelijk gezet in main() na het laden van de config.
+MAPPEN_PAD    = FACTUREN_MAP_DEFAULT
+
+# Cloudflare Worker — status upload (geen PDF)
+WORKER_SCAN_URL = 'https://jm-lead-search.jwz-jjm.workers.dev/scan-result'
+# SCAN_TOKEN wordt uit Keychain gehaald in main()
 
 FACTUUR_PATRONEN = [
     r'factuur\s*#?\s*\d+', r'invoice\s*#?\s*\d+', r'factuurnummer',
@@ -77,21 +89,50 @@ def laad_config():
     with open(CONFIG_PAD, 'r', encoding='utf-8') as f:
         config = json.load(f)
 
-    # Op macOS: wachtwoorden uit Keychain halen als ze niet in config staan
-    is_ci = os.environ.get('CI') == 'true'
-    if not is_ci:
-        keychain_map = {
-            'jwz.jjm@gmail.com': 'jm-scanner-gmail',
-            'info@jmmechanica.nl': 'jm-scanner-hostnet',
-        }
-        for inbox in config.get('inboxen', []):
-            service = keychain_map.get(inbox['adres'])
-            if service:
-                ww = keychain_wachtwoord(inbox['adres'], service)
-                if ww:
-                    inbox['wachtwoord'] = ww
+    # Wachtwoorden uit Keychain halen als ze niet in config staan
+    keychain_map = {
+        'jwz.jjm@gmail.com': 'jm-scanner-gmail',
+        'info@jmmechanica.nl': 'jm-scanner-hostnet',
+    }
+    for inbox in config.get('inboxen', []):
+        service = keychain_map.get(inbox['adres'])
+        if service:
+            ww = keychain_wachtwoord(inbox['adres'], service)
+            if ww:
+                inbox['wachtwoord'] = ww
 
     return config
+
+
+def haal_scan_token():
+    """SCAN_TOKEN uit Keychain. Nodig om JSON naar Worker KV te POSTen."""
+    return keychain_wachtwoord('jm-mechanica', 'jm-scanner-scan-token')
+
+
+def post_naar_worker(data, scan_token):
+    """POST scan-resultaat naar Cloudflare Worker KV."""
+    if not scan_token:
+        print("  ⚠️  Geen SCAN_TOKEN in Keychain — dashboard-sync overgeslagen.")
+        print("     Zet 'm met: security add-generic-password -a jm-mechanica -s jm-scanner-scan-token -w '<token>'")
+        return False
+    try:
+        req = urllib.request.Request(
+            WORKER_SCAN_URL,
+            data=json.dumps(data).encode('utf-8'),
+            headers={
+                'Content-Type': 'application/json',
+                'X-Scan-Token': scan_token,
+            },
+            method='POST',
+        )
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            print(f"  ✓ Dashboard bijgewerkt (HTTP {resp.status})")
+            return True
+    except urllib.error.HTTPError as e:
+        print(f"  ✗ Worker gaf {e.code}: {e.read().decode('utf-8', errors='ignore')[:200]}")
+    except Exception as e:
+        print(f"  ✗ Worker niet bereikt: {e}")
+    return False
 
 
 def datum_naar_kwartaal(datum_str):
@@ -543,8 +584,10 @@ def print_resultaten(alle):
 
 
 def main():
+    global MAPPEN_PAD
+
     print("\n" + "="*62)
-    print("  JM MECHANICA — E-MAIL SCANNER MET PDF DOWNLOAD")
+    print("  JM MECHANICA — FACTUUR SCANNER → DRIVE")
     print(f"  {datetime.now().strftime('%d-%m-%Y %H:%M')}")
     print("="*62)
 
@@ -559,8 +602,19 @@ def main():
     negeerlijst = config_data.get('altijd_negeren', [])
     aantal      = config_data.get('aantal_emails', 150)
 
-    # Maak hoofdmap aan
+    # Facturen-map: config-override (handig om te testen) of Drive default
+    MAPPEN_PAD = config_data.get('facturen_map') or FACTUREN_MAP_DEFAULT
+
+    # Check Drive-folder bereikbaarheid vóór we beginnen
+    parent_bestaat = os.path.isdir(os.path.dirname(MAPPEN_PAD))
+    if not parent_bestaat:
+        print(f"\n  ⚠️  Drive-folder niet bereikbaar: {MAPPEN_PAD}")
+        print("     Google Drive Desktop-app niet ingelogd of pad klopt niet.")
+        print("     Scanner gaat wel door, maar PDF's worden opgeslagen in ~/JM-Mechanica/Facturen/ als fallback.")
+        MAPPEN_PAD = os.path.join(SCRIPT_MAP, 'Facturen')
+
     os.makedirs(MAPPEN_PAD, exist_ok=True)
+    print(f"\n  📂 PDF's → {MAPPEN_PAD}")
 
     alle = {'Inkomsten': [], '100% aftrekbaar': [], 'Deels aftrekbaar': [], 'Onbekende factuur': []}
 
@@ -573,16 +627,19 @@ def main():
 
     with open(RESULTAAT_PAD, 'w', encoding='utf-8') as f:
         json.dump(alle, f, ensure_ascii=False, indent=2)
-    print(f"\nOpgeslagen als: jm_scan_resultaat.json")
+    print(f"\n  💾 Lokale snapshot: {RESULTAAT_PAD}")
 
-    # In CI-modus (GitHub Actions) geen Finder/browser openen
-    if not os.environ.get('CI'):
+    # POST naar Worker (voor dashboard)
+    scan_token = haal_scan_token()
+    post_naar_worker(alle, scan_token)
+
+    # Auto-open Finder als interactief (niet onder launchd of CI)
+    is_interactive = os.isatty(0) if hasattr(os, 'isatty') else True
+    if is_interactive and not os.environ.get('CI') and not os.environ.get('LAUNCH_AGENT'):
         if os.path.exists(MAPPEN_PAD):
             os.system(f'open "{MAPPEN_PAD}"')
-        if os.path.exists(DASHBOARD_PAD):
-            webbrowser.open(f"file://{DASHBOARD_PAD}")
 
-    print("Klaar!\n")
+    print("\nKlaar!\n")
 
 
 if __name__ == "__main__":

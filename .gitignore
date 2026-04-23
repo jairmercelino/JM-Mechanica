@@ -1,3 +1,6 @@
 jm_config.json
+jm_scan_resultaat.json
 Facturen/
 .DS_Store
+.wrangler/
+__pycache__/
