@@ -443,6 +443,8 @@ def scan_inbox(config, afzenders, negeerlijst, aantal):
     genegeerd = 0
     opgeslagen = 0
 
+    debug = os.environ.get('SCANNER_DEBUG') == '1'
+
     for num in reversed(laatste):
         try:
             _, data = mail.fetch(num, '(RFC822)')
@@ -453,7 +455,10 @@ def scan_inbox(config, afzenders, negeerlijst, aantal):
             datum     = datum_raw[:25] if datum_raw else ''
             tekst, pdfs = haal_inhoud(msg)
 
-            if is_reclame(van, onderwerp, tekst, negeerlijst):
+            reclame_match = is_reclame(van, onderwerp, tekst, negeerlijst)
+            if reclame_match:
+                if debug:
+                    print(f"  [SKIP: reclame]        {datum[:10]:10} | {van[:28]:30} | {onderwerp[:45]}")
                 genegeerd += 1
                 continue
 
@@ -462,11 +467,18 @@ def scan_inbox(config, afzenders, negeerlijst, aantal):
                 pdf_tekst += lees_pdf_tekst(pdf_bytes)
 
             if is_reclame('', '', tekst, negeerlijst):
+                if debug:
+                    print(f"  [SKIP: reclame-body]   {datum[:10]:10} | {van[:28]:30} | {onderwerp[:45]}")
                 genegeerd += 1
                 continue
 
             afz = match_afzender(van, onderwerp, tekst, afzenders)
             bedrag = detecteer_bedrag(tekst, pdf_tekst, afzender=van)
+
+            if debug and not afz:
+                factuur_tag = "factuur" if heeft_factuurpatroon(onderwerp, tekst, pdf_tekst) else "geen-factuur"
+                pdf_tag = f"{len(pdfs)}pdf" if pdfs else "geen-pdf"
+                print(f"  [NO MATCH: {factuur_tag:12} {pdf_tag:8}]  {datum[:10]:10} | {van[:28]:30} | {onderwerp[:45]}")
 
             if afz:
                 cat = 'Inkomsten' if afz['cat'] == 'inkomsten' else \
