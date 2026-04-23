@@ -1,5 +1,12 @@
 # Fase 6 — Verbeterplan
 
+> **Status-update (april 2026)**: dit verbeterplan was opgesteld voor de
+> huidige stack (static HTML + Cloudflare Worker + Python scanner).
+> Inmiddels is besloten tot migratie naar Next.js / Supabase / Vercel.
+> Individuele items zijn daarmee grotendeels achterhaald — verbeteringen
+> worden direct in de Next.js-herbouw meegenomen. De inventaris in 01-05
+> blijft relevant als bron voor de herbouw.
+
 *Syntese van Fase 1-5 in concrete actieitems, gesorteerd op impact × haalbaarheid voor één persoon met beperkte tijd.*
 
 ## 0. Leesleidraad
