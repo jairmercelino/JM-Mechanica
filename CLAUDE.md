@@ -146,3 +146,56 @@ In `docs/analyse/` staat een volledige analyse van de huidige stack
   **geen cold mails versturen vanuit het huidige dashboard**.
 - Huiswerk voor eigenaar: Google API key rotation (oude key in git
   history), Mail-Tester DNS-check.
+
+## Geactiveerde skills en plugins
+
+Dit project gebruikt:
+- **Superpowers** (`superpowers@claude-plugins-official` v5.0.7) —
+  skills framework met o.a. `brainstorming`, `test-driven-development`,
+  `systematic-debugging`, `executing-plans`, `dispatching-parallel-agents`,
+  `using-git-worktrees`, `finishing-a-development-branch`.
+- **Frontend-design skill** (`frontend-design@claude-plugins-official`)
+  — voor distinctive UI die niet generiek AI-achtig oogt.
+
+Beide zijn user-scope geïnstalleerd, zichtbaar voor elke sessie in dit
+project.
+
+### Wanneer welke aanpak
+
+Omdat dit een leer-project is én een productie-platform, onderscheid
+ik twee soorten taken:
+
+**Leer-taken / kleine experimenten** (ik wil iets begrijpen of
+uitproberen):
+- Skip de volledige brainstorm/plan-cyclus als ik zeg "snel even" of
+  "laten we proberen".
+- Leg uit wat we doen, maar blokkeer me niet met verplichte tests bij
+  een throwaway experiment.
+- Focus op leren, niet op productie-perfectie.
+
+**Echte feature-bouw** (nieuw onderdeel van het platform):
+- Gebruik de volledige Superpowers-workflow: brainstorm → plan → code
+  → verify.
+- Gebruik TDD waar het zinvol is (utility-functies, logica, formulier-
+  validatie). Voor puur visuele componenten mag TDD worden
+  overgeslagen.
+- Gebruik frontend-design skill voor alle UI-componenten.
+- Review-stap niet overslaan.
+
+**Bug fixes**:
+- Gebruik de `systematic-debugging`-skill, niet gokken.
+- Eerst root cause, dan pas fix.
+
+### Welke taak is welke?
+
+Standaard: behandel een verzoek als leer-taak tenzij ik expliciet zeg
+"dit is een feature" of "dit komt in productie". Bij twijfel: vraag
+het.
+
+### Frontend-design skill gebruik
+
+Activeer automatisch bij:
+- Nieuwe componenten (Header, Hero, Cards, etc.)
+- Pagina-layouts
+- Visuele keuzes (spacing, kleur, typografie)
+- Elke keer dat ik iets "mooi" of "professioneel" wil hebben.
