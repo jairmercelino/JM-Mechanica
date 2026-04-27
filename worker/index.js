@@ -96,8 +96,16 @@ export default {
         return Response.json({ ok: true, ts: Date.now() }, { headers: corsHeaders });
       }
 
-      // GET = ophalen (vanuit dashboard) — vereist geldige sessie
+      // GET = ophalen
       if (request.method === 'GET') {
+        // API-token path (server-side fetch uit Next.js dashboard)
+        const apiToken = request.headers.get('X-Scan-Token');
+        if (apiToken && apiToken === env.SCAN_TOKEN) {
+          const data = await env.JM_DATA.get('scan_result', 'json');
+          return Response.json(data ?? {}, { headers: corsHeaders });
+        }
+
+        // Session-token path (oude dashboard.html flow)
         const sessionToken = url.searchParams.get('token');
         if (!sessionToken) {
           return Response.json({ error: 'Geen sessie token' }, { status: 401, headers: corsHeaders });
