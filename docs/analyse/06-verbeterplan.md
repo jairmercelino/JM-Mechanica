@@ -41,17 +41,15 @@ Cumulatieve werkschatting staat onderaan.
 - **Afhankelijk van**: Cloudflare R2 of KV bij keuze voor server-side opslag.
 - **Meting**: `jm_scan_resultaat.json` niet meer in laatste commit, dashboard toont kostenmetrics nog steeds.
 
-### A2. Google API key in `worker/DEPLOY.md` roteren
-- **Wat**: nieuwe Google API key genereren, oude deactiveren, DEPLOY.md herschrijven naar actuele Serper-flow.
-- **Waarom**: G21 / P4 — key staat in git history.
-- **Hoe**:
-  1. Google Cloud Console → Credentials → verwijder oude key `AIzaSyAM48uGnbdjMn4unW6R4EVC8ueDcEDHLCM`.
-  2. Maak nieuwe key aan (als nog nodig).
-  3. Herschrijf `worker/DEPLOY.md` zodat die de huidige Serper.dev-flow beschrijft (Google CSE wordt niet meer gebruikt).
-  4. Verwijder API-key-literal uit docs.
-- **Werk**: 1u.
-- **Impact**: voorkomt misbruik als iemand git history leest.
-- **Risico**: als de key ergens anders nog actief wordt gebruikt (oude pipelines), breekt die. Check eerst waar hij gebruikt wordt.
+### A2. Google API key in `worker/DEPLOY.md` roteren ✅ *opgelost 2026-04-29*
+- **Wat**: oude Google CSE API key (`AIzaSy...DcEDHLCM`) verwijderd in Google Cloud Console; literal-strings in `worker/DEPLOY.md` vervangen door `[REDACTED]`; deprecation-banner toegevoegd dat Worker nu Serper.dev gebruikt.
+- **Waarom**: G21 / P4 — key stond in git history.
+- **Hoe (uitgevoerd)**:
+  1. Geverifieerd dat key niet meer actief gebruikt werd (Worker draait op Serper, geen CSE-call meer in `worker/index.js`).
+  2. Key verwijderd via Google Cloud Console → Credentials.
+  3. `worker/DEPLOY.md` voorzien van deprecation-banner + key-literal vervangen door `[REDACTED]`.
+  4. Analyse-docs (01, 04) bijgewerkt om resolutie te markeren.
+- **Restpunt**: git history bevat nog de oude key-string, maar die is inactief en niet meer bruikbaar — geen verdere actie nodig.
 - **Afhankelijk van**: toegang Google Cloud Console.
 - **Meting**: `gh` search / git log greppable → geen API-key-literals meer.
 

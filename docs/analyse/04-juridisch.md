@@ -173,7 +173,7 @@ Concreet per module:
 | G20 | CORS-configuratie laat `localhost:3000` toe altijd | Dev-hole in productie | Laag security-risico |
 
 ### 6.5 `worker/DEPLOY.md`
-- **G21**: bevat een gecommitteerde Google API key `AIzaSyAM48uGnbdjMn4unW6R4EVC8ueDcEDHLCM` (r.19) in plaintext. Moet **geroteerd** worden bij Google Cloud. De key staat nu in git history, zelfs als je het bestand nu schoonmaakt.
+- **G21** ✅ *opgelost 2026-04-29*: Google CSE API key (`AIzaSy...DcEDHLCM`) was gecommitteerd in `worker/DEPLOY.md` r.19. Op 2026-04-29 verwijderd in Google Cloud Console; literal-string in DEPLOY.md vervangen door `[REDACTED]`. Git history bevat nog de oude waarde, maar die is nu inactief en niet meer bruikbaar.
 
 ## 7. Specifiek risico `jm_scan_resultaat.json` in publiek repo
 

@@ -227,7 +227,7 @@ Deze zijn relevant maar heb ik niet kunnen toetsen zonder externe toegang:
 ## 7. Opmerkelijke bevindingen voor volgende fases
 
 - **S1 Lek-risico in `~/Desktop/JM/jm_config.json`**: plaintext wachtwoorden voor Gmail en Hostnet op lokale schijf. Niet in git, maar wel kwetsbaar bij backup/sync naar iCloud/Time Machine. Actie: verwijderen of verplaatsen naar Keychain. Ter info: de repo-kopie is schoon.
-- **S2 Stale docs**: `worker/DEPLOY.md` beschrijft Google CSE + committeert een API-key literal (r. 19: `AIzaSyAM48uGnbdjMn4unW6R4EVC8ueDcEDHLCM`) en CSE-id. Die key staat in git history ongeacht of hij nog werkt; moet geroteerd worden als hij nog bestaat.
+- **S2 Stale docs** ✅ *opgelost 2026-04-29*: `worker/DEPLOY.md` beschreef Google CSE + committeerde een API-key literal (`AIzaSy...DcEDHLCM`) en CSE-id. Op 2026-04-29 key verwijderd in Google Cloud, literal-strings in DEPLOY.md vervangen door `[REDACTED]`, deprecation-banner toegevoegd dat Worker nu Serper.dev gebruikt. Git history bevat nog oude waarde maar die is inactief.
 - **S3 Chatbot-leads onbereikbaar**: `localStorage.jm_leads` op bezoekersbrowser wordt nergens benut. Alle dashboard-leads komen uit de zoeker, niet uit de chatbot. Dat is een verspilling van de chatbot-score + gespreksgeschiedenis — die context bereikt Jair niet of alleen in de Formspree-mail.
 - **S4 "Data-single-device"**: op een nieuw apparaat inloggen → leeg dashboard behalve uren. Leads, rooster, opdrachtgevers, facturen-cache gaan niet mee. Mogelijke bug of bewuste keuze.
 - **S5 Scanner mist Certos-bedrag soms**: `jm_scan_resultaat.json` toont 1 Certos-regel met `"bedrag": "onbekend"` — de patronen uit `CERTOS_PATRONEN` (r.307-311) vangen niet alle gevallen.

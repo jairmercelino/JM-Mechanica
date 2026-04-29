@@ -1,5 +1,10 @@
 # JM Lead Search Worker — Deploy Instructies
 
+> **STALE — 2026-04-29**: Deze instructies beschrijven de oude
+> Google Custom Search opzet. De Worker draait nu op Serper.dev
+> (zie `index.js`). De Google CSE-key + CSE-id hieronder zijn
+> geroteerd/verwijderd in Google Cloud op 2026-04-29.
+
 ## Wat is dit?
 Een Cloudflare Worker die als proxy dient voor de Google Custom Search API.
 Je API key blijft veilig server-side (niet zichtbaar in de browser).
@@ -16,8 +21,8 @@ wrangler login
 
 ## Stap 3: Google API key klaarzetten
 Je hebt nodig:
-- **GOOGLE_API_KEY** — je bestaande key: `AIzaSyAM48uGnbdjMn4unW6R4EVC8ueDcEDHLCM`
-- **GOOGLE_CSE_ID** — je bestaande ID: `55ca75ab176604574`
+- **GOOGLE_API_KEY** — je bestaande key: `[REDACTED — rotated 2026-04-29]`
+- **GOOGLE_CSE_ID** — je bestaande ID: `[REDACTED — rotated 2026-04-29]`
 
 **Belangrijk:** Ga naar https://console.cloud.google.com
 1. Selecteer je project
@@ -36,10 +41,10 @@ wrangler deploy
 ## Stap 5: Secrets instellen
 ```bash
 wrangler secret put GOOGLE_API_KEY
-# Plak: AIzaSyAM48uGnbdjMn4unW6R4EVC8ueDcEDHLCM
+# Plak: [REDACTED — rotated 2026-04-29]
 
 wrangler secret put GOOGLE_CSE_ID
-# Plak: 55ca75ab176604574
+# Plak: [REDACTED — rotated 2026-04-29]
 ```
 
 ## Stap 6: Testen
