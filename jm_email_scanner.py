@@ -584,15 +584,158 @@ def print_resultaten(alle):
     print(f"  Geschat terug:        € {schat:,.2f}".replace(',','X').replace('.',',').replace('X','.'))
     print(f"{'='*62}")
 
-    # Toon welke mappen zijn aangemaakt
-    if os.path.exists(MAPPEN_PAD):
-        mappen = sorted([m for m in os.listdir(MAPPEN_PAD) if os.path.isdir(os.path.join(MAPPEN_PAD, m))])
-        if mappen:
-            print(f"\n  PDF's opgeslagen in: {MAPPEN_PAD}")
-            for m in mappen:
-                map_pad = os.path.join(MAPPEN_PAD, m)
-                bestanden = [f for f in os.listdir(map_pad) if f.endswith('.pdf')]
-                print(f"  {m}/ — {len(bestanden)} PDF('s)")
+    # Toon welke mappen zijn aangemaakt. Puur informatief — als de Drive-
+    # folder niet leesbaar is vanuit de launchd-context (macOS Full Disk
+    # Access geldt per-proces, en een achtergrond-launchd-job heeft 'm soms
+    # niet terwijl een interactieve terminal-run wel werkt), mag dat de rest
+    # van main() niet blokkeren. Elke run tot nu toe crashte hier, wat
+    # betekende dat post_naar_worker() en verkade_sync() daarna NOOIT
+    # bereikt werden — de PDF's zelf werden al eerder in main() geschreven,
+    # dus die zijn niet het probleem, dit stukje samenvatting wel.
+    try:
+        if os.path.exists(MAPPEN_PAD):
+            mappen = sorted([m for m in os.listdir(MAPPEN_PAD) if os.path.isdir(os.path.join(MAPPEN_PAD, m))])
+            if mappen:
+                print(f"\n  PDF's opgeslagen in: {MAPPEN_PAD}")
+                for m in mappen:
+                    map_pad = os.path.join(MAPPEN_PAD, m)
+                    bestanden = [f for f in os.listdir(map_pad) if f.endswith('.pdf')]
+                    print(f"  {m}/ — {len(bestanden)} PDF('s)")
+    except OSError as e:
+        print(f"\n  ⚠️  Kon Drive-map niet uitlezen voor samenvatting ({e}) — niet blokkerend, ga door.")
+
+
+# ── VERKADE MAIL-SYNC ──
+# Zoekt de nieuwste "Geaccordeerde werkzaamheden tbv Verkade"-mail (pladis)
+# op, plus de bijbehorende ingediende-uren-PDF, en post beide naar de
+# /api/verkade-sync-route op jmmechanica.nl. Die route schrijft alleen naar
+# een staging-tabel — de echte import gebeurt pas als Jair op "Importeer"
+# klikt in de browser (zelfde pad als een handmatige upload).
+
+VERKADE_SYNC_URL = 'https://jmmechanica.nl/api/verkade-sync'
+VERKADE_STATE_PAD = os.path.join(SCRIPT_MAP, 'jm_verkade_state.json')
+VERKADE_HOSTNET_ADRES = 'info@jmmechanica.nl'
+VERKADE_PARTNER_ADRES = 'jair.mercelino@partner.pladisglobal.com'
+
+
+def verkade_sync_token():
+    """Aparte token voor de nieuwe /api/verkade-sync-route (niet SCAN_TOKEN)."""
+    return keychain_wachtwoord('jm-mechanica', 'jm-scanner-verkade-sync-token')
+
+
+def laad_verkade_state():
+    if os.path.exists(VERKADE_STATE_PAD):
+        with open(VERKADE_STATE_PAD, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    return {}
+
+
+def bewaar_verkade_state(state):
+    with open(VERKADE_STATE_PAD, 'w', encoding='utf-8') as f:
+        json.dump(state, f)
+
+
+def verkade_sync():
+    """Eén run: check op een nieuwe pladis-goedkeuringsmail, post naar de website."""
+    token = verkade_sync_token()
+    if not token:
+        print("\n  ⚠️  Verkade-sync overgeslagen — geen VERKADE_SYNC_TOKEN in Keychain.")
+        print("     Zet 'm met: security add-generic-password -a jm-mechanica -s jm-scanner-verkade-sync-token -w '<token>'")
+        return
+
+    wachtwoord = keychain_wachtwoord(VERKADE_HOSTNET_ADRES, 'jm-scanner-hostnet')
+    if not wachtwoord:
+        return
+
+    state = laad_verkade_state()
+
+    try:
+        mail = imaplib.IMAP4_SSL('imap.hostnet.nl', 993)
+        mail.login(VERKADE_HOSTNET_ADRES, wachtwoord)
+        mail.select('INBOX')
+    except Exception as e:
+        print(f"\n  ⚠️  Verkade-sync: kon niet inloggen ({e})")
+        return
+
+    print("\n  🔄 Verkade-sync: zoeken naar nieuwe goedkeuringsmail...")
+
+    _, data = mail.search(None, '(SUBJECT "Geaccordeerde werkzaamheden tbv Verkade")')
+    ids = data[0].split()
+    if not ids:
+        print("     Geen goedkeuringsmail gevonden.")
+        mail.logout()
+        return
+
+    nieuwste_id = ids[-1].decode()
+    if state.get('laatste_verwerkte_id') == nieuwste_id:
+        print("     Nieuwste goedkeuringsmail is al verwerkt, niks te doen.")
+        mail.logout()
+        return
+
+    _, msgdata = mail.fetch(ids[-1], '(RFC822)')
+    approval_msg = email.message_from_bytes(msgdata[0][1])
+    approval_datum = approval_msg.get('Date', '')
+
+    tekst, _pdfs = haal_inhoud(approval_msg)
+    ref_match = re.search(r'Factuurreferentie[^\n]*?([A-Za-z0-9/_-]+)\s*$', tekst, re.MULTILINE)
+    referentie = ref_match.group(1).strip() if ref_match else None
+
+    csv_text = None
+    for deel in approval_msg.walk():
+        fn = decode_str(deel.get_filename('') or '')
+        if fn.lower().endswith('.csv'):
+            payload = deel.get_payload(decode=True)
+            if payload:
+                csv_text = payload.decode('utf-8', errors='ignore')
+            break
+
+    if not csv_text:
+        print("     Goedkeuringsmail gevonden maar geen CSV-bijlage — overgeslagen.")
+        mail.logout()
+        return
+
+    # Zoek de meest recente ingediende-uren-PDF van Jair's partner-adres.
+    pdf_base64 = None
+    _, submit_ids = mail.search(None, f'(FROM "{VERKADE_PARTNER_ADRES}")')
+    submit_ids = submit_ids[0].split()
+    for sid in reversed(submit_ids[-5:]):
+        _, sdata = mail.fetch(sid, '(RFC822)')
+        submit_msg = email.message_from_bytes(sdata[0][1])
+        for deel in submit_msg.walk():
+            fn = decode_str(deel.get_filename('') or '')
+            if fn.lower().endswith('.pdf'):
+                payload = deel.get_payload(decode=True)
+                if payload:
+                    import base64
+                    pdf_base64 = base64.b64encode(payload).decode('ascii')
+                break
+        if pdf_base64:
+            break
+
+    mail.logout()
+
+    body = {
+        'ontvangen_op': approval_datum or datetime.now().isoformat(),
+        'referentie': referentie,
+        'csv_text': csv_text,
+        'pdf_base64': pdf_base64,
+    }
+
+    try:
+        req = urllib.request.Request(
+            VERKADE_SYNC_URL,
+            data=json.dumps(body).encode('utf-8'),
+            headers={'Content-Type': 'application/json', 'X-Sync-Token': token},
+            method='POST',
+        )
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            print(f"     ✓ Naar website gestuurd (HTTP {resp.status})")
+        state['laatste_verwerkte_id'] = nieuwste_id
+        bewaar_verkade_state(state)
+    except urllib.error.HTTPError as e:
+        print(f"     ✗ Website gaf {e.code}: {e.read().decode('utf-8', errors='ignore')[:200]}")
+    except Exception as e:
+        print(f"     ✗ Kon website niet bereiken: {e}")
 
 
 def main():
@@ -644,6 +787,9 @@ def main():
     # POST naar Worker (voor dashboard)
     scan_token = haal_scan_token()
     post_naar_worker(alle, scan_token)
+
+    # Verkade mail-sync (aparte klant-facturatie-flow, eigen token)
+    verkade_sync()
 
     # Auto-open Finder als interactief (niet onder launchd of CI)
     is_interactive = os.isatty(0) if hasattr(os, 'isatty') else True
